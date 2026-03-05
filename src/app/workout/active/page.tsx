@@ -5,9 +5,82 @@ import { Check, Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { customFetch } from '@/lib/api-client'
+import { cn } from '@/lib/utils'
+
+function SetRow({ index, isCompleted: initialCompleted }: { index: number, isCompleted?: boolean }) {
+    const [weight, setWeight] = useState(index === 1 ? "60" : "")
+    const [reps, setReps] = useState(index === 1 ? "12" : "")
+    const [isCompleted, setIsCompleted] = useState(initialCompleted || false)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleSave = async () => {
+        if (!weight || !reps) return
+        setIsLoading(true)
+        try {
+            // Mock workoutExerciseId - in a real app this comes from the active session context
+            const mockId = "00000000-0000-0000-0000-000000000000"
+            await customFetch('/api/sets', {
+                method: 'POST',
+                body: [{
+                    workoutExerciseId: mockId,
+                    setIndex: index,
+                    weight: parseFloat(weight),
+                    reps: parseInt(reps, 10),
+                }]
+            })
+            // Optimistically mark as completed, even if queued offline!
+            setIsCompleted(true)
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    return (
+        <div className={cn("grid grid-cols-[3rem_1fr_1fr_4rem] gap-2 items-center rounded-xl p-2 transition-colors", isCompleted ? "bg-primary/10" : "bg-secondary/40")}>
+            <div className={cn("text-center text-[15px] font-bold", isCompleted ? "text-primary" : "text-muted-foreground")}>{index}</div>
+            <Input
+                type="number"
+                value={weight}
+                onChange={e => setWeight(e.target.value)}
+                placeholder="60"
+                disabled={isCompleted}
+                className={cn("h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none", isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground")}
+            />
+            <Input
+                type="number"
+                value={reps}
+                onChange={e => setReps(e.target.value)}
+                placeholder="10"
+                disabled={isCompleted}
+                className={cn("h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none", isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground")}
+            />
+            <div className="flex justify-end pr-1">
+                <Button
+                    onClick={handleSave}
+                    disabled={isCompleted || isLoading || !weight || !reps}
+                    size="icon"
+                    variant={isCompleted ? "default" : "outline"}
+                    className={cn(
+                        "h-9 w-9 rounded-[10px]",
+                        isCompleted ? "bg-primary text-primary-foreground border-0" : "bg-secondary/80 text-muted-foreground border-white/10"
+                    )}
+                >
+                    <Check className={cn("h-5 w-5", isLoading && "animate-pulse")} />
+                </Button>
+            </div>
+        </div>
+    )
+}
 
 export default function ActiveWorkout() {
-    const [timer, setTimer] = useState<number | null>(null)
+    const [sets, setSets] = useState([{ id: 1, isCompleted: true }, { id: 2, isCompleted: false }])
+
+    const addSet = () => {
+        setSets(prev => [...prev, { id: prev.length + 1, isCompleted: false }])
+    }
 
     return (
         <div className="min-h-screen bg-background pb-32">
@@ -39,31 +112,11 @@ export default function ActiveWorkout() {
                         </div>
 
                         <div className="space-y-1 p-2 pt-0">
-                            {/* Set 1: Completed */}
-                            <div className="grid grid-cols-[3rem_1fr_1fr_4rem] gap-2 items-center bg-primary/10 rounded-xl p-2 transition-colors">
-                                <div className="text-center text-[15px] font-bold text-primary">1</div>
-                                <Input type="number" defaultValue="60" className="h-11 text-[16px] text-center font-semibold bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none" />
-                                <Input type="number" defaultValue="12" className="h-11 text-[16px] text-center font-semibold bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none" />
-                                <div className="flex justify-end pr-1">
-                                    <Button size="icon" className="h-9 w-9 rounded-[10px] bg-primary text-primary-foreground">
-                                        <Check className="h-5 w-5" />
-                                    </Button>
-                                </div>
-                            </div>
+                            {sets.map((set) => (
+                                <SetRow key={set.id} index={set.id} isCompleted={set.isCompleted} />
+                            ))}
 
-                            {/* Set 2: Active */}
-                            <div className="grid grid-cols-[3rem_1fr_1fr_4rem] gap-2 items-center bg-secondary/40 rounded-xl p-2 transition-colors">
-                                <div className="text-center text-[15px] font-bold text-muted-foreground">2</div>
-                                <Input type="number" placeholder="60" className="h-11 text-[16px] text-center font-semibold bg-secondary/80 border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none" />
-                                <Input type="number" placeholder="10" className="h-11 text-[16px] text-center font-semibold bg-secondary/80 border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none" />
-                                <div className="flex justify-end pr-1">
-                                    <Button size="icon" variant="outline" className="h-9 w-9 rounded-[10px] border-white/10 bg-secondary/80 text-muted-foreground">
-                                        <Check className="h-5 w-5" />
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <Button variant="ghost" className="w-full h-11 text-[13px] font-semibold text-primary hover:bg-primary/5 mt-2 rounded-xl">
+                            <Button onClick={addSet} variant="ghost" className="w-full h-11 text-[13px] font-semibold text-primary hover:bg-primary/5 mt-2 rounded-xl">
                                 <Plus className="mr-1 h-4 w-4" /> SATZ HINZUFÜGEN
                             </Button>
                         </div>
