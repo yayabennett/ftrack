@@ -1,11 +1,94 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  
+  exercises   Exercise[]
+  templates   Template[]
+  sessions    WorkoutSession[]
+}
+
+model Exercise {
+  id          String   @id @default(uuid())
+  name        String
+  muscleGroup String?
+  equipment   String?
+  isCustom    Boolean  @default(false)
+  notes       String?
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  
+  templateExercises TemplateExercise[]
+  workoutExercises  WorkoutExercise[]
+}
+
+model Template {
+  id        String   @id @default(uuid())
+  name      String
+  order     Int      @default(0)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  exercises TemplateExercise[]
+  sessions  WorkoutSession[]
+}
+
+model TemplateExercise {
+  id          String   @id @default(uuid())
+  templateId  String
+  exerciseId  String
+  order       Int
+  targetSets  Int?
+  repRange    String?  // e.g. "8-12"
+  notes       String?
+  
+  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  exercise    Exercise @relation(fields: [exerciseId], references: [id])
+}
+
+model WorkoutSession {
+  id         String    @id @default(uuid())
+  startedAt  DateTime  @default(now())
+  endedAt    DateTime?
+  templateId String?
+  notes      String?
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id])
+  template   Template? @relation(fields: [templateId], references: [id])
+  
+  exercises  WorkoutExercise[]
+}
+
+model WorkoutExercise {
+  id         String   @id @default(uuid())
+  sessionId  String
+  exerciseId String
+  order      Int
+  
+  session    WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exercise   Exercise       @relation(fields: [exerciseId], references: [id])
+  sets       SetEntry[]
+}
+
+model SetEntry {
+  id                String   @id @default(uuid())
+  workoutExerciseId String
+  setIndex          Int
+  weight            Float
+  reps              Int
+  rpe               Float?
+  isWarmup          Boolean  @default(false)
+  note              String?
+  createdAt         DateTime @default(now())
+  
+  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
 }
