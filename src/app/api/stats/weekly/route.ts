@@ -24,9 +24,9 @@ export async function GET() {
         let totalVolume = 0
         let totalSets = 0
 
-        sessions.forEach(session => {
-            session.exercises.forEach(ex => {
-                ex.sets.forEach(set => {
+        sessions.forEach((session: any) => {
+            session.exercises.forEach((ex: any) => {
+                ex.sets.forEach((set: any) => {
                     totalVolume += (set.weight * set.reps)
                     totalSets += 1
                 })

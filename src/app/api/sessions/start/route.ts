@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
             if (templateExercises.length > 0) {
                 await prisma.workoutExercise.createMany({
-                    data: templateExercises.map(te => ({
+                    data: templateExercises.map((te: any) => ({
                         sessionId: session.id,
                         exerciseId: te.exerciseId,
                         order: te.order

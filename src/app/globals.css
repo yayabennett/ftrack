@@ -4,11 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Tailwind v4 token mapping (shadcn expects these) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -17,27 +19,38 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
+
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
+
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
+
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -47,86 +60,185 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* Light mode (optional – sauber, nicht blendend) */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+
+  --background: oklch(0.99 0.003 255);
+  --foreground: oklch(0.18 0.01 255);
+
+  --card: oklch(0.995 0.002 255);
+  --card-foreground: oklch(0.18 0.01 255);
+
+  --popover: oklch(0.995 0.002 255);
+  --popover-foreground: oklch(0.18 0.01 255);
+
+  --primary: oklch(0.44 0.18 256);
+  --primary-foreground: oklch(0.99 0.003 255);
+
+  --secondary: oklch(0.965 0.005 255);
+  --secondary-foreground: oklch(0.22 0.01 255);
+
+  --muted: oklch(0.965 0.005 255);
+  --muted-foreground: oklch(0.52 0.02 255);
+
+  --accent: oklch(0.965 0.005 255);
+  --accent-foreground: oklch(0.22 0.01 255);
+
+  --destructive: oklch(0.58 0.23 27.3);
+  --destructive-foreground: oklch(0.99 0.003 255);
+
+  --border: oklch(0.92 0.01 255);
+  --input: oklch(0.97 0.006 255);
+  --ring: oklch(0.58 0.16 256 / 0.45);
+
+  --chart-1: oklch(0.55 0.19 256);
+  --chart-2: oklch(0.6 0.14 240);
+  --chart-3: oklch(0.48 0.09 230);
+  --chart-4: oklch(0.72 0.12 265);
+  --chart-5: oklch(0.66 0.16 256);
+
+  --sidebar: oklch(0.985 0.003 255);
+  --sidebar-foreground: oklch(0.18 0.01 255);
+  --sidebar-primary: oklch(0.44 0.18 256);
+  --sidebar-primary-foreground: oklch(0.99 0.003 255);
+  --sidebar-accent: oklch(0.965 0.005 255);
+  --sidebar-accent-foreground: oklch(0.22 0.01 255);
+  --sidebar-border: oklch(0.92 0.01 255);
+  --sidebar-ring: oklch(0.58 0.16 256 / 0.45);
+
+  color-scheme: light;
 }
 
+/* Dark Navy SaaS theme (clean, layered, no glow spam) */
 .dark {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.15 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.15 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: #84cc16;
-  --primary-foreground: #000000;
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: #84cc16;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #84cc16;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #84cc16;
+  /* Base layers */
+  --background: #070A12;
+  /* very dark navy */
+  --foreground: #F1F5F9;
+  /* slate-100 */
+
+  --card: #0B1222;
+  /* primary surface */
+  --card-foreground: #F1F5F9;
+
+  --popover: #0B1222;
+  --popover-foreground: #F1F5F9;
+
+  /* Brand */
+  --primary: #2B6FFF;
+  /* crisp SaaS blue */
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary layers (buttons, chips, subtle panels) */
+  --secondary: #0E1730;
+  /* a bit brighter than card */
+  --secondary-foreground: #F1F5F9;
+
+  --muted: #0A1224;
+  /* muted background */
+  --muted-foreground: #94A3B8;
+  /* slate-400 */
+
+  --accent: #0E1730;
+  --accent-foreground: #F1F5F9;
+
+  /* System */
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  /* Lines + inputs (hairline feel) */
+  --border: #182443;
+  /* navy border */
+  --input: #0E1730;
+  /* input fill */
+  --ring: rgba(43, 111, 255, 0.45);
+
+  /* Charts (monochrome-blue friendly) */
+  --chart-1: #2B6FFF;
+  --chart-2: #245FE0;
+  --chart-3: #1B49B8;
+  --chart-4: #6FA3FF;
+  --chart-5: #3F7DFF;
+
+  /* Sidebar */
+  --sidebar: #0B1222;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #2B6FFF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #0E1730;
+  --sidebar-accent-foreground: #F1F5F9;
+  --sidebar-border: #182443;
+  --sidebar-ring: rgba(43, 111, 255, 0.45);
+
+  --radius: 0.75rem;
+
+  color-scheme: dark;
 }
 
+/* Small utility set for "app feeling" */
 @layer utilities {
-  .action-glow {
-    box-shadow: 0 0 15px rgba(132, 204, 22, 0.5);
+
+  /* Press feedback without glow */
+  .action-press {
+    @apply transition-transform duration-150 active:scale-[0.98];
+  }
+
+  /* Hairline borders that look premium on dark */
+  .hairline {
+    border-color: color-mix(in srgb, var(--border) 85%, transparent);
+  }
+
+  /* Soft elevation for cards/sheets (subtle) */
+  .shadow-soft {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.03) inset,
+      0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  /* iOS-like sheet backdrop */
+  .backdrop-dim {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
   }
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Selection looks clean on navy */
+  ::selection {
+    background: rgba(43, 111, 255, 0.28);
+  }
+
+  /* Focus ring: crisp, SaaS-clean */
+  :where(button, a, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 0 0 4px var(--ring);
+    border-radius: var(--radius);
+  }
+
+  /* Inputs: subtle border + better hover */
+  input,
+  textarea,
+  select {
+    transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  :where(input, textarea, select):hover {
+    border-color: color-mix(in srgb, var(--border) 75%, var(--primary) 25%);
   }
 }
