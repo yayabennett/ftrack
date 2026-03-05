@@ -1,4 +1,4 @@
-import { Plus, User } from 'lucide-react'
+import { Plus, User, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -6,7 +6,10 @@ export default function TemplatesPage() {
     return (
         <div className="min-h-screen bg-background pb-24">
             <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
-                <h1 className="text-[22px] font-bold tracking-tight text-foreground">Vorlagen</h1>
+                <div className="flex items-center gap-2">
+                    <Copy className="h-5 w-5 text-primary" />
+                    <h1 className="text-[22px] font-bold tracking-tight text-foreground">Vorlagen</h1>
+                </div>
                 <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-secondary text-foreground hover:bg-secondary/80">
                     <Plus className="h-5 w-5" />
                 </Button>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Dumbbell, Plus } from 'lucide-react'
+import { Dumbbell, Plus, Copy } from 'lucide-react'
 import prisma from '@/lib/prisma'
 
 // This is now a React Server Component (RSC)
@@ -50,17 +50,12 @@ export default async function Home() {
         </div>
       </header>
 
-      <div className="container mx-auto p-4 space-y-8 animate-in fade-in duration-300">
-        <section>
-          <Link href="/workout/active" className="block w-full">
-            <Button className="w-full h-14 text-[17px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-2">
-              <Plus className="h-5 w-5" /> Training starten
-            </Button>
-          </Link>
-        </section>
-
+      <div className="container mx-auto p-4 pt-6 space-y-8 animate-in fade-in duration-300">
         <section className="space-y-3">
-          <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase px-1">Vorlagen</h2>
+          <div className="flex items-center gap-2 px-1">
+            <Copy className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase">Vorlagen</h2>
+          </div>
           {templates.length === 0 ? (
             <p className="text-sm text-muted-foreground px-1">Keine Vorlagen gefunden.</p>
           ) : (
