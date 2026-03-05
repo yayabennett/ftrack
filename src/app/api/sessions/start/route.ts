@@ -40,7 +40,11 @@ export async function POST(request: Request) {
                     }
                 },
                 include: {
-                    exercises: true
+                    exercises: {
+                        include: {
+                            exercise: true
+                        }
+                    }
                 }
             })
 

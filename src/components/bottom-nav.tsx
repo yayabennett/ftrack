@@ -10,7 +10,7 @@ export function BottomNav() {
 
     const navItems = [
         { name: 'Home', href: '/', icon: Home },
-        { name: 'Vorlagen', href: '/templates', icon: Copy },
+        { name: 'Einheiten', href: '/templates', icon: Copy },
         { name: 'Start', href: '/workout/active', icon: Plus, isAction: true },
         { name: 'Statistiken', href: '/stats', icon: BarChart2 },
         { name: 'Profil', href: '/settings', icon: User },

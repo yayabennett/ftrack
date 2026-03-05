@@ -156,7 +156,7 @@ export default async function Home() {
           <div className="px-5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Copy className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase">Schnellstart</h2>
+              <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase">Einheiten</h2>
             </div>
             <Link href="/templates" className="text-[11px] font-bold text-primary hover:underline underline-offset-4">ALLE ANSEHEN</Link>
           </div>
@@ -165,7 +165,7 @@ export default async function Home() {
             {templates.length === 0 ? (
               <Card className="min-w-[240px] bg-secondary/30 ring-1 ring-white/5 border-0 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2">
                 <Plus className="w-6 h-6 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground font-medium">Noch keine Vorlagen</p>
+                <p className="text-xs text-muted-foreground font-medium">Noch keine Einheiten</p>
               </Card>
             ) : templates.map(template => (
               <Link key={template.id} href="/workout/active" className="min-w-[170px] active:scale-95 transition-transform">

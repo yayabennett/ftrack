@@ -1,48 +1,69 @@
 "use client"
 
-import { useEffect } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { Plus, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { WorkoutTimer } from '@/components/workout/workout-timer'
 import { SetRow } from '@/components/workout/set-row'
 import { useWorkoutStore } from '@/store/use-workout-store'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function ActiveWorkout() {
+function WorkoutContent() {
     const router = useRouter()
-    const { isActive, startedAt, exercises, startWorkout, endWorkout, addSet, addExercise } = useWorkoutStore()
+    const searchParams = useSearchParams()
+    const templateId = searchParams.get('templateId')
+    const { isActive, startedAt, exercises, startWorkout, endWorkout, addSet } = useWorkoutStore()
+    const [isLoading, setIsLoading] = useState(!isActive)
 
-    // Debug Mock: Auto-Start Workout for development if not active
     useEffect(() => {
+        // Only fetch if session is not active
         if (!isActive) {
-            startWorkout("mock-session-uuid", [
-                {
-                    id: "mock-workout-exercise-uuid",
-                    exerciseId: "mock-exercise-uuid",
-                    name: "Bankdrücken (Langhantel)",
-                    order: 0,
-                    sets: [{
-                        id: "mock-set-id-1",
-                        workoutExerciseId: "mock-workout-exercise-uuid",
-                        setIndex: 1,
-                        weight: 60,
-                        reps: 12,
-                        isCompleted: true
-                    }]
+            const initSession = async () => {
+                try {
+                    const res = await fetch('/api/sessions/start', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ templateId })
+                    })
+
+                    if (res.ok) {
+                        const session = await res.json()
+                        // Map API structure to Zustand store structure
+                        const mappedExercises = session.exercises ? session.exercises.map((ex: any) => ({
+                            id: ex.id,
+                            exerciseId: ex.exerciseId,
+                            name: ex.exercise?.name || 'Unbekannte Übung',
+                            order: ex.order,
+                            sets: [] // Initialize empty sets or use API returned sets
+                        })) : []
+
+                        startWorkout(session.id, mappedExercises)
+                    }
+                } catch (error) {
+                    console.error("Failed to start session:", error)
+                } finally {
+                    setIsLoading(false)
                 }
-            ])
+            }
+
+            initSession()
+        } else {
+            setIsLoading(false)
         }
-    }, [isActive, startWorkout])
+    }, [isActive, startWorkout, templateId])
 
     const handleEndWorkout = () => {
-        // Implement end session API call here
+        // In a real app, call POST /api/sessions/[id]/finish here
         endWorkout()
         router.push('/')
     }
 
-    if (!isActive) {
-        return <div className="min-h-screen bg-background flex justify-center items-center">Lädt Workout...</div>
+    if (isLoading) {
+        return <div className="min-h-screen bg-background flex flex-col justify-center items-center text-muted-foreground gap-4">
+            <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+            <p className="font-bold tracking-widest uppercase text-xs">Einheit wird vorbereitet...</p>
+        </div>
     }
 
     return (
@@ -53,12 +74,16 @@ export default function ActiveWorkout() {
                     <WorkoutTimer startedAt={startedAt} />
                 </div>
                 <Button onClick={handleEndWorkout} variant="default" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-4 h-8 rounded-full shadow-sm">
-                    Einheit beenden
+                    Beenden
                 </Button>
             </div>
 
             <div className="container mx-auto p-4 space-y-6 animate-in slide-in-from-bottom-8 duration-300">
-
+                {exercises.length === 0 && (
+                    <div className="text-center text-sm text-muted-foreground italic mt-10">
+                        Keine Übungen in dieser Einheit. Füge unten eine hinzu.
+                    </div>
+                )}
                 {exercises.map((exercise) => (
                     <Card key={exercise.id} className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
                         <CardHeader className="bg-secondary/50 p-3 flex flex-row items-center justify-between border-b border-white/5">
@@ -76,7 +101,7 @@ export default function ActiveWorkout() {
                             </div>
 
                             <div className="space-y-1 p-2 pt-0">
-                                {exercise.sets.map((set) => (
+                                {exercise.sets && exercise.sets.map((set) => (
                                     <SetRow key={set.id} exerciseId={exercise.id} setEntry={set} />
                                 ))}
 
@@ -94,5 +119,13 @@ export default function ActiveWorkout() {
                 </Button>
             </div>
         </div>
+    )
+}
+
+export default function ActiveWorkout() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-background flex flex-col justify-center items-center"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" /></div>}>
+            <WorkoutContent />
+        </Suspense>
     )
 }
