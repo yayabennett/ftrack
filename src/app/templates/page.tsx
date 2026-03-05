@@ -1,19 +1,19 @@
-import { Plus } from 'lucide-react'
+import { Plus, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
 export default function TemplatesPage() {
     return (
-        <div className="container mx-auto p-4 space-y-6 pb-24 animate-in fade-in duration-300">
-            <header className="flex items-center justify-between pt-4">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Vorlagen</h1>
-                <Button size="icon" variant="ghost" className="rounded-full text-primary hover:text-primary hover:bg-primary/10 w-10 h-10">
-                    <Plus className="h-6 w-6" />
+        <div className="min-h-screen bg-background pb-24">
+            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
+                <h1 className="text-[22px] font-bold tracking-tight text-foreground">Vorlagen</h1>
+                <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-secondary text-foreground hover:bg-secondary/80">
+                    <Plus className="h-5 w-5" />
                 </Button>
             </header>
 
-            <div className="space-y-3">
-                <Card className="bg-surface border-border hover:bg-surface-2 transition-colors cursor-pointer rounded-xl">
+            <div className="container mx-auto p-4 space-y-4 animate-in fade-in duration-300">
+                <Card className="bg-card ring-1 ring-white/5 shadow-sm hover:scale-[0.99] hover:bg-secondary transition-all cursor-pointer rounded-2xl border-0 overflow-hidden text-card-foreground">
                     <CardContent className="p-4 flex justify-between items-center">
                         <div>
                             <h3 className="font-semibold text-[17px] mb-1">Push Day</h3>
@@ -25,7 +25,7 @@ export default function TemplatesPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-surface border-border hover:bg-surface-2 transition-colors cursor-pointer rounded-xl">
+                <Card className="bg-card ring-1 ring-white/5 shadow-sm hover:scale-[0.99] hover:bg-secondary transition-all cursor-pointer rounded-2xl border-0 overflow-hidden text-card-foreground">
                     <CardContent className="p-4 flex justify-between items-center">
                         <div>
                             <h3 className="font-semibold text-[17px] mb-1">Pull Day</h3>
@@ -37,9 +37,9 @@ export default function TemplatesPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-surface border-border hover:bg-surface-2 transition-colors cursor-pointer border-dashed mt-6 rounded-xl">
-                    <CardContent className="p-6 flex flex-col items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                        <Plus className="h-8 w-8 mb-2 opacity-60" />
+                <Card className="bg-card ring-1 ring-white/5 shadow-sm hover:bg-secondary transition-colors cursor-pointer border border-dashed border-white/10 mt-6 rounded-2xl overflow-hidden text-card-foreground">
+                    <CardContent className="p-6 flex gap-3 items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                        <Plus className="h-5 w-5 opacity-60" />
                         <p className="text-[15px] font-medium">Neue Vorlage erstellen</p>
                     </CardContent>
                 </Card>
