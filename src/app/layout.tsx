@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
 import { OfflineBanner } from "@/components/offline-banner";
+import Providers from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,11 +35,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <OfflineBanner />
-        <main className="pb-20 min-h-screen">
-          {children}
-        </main>
-        <BottomNav />
+        <Providers>
+          <OfflineBanner />
+          <main className="pb-20 min-h-screen">
+            {children}
+          </main>
+          <BottomNav />
+        </Providers>
       </body>
     </html>
   );

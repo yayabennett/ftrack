@@ -1,8 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Activity, Flame, TrendingUp, User } from 'lucide-react'
+import prisma from '@/lib/prisma'
 import { Button } from '@/components/ui/button'
 
-export default function StatsPage() {
+export const revalidate = 0 // Disable aggressive static caching for stats page
+
+export default async function StatsPage() {
+    const today = new Date()
+    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+    // Parallel data fetching on the server for max performance
+    const [setsFromLastWeek, sessionsCount] = await Promise.all([
+        prisma.setEntry.findMany({
+            where: {
+                workoutExercise: {
+                    session: {
+                        startedAt: { gte: lastWeek }
+                    }
+                }
+            },
+            select: { weight: true, reps: true }
+        }),
+        prisma.workoutSession.count({
+            where: {
+                startedAt: { gte: lastWeek }
+            }
+        })
+    ])
+
+    let totalVolume = 0
+    setsFromLastWeek.forEach((set: any) => {
+        totalVolume += (set.weight * set.reps)
+    })
+
+    const volumeText = totalVolume > 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${totalVolume}kg`
+
     return (
         <div className="min-h-screen bg-background pb-24">
             <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
@@ -25,7 +57,7 @@ export default function StatsPage() {
                     <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 hover:bg-secondary transition-colors text-card-foreground">
                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
                             <Activity className="h-8 w-8 text-primary mb-2" />
-                            <h3 className="text-3xl font-bold text-foreground">24</h3>
+                            <h3 className="text-3xl font-bold text-foreground">{sessionsCount}</h3>
                             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Einheiten</p>
                         </CardContent>
                     </Card>
@@ -37,11 +69,11 @@ export default function StatsPage() {
                             <TrendingUp className="h-4 w-4 text-primary" />
                             Wochen-Volumen (kg)
                         </CardTitle>
-                        <p className="text-xs text-muted-foreground mt-1">Diese Woche lief stark: 8,5t Volumen bewegt.</p>
+                        <p className="text-xs text-muted-foreground mt-1">Diese Woche lief stark: {volumeText} bewegt.</p>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
                         <div className="h-48 flex items-end justify-between gap-2 pt-4">
-                            {/* Fake Chart Bars for MVP */}
+                            {/* Fake Chart Bars for MVP, but real data up top */}
                             {[40, 65, 30, 80, 50, 90, 60].map((height, i) => (
                                 <div key={i} className="w-full flex flex-col items-center gap-2 group cursor-pointer relative">
                                     <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-secondary ring-1 ring-white/10 text-[11px] text-foreground py-1 px-2 rounded-md font-medium transition-opacity pointer-events-none shadow-sm">
