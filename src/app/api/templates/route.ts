@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
+import { z } from 'zod'
 
-const prisma = new PrismaClient()
+const CreateTemplateSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    exercises: z.array(z.object({
+        exerciseId: z.string().uuid(),
+        targetSets: z.number().optional().nullable(),
+        repRange: z.string().optional().nullable(),
+        notes: z.string().optional().nullable()
+    })).optional()
+})
 
 export async function GET() {
     try {
@@ -25,18 +34,19 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const json = await request.json()
-        const { name, exercises } = json
+        const result = CreateTemplateSchema.safeParse(json)
 
-        if (!name) {
-            return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.format() }, { status: 400 })
         }
+
+        const { name, exercises } = result.data
 
         const template = await prisma.template.create({
             data: {
                 name,
-                // Assuming exercises is an array of { exerciseId, targetSets, repRange, notes }
                 exercises: {
-                    create: exercises?.map((ex: any, index: number) => ({
+                    create: exercises?.map((ex, index) => ({
                         exerciseId: ex.exerciseId,
                         order: index,
                         targetSets: ex.targetSets,

@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
+import { z } from 'zod'
 
-const prisma = new PrismaClient()
+const CreateExerciseSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    muscleGroup: z.string().optional(),
+    equipment: z.string().optional(),
+    notes: z.string().optional()
+})
 
 export async function GET() {
     try {
@@ -17,18 +23,17 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const json = await request.json()
-        const { name, muscleGroup, equipment, notes } = json
+        const result = CreateExerciseSchema.safeParse(json)
 
-        if (!name) {
-            return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.format() }, { status: 400 })
         }
+
+        const data = result.data
 
         const exercise = await prisma.exercise.create({
             data: {
-                name,
-                muscleGroup,
-                equipment,
-                notes,
+                ...data,
                 isCustom: true,
             },
         })

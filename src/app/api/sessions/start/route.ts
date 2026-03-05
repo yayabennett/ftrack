@@ -1,38 +1,59 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
+import { z } from 'zod'
 
-const prisma = new PrismaClient()
+const StartSessionSchema = z.object({
+    templateId: z.string().uuid().optional().nullable(),
+    notes: z.string().optional().nullable()
+})
 
 export async function POST(request: Request) {
     try {
         const bodyText = await request.text()
         const json = bodyText ? JSON.parse(bodyText) : {}
-        const { templateId, notes } = json
+        const result = StartSessionSchema.safeParse(json)
 
-        const session = await prisma.workoutSession.create({
-            data: {
-                templateId: templateId || null,
-                notes,
-                startedAt: new Date(),
-            }
-        })
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.format() }, { status: 400 })
+        }
+
+        const { templateId, notes } = result.data
 
         if (templateId) {
+            // Fetch template exercises first to know what to create
             const templateExercises = await prisma.templateExercise.findMany({
                 where: { templateId },
                 orderBy: { order: 'asc' }
             })
 
-            if (templateExercises.length > 0) {
-                await prisma.workoutExercise.createMany({
-                    data: templateExercises.map((te: any) => ({
-                        sessionId: session.id,
-                        exerciseId: te.exerciseId,
-                        order: te.order
-                    }))
-                })
-            }
+            // Use nested writes to create session and workout exercises in one transaction
+            const session = await prisma.workoutSession.create({
+                data: {
+                    templateId,
+                    notes,
+                    startedAt: new Date(),
+                    exercises: {
+                        create: templateExercises.map((te: any) => ({
+                            exerciseId: te.exerciseId,
+                            order: te.order
+                        }))
+                    }
+                },
+                include: {
+                    exercises: true
+                }
+            })
+
+            return NextResponse.json(session)
         }
+
+        // Without template, just create an empty session
+        const session = await prisma.workoutSession.create({
+            data: {
+                notes,
+                startedAt: new Date(),
+            }
+        })
 
         return NextResponse.json(session)
     } catch (error) {

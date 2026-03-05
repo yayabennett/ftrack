@@ -1,19 +1,40 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
+import { z } from 'zod'
 
-const prisma = new PrismaClient()
+const SetEntrySchema = z.object({
+    id: z.string().uuid().optional(),
+    workoutExerciseId: z.string().uuid(),
+    setIndex: z.number().int(),
+    weight: z.number(),
+    reps: z.number().int(),
+    rpe: z.number().optional().nullable(),
+    isWarmup: z.boolean().optional(),
+    note: z.string().optional().nullable()
+})
+
+const BulkSetsSchema = z.array(SetEntrySchema).or(z.object({
+    sets: z.array(SetEntrySchema)
+}))
 
 export async function POST(request: Request) {
     try {
         const json = await request.json()
-        const sets = Array.isArray(json) ? json : json.sets
+        const result = BulkSetsSchema.safeParse(json)
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error.format() }, { status: 400 })
+        }
+
+        const parsedData = result.data
+        const sets = Array.isArray(parsedData) ? parsedData : parsedData.sets
 
         if (!sets || !sets.length) {
             return NextResponse.json({ error: 'No sets provided' }, { status: 400 })
         }
 
         const created = await prisma.setEntry.createMany({
-            data: sets.map((s: any) => ({
+            data: sets.map((s) => ({
                 id: s.id, // optional uuid from client for offline sync matching
                 workoutExerciseId: s.workoutExerciseId,
                 setIndex: s.setIndex,
