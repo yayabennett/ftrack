@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { Activity, Flame, Dumbbell } from 'lucide-react'
+import { Activity, Flame, Dumbbell, User as UserIcon } from 'lucide-react'
 import prisma from '@/lib/prisma'
 import { Button } from '@/components/ui/button'
 import { VolumeChart, DailyVolume } from '@/components/stats/volume-chart'
@@ -100,6 +100,11 @@ export default async function StatsPage() {
         <div className="min-h-screen bg-background pb-32">
             <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
                 <h1 className="text-[22px] font-bold tracking-tight text-foreground">Statistiken</h1>
+                <Link href="/settings">
+                    <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-secondary text-foreground hover:bg-secondary/80">
+                        <UserIcon className="h-5 w-5" />
+                    </Button>
+                </Link>
             </header>
 
             <div className="container mx-auto p-4 space-y-6 pt-6 animate-in fade-in duration-300">
