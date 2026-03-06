@@ -1,53 +1,105 @@
-import { redirect } from 'next/navigation'
-import { ArrowLeft, Check, Plus, Search } from 'lucide-react'
+"use client"
+
+import { useState, useTransition } from 'react'
+import { ArrowLeft, Check, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
-import prisma from '@/lib/prisma'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-export const revalidate = 0 // Disable caching
+// Defines how muscle groups map to main categories
+const CATEGORY_MAP: Record<string, string[]> = {
+    'Push': ['Brust', 'Schultern', 'Trizeps'],
+    'Pull': ['Rücken', 'Bizeps'],
+    'Beine': ['Beine (Quads)', 'Beine (Hams)', 'Po / Glutes', 'Waden'],
+    'Core': ['Bauch']
+}
 
-export default async function CreateTemplatePage() {
-    // 1. Fetch available exercises
-    const allExercises = await prisma.exercise.findMany({
-        orderBy: { name: 'asc' }
+export default function CreateTemplatePage() {
+    const router = useRouter()
+    const [isPending, startTransition] = useTransition()
+
+    // Fetch data via an API call instead of direct prisma (since it's a Client Component)
+    // We'll manage state for the exercises here
+    const [exercises, setExercises] = useState<any[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
+    // UI State
+    const [name, setName] = useState('')
+    const [searchQuery, setSearchQuery] = useState('')
+    const [activeTab, setActiveTab] = useState('Alle')
+
+    // Selected exercises map (id -> order) to preserve selection sequence
+    const [selectedIds, setSelectedIds] = useState<string[]>([])
+
+    // Load exercises on mount
+    import('react').then(React => {
+        React.useEffect(() => {
+            fetch('/api/exercises')
+                .then(res => res.json())
+                .then(data => {
+                    setExercises(data)
+                    setIsLoading(false)
+                })
+        }, [])
     })
 
-    // 2. Define the Server Action inside the component file
-    async function createTemplate(formData: FormData) {
-        'use server'
+    const handleFormSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!name.trim() || selectedIds.length === 0) return
 
-        const rawName = formData.get('name')
-        const name = typeof rawName === 'string' ? rawName.trim() : ''
+        startTransition(async () => {
+            const formData = new FormData()
+            formData.append('name', name)
+            selectedIds.forEach(id => {
+                formData.append(`exercise_${id}`, 'on')
+            })
 
-        if (!name) return
+            // Call the existing server action logic by using our POST endpoint or an inline action
+            // Actually, we can't easily inline server actions in a standard CC without a separate file.
+            // Let's create an API endpoint or just use a generic fetch.
+            // Since we need to create a template, let's justPOST to /api/templates
+            const res = await fetch('/api/templates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name,
+                    exercises: selectedIds.map(id => ({ exerciseId: id }))
+                })
+            })
 
-        // Extract selected exercise IDs
-        const selectedIds = []
-        for (const [key, value] of formData.entries()) {
-            if (key.startsWith('exercise_') && value === 'on') {
-                selectedIds.push(key.replace('exercise_', ''))
-            }
-        }
-
-        if (selectedIds.length === 0) return
-
-        // Create the template with nested writes
-        await prisma.template.create({
-            data: {
-                name,
-                exercises: {
-                    create: selectedIds.map((exId, index) => ({
-                        exerciseId: exId,
-                        order: index
-                    }))
-                }
+            if (res.ok) {
+                router.push('/templates')
+            } else {
+                alert('Fehler beim Speichern der Einheit.')
             }
         })
-
-        redirect('/templates')
     }
+
+    const toggleSelection = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        )
+    }
+
+    // Filter Logic
+    const filteredExercises = exercises.filter(ex => {
+        // Search filter
+        const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (ex.muscleGroup && ex.muscleGroup.toLowerCase().includes(searchQuery.toLowerCase()))
+
+        // Category filter
+        let matchesCategory = true
+        if (activeTab !== 'Alle') {
+            const allowedMuscleGroups = CATEGORY_MAP[activeTab] || []
+            matchesCategory = allowedMuscleGroups.includes(ex.muscleGroup)
+        }
+
+        return matchesSearch && matchesCategory
+    })
+
+    const tabs = ['Alle', 'Push', 'Pull', 'Beine', 'Core']
 
     return (
         <div className="min-h-screen bg-background pb-28">
@@ -62,7 +114,7 @@ export default async function CreateTemplatePage() {
                 </div>
             </header>
 
-            <form action={createTemplate} className="container mx-auto p-4 space-y-6 mt-4 animate-in fade-in duration-300">
+            <form onSubmit={handleFormSubmit} className="container mx-auto p-4 pt-6 space-y-6 animate-in fade-in duration-300">
                 {/* Name Input */}
                 <div className="space-y-2">
                     <label htmlFor="name" className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">
@@ -70,53 +122,96 @@ export default async function CreateTemplatePage() {
                     </label>
                     <Input
                         id="name"
-                        name="name"
+                        value={name}
+                        onChange={e => setName(e.target.value)}
                         placeholder="z.B. Push Day, Full Body A..."
                         className="h-14 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-2xl text-[16px] px-4 font-semibold"
                         required
                     />
                 </div>
 
-                {/* Exercises List */}
-                <div className="space-y-3">
+                {/* Exercises Section */}
+                <div className="space-y-4">
                     <div className="flex items-center justify-between px-1">
                         <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
-                            Übungen auswählen
+                            Übungen ({selectedIds.length} gewählt)
                         </label>
-                        <span className="text-[10px] text-muted-foreground font-medium bg-secondary px-2 py-0.5 rounded-full">{allExercises.length} verfügbar</span>
                     </div>
 
-                    <div className="space-y-2 max-h-[50vh] overflow-y-auto no-scrollbar pb-10">
-                        {allExercises.map(ex => (
-                            <label key={ex.id} className="relative block group cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    name={`exercise_${ex.id}`}
-                                    className="peer sr-only"
-                                />
-                                <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-all peer-checked:ring-primary peer-checked:bg-primary/5 active:scale-[0.98]">
-                                    <CardContent className="p-4 flex items-center justify-between">
-                                        <div>
-                                            <h4 className="font-semibold text-[15px]">{ex.name}</h4>
-                                            <p className="text-[12px] text-muted-foreground">{ex.muscleGroup} • {ex.equipment}</p>
-                                        </div>
-                                        <div className="w-6 h-6 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center transition-all peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground">
-                                            <Check className="w-3.5 h-3.5 opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </label>
+                    {/* Filter Tabs */}
+                    <div className="flex overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4">
+                        {tabs.map(tab => (
+                            <button
+                                key={tab}
+                                type="button"
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all active:scale-95 ${activeTab === tab
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'bg-card text-muted-foreground ring-1 ring-white/5'
+                                    }`}
+                            >
+                                {tab}
+                            </button>
                         ))}
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Übung suchen..."
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="h-12 pl-10 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-xl text-[15px] font-semibold"
+                        />
+                    </div>
+
+                    {/* Exercise List */}
+                    <div className="space-y-2 max-h-[50vh] overflow-y-auto no-scrollbar pb-10">
+                        {isLoading ? (
+                            <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Lade Übungen...</div>
+                        ) : filteredExercises.length === 0 ? (
+                            <div className="p-8 text-center text-sm text-muted-foreground">Keine Übungen gefunden.</div>
+                        ) : (
+                            filteredExercises.map(ex => {
+                                const isSelected = selectedIds.includes(ex.id)
+                                return (
+                                    <label key={ex.id} className="relative block group cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleSelection(ex.id)}
+                                            className="peer sr-only"
+                                        />
+                                        <Card className={`bg-card ring-1 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-all active:scale-[0.98] ${isSelected ? 'ring-primary bg-primary/5' : 'ring-white/5'}`}>
+                                            <CardContent className="p-4 flex items-center justify-between">
+                                                <div>
+                                                    <h4 className="font-semibold text-[15px]">{ex.name}</h4>
+                                                    <p className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">{ex.muscleGroup} • {ex.equipment}</p>
+                                                </div>
+                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'}`}>
+                                                    <Check className={`w-3.5 h-3.5 transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0'}`} strokeWidth={3} />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </label>
+                                )
+                            })
+                        )}
                     </div>
                 </div>
 
                 {/* Floating Submit Button */}
                 <div className="fixed bottom-24 left-0 right-0 px-4 z-40">
-                    <Button type="submit" className="w-full h-14 text-[16px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] transition-transform active:scale-95 flex items-center justify-center gap-2">
-                        <Check className="w-5 h-5 stroke-[3px]" /> Einheit speichern
+                    <Button
+                        type="submit"
+                        disabled={isPending || selectedIds.length === 0 || !name.trim()}
+                        className="w-full h-14 text-[16px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 rounded-2xl shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] transition-transform active:scale-95 flex items-center justify-center gap-2"
+                    >
+                        {isPending ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <><Check className="w-5 h-5 stroke-[3px]" /> Einheit speichern</>}
                     </Button>
                 </div>
-            </form >
-        </div >
+            </form>
+        </div>
     )
 }
