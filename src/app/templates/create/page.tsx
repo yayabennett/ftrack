@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { ArrowLeft, Check, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,16 +34,14 @@ export default function CreateTemplatePage() {
     const [selectedIds, setSelectedIds] = useState<string[]>([])
 
     // Load exercises on mount
-    import('react').then(React => {
-        React.useEffect(() => {
-            fetch('/api/exercises')
-                .then(res => res.json())
-                .then(data => {
-                    setExercises(data)
-                    setIsLoading(false)
-                })
-        }, [])
-    })
+    useEffect(() => {
+        fetch('/api/exercises')
+            .then(res => res.json())
+            .then(data => {
+                setExercises(data)
+                setIsLoading(false)
+            })
+    }, [])
 
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
