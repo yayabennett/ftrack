@@ -11,9 +11,10 @@ import { SetEntry, useWorkoutStore } from '@/store/use-workout-store'
 interface SetRowProps {
     exerciseId: string;
     setEntry: SetEntry;
+    onComplete?: () => void;
 }
 
-export function SetRow({ exerciseId, setEntry }: SetRowProps) {
+export function SetRow({ exerciseId, setEntry, onComplete }: SetRowProps) {
     const { updateSet, toggleSetComplete } = useWorkoutStore()
     const [weight, setWeight] = useState(setEntry.weight ? setEntry.weight.toString() : "")
     const [reps, setReps] = useState(setEntry.reps ? setEntry.reps.toString() : "")
@@ -30,6 +31,7 @@ export function SetRow({ exerciseId, setEntry }: SetRowProps) {
                     reps: parseInt(reps, 10)
                 })
                 toggleSetComplete(exerciseId, setEntry.id)
+                onComplete?.()
 
                 // Sync with backend / IndexedDB Queue
                 await customFetch('/api/sets', {

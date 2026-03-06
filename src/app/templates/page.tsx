@@ -1,16 +1,63 @@
-import { Plus, Copy, Play } from 'lucide-react'
+"use client"
+
+import { Plus, Copy, Play, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import prisma from '@/lib/prisma'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
-export const revalidate = 0 // Disable caching to always show latest Einheiten
+interface TemplateExercise {
+    id: string
+    exercise: { name: string }
+}
 
-export default async function EinheitenPage() {
-    const templates = await prisma.template.findMany({
-        include: { exercises: { include: { exercise: true } } },
-        orderBy: { order: 'asc' }
-    })
+interface Template {
+    id: string
+    name: string
+    exercises: TemplateExercise[]
+}
+
+export default function EinheitenPage() {
+    const router = useRouter()
+    const [templates, setTemplates] = useState<Template[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+
+    const fetchTemplates = async () => {
+        try {
+            const res = await fetch('/api/templates')
+            if (res.ok) {
+                const data = await res.json()
+                setTemplates(data)
+            }
+        } catch (e) {
+            console.error('Failed to fetch templates:', e)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchTemplates()
+    }, [])
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`"${name}" wirklich löschen?`)) return
+        setDeletingId(id)
+        try {
+            const res = await fetch(`/api/templates/${id}`, { method: 'DELETE' })
+            if (res.ok) {
+                setTemplates(prev => prev.filter(t => t.id !== id))
+            }
+        } catch (e) {
+            console.error('Failed to delete template:', e)
+        } finally {
+            setDeletingId(null)
+        }
+    }
+
+    if (isLoading) return null // loading.tsx handles this
 
     return (
         <div className="min-h-screen bg-background pb-24">
@@ -19,7 +66,6 @@ export default async function EinheitenPage() {
                     <Copy className="h-5 w-5 text-primary" />
                     <h1 className="text-[22px] font-bold tracking-tight text-foreground">Einheiten</h1>
                 </div>
-                {/* Temporary Link to Create Page, we will build it next */}
                 <Link href="/templates/create">
                     <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-secondary text-foreground hover:bg-secondary/80">
                         <Plus className="h-5 w-5" />
@@ -40,16 +86,25 @@ export default async function EinheitenPage() {
                     </div>
                 ) : (
                     templates.map(template => (
-                        <Card key={template.id} className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
+                        <Card key={template.id} className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-opacity ${deletingId === template.id ? 'opacity-50' : ''}`}>
                             <CardContent className="p-0">
                                 <div className="p-4 flex flex-col gap-3">
                                     <div className="flex justify-between items-start">
-                                        <div>
+                                        <div className="flex-1 min-w-0">
                                             <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
-                                            <p className="text-[13px] text-muted-foreground leading-snug">
+                                            <p className="text-[13px] text-muted-foreground leading-snug truncate">
                                                 {template.exercises.map(e => e.exercise.name).join(', ')}
                                             </p>
                                         </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                                            onClick={() => handleDelete(template.id, template.name)}
+                                            disabled={deletingId === template.id}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
                                     </div>
 
                                     <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">

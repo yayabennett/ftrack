@@ -30,7 +30,9 @@ interface WorkoutState {
     startWorkout: (sessionId: string, exercises?: WorkoutExercise[]) => void;
     endWorkout: () => void;
     addExercise: (exercise: WorkoutExercise) => void;
+    removeExercise: (exerciseId: string) => void;
     addSet: (exerciseId: string) => void;
+    removeSet: (exerciseId: string, setId: string) => void;
     updateSet: (exerciseId: string, setId: string, updates: Partial<SetEntry>) => void;
     toggleSetComplete: (exerciseId: string, setId: string) => void;
 }
@@ -64,6 +66,12 @@ export const useWorkoutStore = create<WorkoutState>()(
                 set((state) => ({ exercises: [...state.exercises, exercise] }))
             },
 
+            removeExercise: (exerciseId) => {
+                set((state) => ({
+                    exercises: state.exercises.filter(ex => ex.id !== exerciseId)
+                }))
+            },
+
             addSet: (exerciseId) => {
                 set((state) => ({
                     exercises: state.exercises.map(ex => {
@@ -80,6 +88,20 @@ export const useWorkoutStore = create<WorkoutState>()(
                             return { ...ex, sets: [...ex.sets, newSet] };
                         }
                         return ex;
+                    })
+                }))
+            },
+
+            removeSet: (exerciseId, setId) => {
+                set((state) => ({
+                    exercises: state.exercises.map(ex => {
+                        if (ex.id === exerciseId) {
+                            const filtered = ex.sets.filter(s => s.id !== setId)
+                            // Re-index setIndex
+                            const reindexed = filtered.map((s, i) => ({ ...s, setIndex: i + 1 }))
+                            return { ...ex, sets: reindexed }
+                        }
+                        return ex
                     })
                 }))
             },
