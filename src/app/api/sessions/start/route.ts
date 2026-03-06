@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 const StartSessionSchema = z.object({
     templateId: z.string().uuid().optional().nullable(),
+    startedAt: z.string().datetime({ offset: true }).optional().nullable(),
     notes: z.string().optional().nullable()
 })
 
@@ -17,7 +18,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: result.error.format() }, { status: 400 })
         }
 
-        const { templateId, notes } = result.data
+        const { templateId, startedAt, notes } = result.data
+        const sessionDate = startedAt ? new Date(startedAt) : new Date()
 
         if (templateId) {
             // Fetch template exercises first to know what to create
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
                 data: {
                     templateId,
                     notes,
-                    startedAt: new Date(),
+                    startedAt: sessionDate,
                     exercises: {
                         create: templateExercises.map((te: any) => ({
                             exerciseId: te.exerciseId,
@@ -55,7 +57,7 @@ export async function POST(request: Request) {
         const session = await prisma.workoutSession.create({
             data: {
                 notes,
-                startedAt: new Date(),
+                startedAt: sessionDate,
             }
         })
 

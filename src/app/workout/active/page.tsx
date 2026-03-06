@@ -13,6 +13,7 @@ function WorkoutContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const templateId = searchParams.get('templateId')
+    const startedAtQuery = searchParams.get('startedAt')
     const { isActive, startedAt, exercises, startWorkout, endWorkout, addSet } = useWorkoutStore()
     const [isLoading, setIsLoading] = useState(!isActive)
 
@@ -21,10 +22,14 @@ function WorkoutContent() {
         if (!isActive) {
             const initSession = async () => {
                 try {
+                    const payload: any = {}
+                    if (templateId) payload.templateId = templateId
+                    if (startedAtQuery) payload.startedAt = startedAtQuery
+
                     const res = await fetch('/api/sessions/start', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ templateId })
+                        body: JSON.stringify(payload)
                     })
 
                     if (res.ok) {
