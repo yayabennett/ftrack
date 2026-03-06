@@ -139,7 +139,7 @@ export default async function Home() {
 
         {/* Hub: Highlight Card */}
         <section className="px-5">
-          <Card className="bg-gradient-to-br from-primary/20 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden shadow-lg group active:scale-[0.98] transition-transform cursor-pointer">
+          <Card className="bg-gradient-to-br from-primary/20 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden shadow-lg glow-primary group active:scale-[0.98] transition-transform cursor-pointer">
             <CardContent className="p-6 flex items-center gap-5">
               <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary shrink-0">
                 {highlightIcon}
@@ -170,8 +170,8 @@ export default async function Home() {
                 <p className="text-xs text-muted-foreground font-medium">Noch keine Einheiten</p>
               </Card>
             ) : templates.map(template => (
-              <Link key={template.id} href="/workout/active" className="min-w-[170px] active:scale-95 transition-transform">
-                <Card className="bg-card ring-1 ring-white/5 shadow-sm border-0 rounded-2xl overflow-hidden h-full">
+              <Link key={template.id} href={`/workout/active?templateId=${template.id}`} className="min-w-[170px] active:scale-95 transition-transform">
+                <Card className="bg-card ring-1 ring-white/5 shadow-sm border-0 rounded-2xl overflow-hidden h-full card-hover">
                   <CardContent className="p-4 flex flex-col justify-between h-full">
                     <div>
                       <h3 className="font-bold text-[15px] mb-1 truncate">{template.name}</h3>
@@ -191,7 +191,7 @@ export default async function Home() {
         <section className="px-5 space-y-4">
           <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase px-1">Letzte Einheit</h2>
           {lastSession ? (
-            <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
+            <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground card-hover">
               <CardContent className="p-4 flex gap-4 items-center">
                 <div className="p-3 bg-primary/10 rounded-2xl text-primary">
                   <Dumbbell className="w-6 h-6" />

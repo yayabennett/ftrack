@@ -201,6 +201,60 @@
     background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(10px);
   }
+
+  /* Hide scrollbar for horizontal carousels */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Gradient text (for hero numbers) */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, #6FA3FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Card lift on hover */
+  .card-hover {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Ambient glow for primary elements */
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(43, 111, 255, 0.15), 0 0 60px rgba(43, 111, 255, 0.05);
+  }
+
+  /* Number input: hide arrows for clean look */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /* Safe area padding for modern phones */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .h-safe {
+    height: env(safe-area-inset-bottom, 0px);
+  }
 }
 
 @layer base {
