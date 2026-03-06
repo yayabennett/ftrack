@@ -10,19 +10,21 @@ export default async function Home() {
   const now = new Date()
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
 
-  // Fetch data for the Progress Hub
+  // Fetch data for the Progress Hub — optimized with lean selects
   const [templates, recentSessions, weekSessions] = await Promise.all([
     prisma.template.findMany({
-      include: { exercises: true },
+      include: { exercises: { select: { id: true } } },
       orderBy: { order: 'asc' },
     }),
     prisma.workoutSession.findMany({
       orderBy: { startedAt: 'desc' },
       take: 2,
       include: {
-        template: true,
+        template: { select: { name: true } },
         exercises: {
-          include: { sets: true }
+          include: {
+            sets: { select: { weight: true, reps: true } }
+          }
         }
       }
     }),

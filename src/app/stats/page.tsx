@@ -9,8 +9,11 @@ export default async function StatsPage() {
     const today = new Date()
     const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
 
+    // Fetch streak data: last 12 weeks of sessions for streak calculation
+    const twelveWeeksAgo = new Date(today.getTime() - 12 * 7 * 24 * 60 * 60 * 1000)
+
     // Parallel data fetching on the server for max performance
-    const [setsFromLastWeek, sessionsCount] = await Promise.all([
+    const [setsFromLastWeek, sessionsCount, streakSessions] = await Promise.all([
         prisma.setEntry.findMany({
             where: {
                 workoutExercise: {
@@ -25,8 +28,29 @@ export default async function StatsPage() {
             where: {
                 startedAt: { gte: lastWeek }
             }
+        }),
+        prisma.workoutSession.findMany({
+            where: { startedAt: { gte: twelveWeeksAgo } },
+            select: { startedAt: true },
+            orderBy: { startedAt: 'desc' }
         })
     ])
+
+    // Compute real weekly streak
+    let weeklyStreak = 0
+    for (let i = 0; i < 12; i++) {
+        const weekStart = new Date(today.getTime() - (i + 1) * 7 * 24 * 60 * 60 * 1000)
+        const weekEnd = new Date(today.getTime() - i * 7 * 24 * 60 * 60 * 1000)
+        const hasSession = streakSessions.some(s => {
+            const d = new Date(s.startedAt)
+            return d >= weekStart && d < weekEnd
+        })
+        if (hasSession) {
+            weeklyStreak++
+        } else {
+            break
+        }
+    }
 
     let totalVolume = 0
     setsFromLastWeek.forEach((set: any) => {
@@ -49,7 +73,7 @@ export default async function StatsPage() {
                     <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 text-card-foreground">
                         <CardContent className="p-4 flex flex-col items-center justify-center text-center">
                             <Flame className="h-8 w-8 text-blue-500 mb-2" />
-                            <h3 className="text-3xl font-bold text-foreground">3</h3>
+                            <h3 className="text-3xl font-bold text-foreground">{weeklyStreak}</h3>
                             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Wochen-Streak</p>
                         </CardContent>
                     </Card>

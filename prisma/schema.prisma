@@ -30,6 +30,9 @@ model Exercise {
   
   templateExercises TemplateExercise[]
   workoutExercises  WorkoutExercise[]
+
+  @@index([userId])
+  @@index([muscleGroup])
 }
 
 model Template {
@@ -41,6 +44,8 @@ model Template {
   
   exercises TemplateExercise[]
   sessions  WorkoutSession[]
+
+  @@index([userId])
 }
 
 model TemplateExercise {
@@ -54,6 +59,10 @@ model TemplateExercise {
   
   template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
   exercise    Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@unique([templateId, exerciseId])
+  @@index([templateId])
+  @@index([exerciseId])
 }
 
 model WorkoutSession {
@@ -67,6 +76,10 @@ model WorkoutSession {
   template   Template? @relation(fields: [templateId], references: [id])
   
   exercises  WorkoutExercise[]
+
+  @@index([userId])
+  @@index([templateId])
+  @@index([startedAt])
 }
 
 model WorkoutExercise {
@@ -78,6 +91,9 @@ model WorkoutExercise {
   session    WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   exercise   Exercise       @relation(fields: [exerciseId], references: [id])
   sets       SetEntry[]
+
+  @@index([sessionId])
+  @@index([exerciseId])
 }
 
 model SetEntry {
@@ -92,4 +108,7 @@ model SetEntry {
   createdAt         DateTime @default(now())
   
   workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+
+  @@index([workoutExerciseId])
+  @@index([createdAt])
 }

@@ -63,7 +63,7 @@ export default function CreateTemplatePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name,
-                    exerciseIds: selectedIds
+                    exercises: selectedIds.map(id => ({ exerciseId: id }))
                 })
             })
 
