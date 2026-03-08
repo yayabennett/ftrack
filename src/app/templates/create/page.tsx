@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { cachedGet, invalidateCache } from '@/lib/api-client'
+import type { ExerciseDTO } from '@/lib/types'
 
 // Defines how muscle groups map to main categories
 const CATEGORY_MAP: Record<string, string[]> = {
@@ -22,7 +24,7 @@ export default function CreateTemplatePage() {
 
     // Fetch data via an API call instead of direct prisma (since it's a Client Component)
     // We'll manage state for the exercises here
-    const [exercises, setExercises] = useState<any[]>([])
+    const [exercises, setExercises] = useState<ExerciseDTO[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
     // UI State
@@ -35,12 +37,12 @@ export default function CreateTemplatePage() {
 
     // Load exercises on mount
     useEffect(() => {
-        fetch('/api/exercises')
-            .then(res => res.json())
+        cachedGet<ExerciseDTO[]>('/api/exercises', 'cache-exercises')
             .then(data => {
-                setExercises(data)
+                if (data) setExercises(data)
                 setIsLoading(false)
             })
+            .catch(() => setIsLoading(false))
     }, [])
 
     const handleFormSubmit = async (e: React.FormEvent) => {
@@ -68,6 +70,7 @@ export default function CreateTemplatePage() {
             })
 
             if (res.ok) {
+                await invalidateCache('cache-templates')
                 router.push('/templates')
             } else {
                 alert('Fehler beim Speichern der Einheit.')
@@ -91,7 +94,7 @@ export default function CreateTemplatePage() {
         let matchesCategory = true
         if (activeTab !== 'Alle') {
             const allowedMuscleGroups = CATEGORY_MAP[activeTab] || []
-            matchesCategory = allowedMuscleGroups.includes(ex.muscleGroup)
+            matchesCategory = !!ex.muscleGroup && allowedMuscleGroups.includes(ex.muscleGroup)
         }
 
         return matchesSearch && matchesCategory

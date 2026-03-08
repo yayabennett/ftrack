@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { z } from 'zod'
+import { getCurrentUserId } from '@/lib/auth'
 
 const StartSessionSchema = z.object({
     templateId: z.string().uuid().optional().nullable(),
@@ -19,7 +20,10 @@ export async function POST(request: Request) {
         }
 
         const { templateId, startedAt, notes } = result.data
+        const userId = await getCurrentUserId()
         const sessionDate = startedAt ? new Date(startedAt) : new Date()
+
+        let session; // Declare session here to be accessible outside if/else
 
         if (templateId) {
             // Fetch template exercises first to know what to create
@@ -29,13 +33,14 @@ export async function POST(request: Request) {
             })
 
             // Use nested writes to create session and workout exercises in one transaction
-            const session = await prisma.workoutSession.create({
+            session = await prisma.workoutSession.create({
                 data: {
                     templateId,
                     notes,
+                    userId,
                     startedAt: sessionDate,
                     exercises: {
-                        create: templateExercises.map((te: any) => ({
+                        create: templateExercises.map((te: { exerciseId: string; order: number }) => ({
                             exerciseId: te.exerciseId,
                             order: te.order
                         }))
@@ -54,9 +59,10 @@ export async function POST(request: Request) {
         }
 
         // Without template, just create an empty session
-        const session = await prisma.workoutSession.create({
+        session = await prisma.workoutSession.create({
             data: {
                 notes,
+                userId,
                 startedAt: sessionDate,
             }
         })

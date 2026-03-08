@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { z } from 'zod'
+import { getCurrentUserId } from '@/lib/auth'
 
 const CreateExerciseSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -11,7 +12,14 @@ const CreateExerciseSchema = z.object({
 
 export async function GET() {
     try {
+        const userId = await getCurrentUserId()
         const exercises = await prisma.exercise.findMany({
+            where: {
+                OR: [
+                    { isCustom: false },
+                    { userId },
+                ]
+            },
             orderBy: { name: 'asc' },
         })
         return NextResponse.json(exercises)
@@ -29,12 +37,17 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: result.error.format() }, { status: 400 })
         }
 
-        const data = result.data
+        const { name, muscleGroup, equipment, notes } = result.data
+        const userId = await getCurrentUserId()
 
         const exercise = await prisma.exercise.create({
             data: {
-                ...data,
+                name,
+                muscleGroup,
+                equipment,
+                notes,
                 isCustom: true,
+                userId,
             },
         })
 

@@ -1,8 +1,26 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
+    // ─── Default user ────────────────────────────────────────────────────────
+    const defaultEmail = 'athlete@ftrack.app'
+    const existingUser = await prisma.user.findUnique({ where: { email: defaultEmail } })
+    if (!existingUser) {
+        const hashedPassword = await bcrypt.hash('champion123', 12)
+        await prisma.user.create({
+            data: {
+                email: defaultEmail,
+                name: 'Athlet',
+                password: hashedPassword,
+            },
+        })
+        console.log(`Created default user: ${defaultEmail} / champion123`)
+    } else {
+        console.log('Default user already exists — skipping.')
+    }
+
     // Extensive list of exercises categorized by primary muscle group
     const exercises = [
         // CHEST (Push)

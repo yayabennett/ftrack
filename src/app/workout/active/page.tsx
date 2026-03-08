@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useCallback } from 'react'
 import { Plus, X, Check, Search, Dumbbell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -8,7 +8,10 @@ import { Input } from '@/components/ui/input'
 import { WorkoutTimer } from '@/components/workout/workout-timer'
 import { SetRow } from '@/components/workout/set-row'
 import { useWorkoutStore } from '@/store/use-workout-store'
+import type { WorkoutExercise } from '@/store/use-workout-store'
 import { useRouter, useSearchParams } from 'next/navigation'
+import type { ExerciseDTO } from '@/lib/types'
+import { cachedGet } from '@/lib/api-client'
 
 function ExercisePickerDialog({
     isOpen,
@@ -19,15 +22,14 @@ function ExercisePickerDialog({
     onClose: () => void
     onSelect: (exercise: { id: string; exerciseId: string; name: string }) => void
 }) {
-    const [exercises, setExercises] = useState<any[]>([])
+    const [exercises, setExercises] = useState<ExerciseDTO[]>([])
     const [search, setSearch] = useState('')
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         if (!isOpen) return
-        fetch('/api/exercises')
-            .then(res => res.json())
-            .then(data => { setExercises(data); setIsLoading(false) })
+        cachedGet<ExerciseDTO[]>('/api/exercises', 'cache-exercises')
+            .then(data => { if (data) { setExercises(data); setIsLoading(false) } else { setIsLoading(false) } })
             .catch(() => setIsLoading(false))
     }, [isOpen])
 
@@ -144,6 +146,11 @@ function WorkoutContent() {
     const [restTimerEnd, setRestTimerEnd] = useState<number | null>(null)
     const [prAlert, setPrAlert] = useState<string | null>(null)
 
+    const handlePR = useCallback((message: string) => {
+        setPrAlert(message)
+        setTimeout(() => setPrAlert(null), 4000)
+    }, [])
+
     useEffect(() => {
         if (!isActive) {
             const initSession = async () => {
@@ -160,13 +167,14 @@ function WorkoutContent() {
 
                     if (res.ok) {
                         const session = await res.json()
-                        const mappedExercises = session.exercises ? session.exercises.map((ex: any) => ({
-                            id: ex.id,
-                            exerciseId: ex.exerciseId,
-                            name: ex.exercise?.name || 'Unbekannte Übung',
-                            order: ex.order,
-                            sets: []
-                        })) : []
+                        const mappedExercises: WorkoutExercise[] = session.exercises
+                            ? session.exercises.map((ex: { id: string; exerciseId: string; exercise?: { name: string }; order: number }) => ({
+                                id: ex.id,
+                                exerciseId: ex.exerciseId,
+                                name: ex.exercise?.name || 'Unbekannte Übung',
+                                order: ex.order,
+                                sets: []
+                            })) : []
 
                         startWorkout(session.id, mappedExercises)
                     }
@@ -289,7 +297,14 @@ function WorkoutContent() {
 
                             <div className="space-y-1 p-2 pt-0">
                                 {exercise.sets && exercise.sets.map((set) => (
-                                    <SetRow key={set.id} exerciseId={exercise.id} setEntry={set} onComplete={handleSetCompleted} />
+                                    <SetRow
+                                        key={set.id}
+                                        exerciseId={exercise.id}
+                                        exerciseDbId={exercise.exerciseId}
+                                        setEntry={set}
+                                        onComplete={handleSetCompleted}
+                                        onPR={handlePR}
+                                    />
                                 ))}
 
                                 <Button onClick={() => addSet(exercise.id)} variant="ghost" className="w-full h-11 text-[13px] font-semibold text-primary hover:bg-primary/5 mt-2 rounded-xl">

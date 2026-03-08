@@ -9,9 +9,18 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String?  @unique
-  createdAt DateTime @default(now())
+  id              String   @id @default(uuid())
+  email           String?  @unique
+  name            String?
+  password        String?
+  age             Int?
+  weight          Float?
+  height          Float?
+  gender          String?
+  goal            String?
+  experienceLevel String?
+  isOnboarded     Boolean  @default(false)
+  createdAt       DateTime @default(now())
   
   exercises   Exercise[]
   templates   Template[]

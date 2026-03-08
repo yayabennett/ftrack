@@ -6,15 +6,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { customFetch } from '@/lib/api-client'
-import { SetEntry, useWorkoutStore } from '@/store/use-workout-store'
+import { useWorkoutStore } from '@/store/use-workout-store'
+import type { SetEntry } from '@/store/use-workout-store'
+import type { PRResult } from '@/lib/types'
 
 interface SetRowProps {
-    exerciseId: string;
-    setEntry: SetEntry;
-    onComplete?: () => void;
+    exerciseId: string      // The Zustand workout-exercise ID (client UUID)
+    exerciseDbId: string    // The actual DB exercise ID (for PR lookups)
+    setEntry: SetEntry
+    onComplete?: () => void
+    onPR?: (message: string) => void
 }
 
-export function SetRow({ exerciseId, setEntry, onComplete }: SetRowProps) {
+export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }: SetRowProps) {
     const { updateSet, toggleSetComplete } = useWorkoutStore()
     const [weight, setWeight] = useState(setEntry.weight ? setEntry.weight.toString() : "")
     const [reps, setReps] = useState(setEntry.reps ? setEntry.reps.toString() : "")
@@ -23,34 +27,53 @@ export function SetRow({ exerciseId, setEntry, onComplete }: SetRowProps) {
     const handleSave = async () => {
         if (!weight || !reps || isLoading) return
         setIsLoading(true)
+
+        const parsedWeight = parseFloat(weight)
+        const parsedReps = parseInt(reps, 10)
+
         try {
             if (!setEntry.isCompleted) {
-                // Optimistically update
-                updateSet(exerciseId, setEntry.id, {
-                    weight: parseFloat(weight),
-                    reps: parseInt(reps, 10)
-                })
+                // Optimistic UI update
+                updateSet(exerciseId, setEntry.id, { weight: parsedWeight, reps: parsedReps })
                 toggleSetComplete(exerciseId, setEntry.id)
                 onComplete?.()
 
-                // Sync with backend / IndexedDB Queue
+                // Sync with backend / offline queue
                 await customFetch('/api/sets', {
                     method: 'POST',
                     body: [{
                         id: setEntry.id,
                         workoutExerciseId: setEntry.workoutExerciseId,
                         setIndex: setEntry.setIndex,
-                        weight: parseFloat(weight),
-                        reps: parseInt(reps, 10),
+                        weight: parsedWeight,
+                        reps: parsedReps,
                     }]
                 })
+
+                // ── PR Detection ─────────────────────────────────────────────
+                // Only check PR when online (GET can't be queued offline)
+                if (exerciseDbId && typeof window !== 'undefined' && navigator.onLine) {
+                    try {
+                        const prRes = await fetch(`/api/exercises/${exerciseDbId}/pr`)
+                        if (prRes.ok) {
+                            const pr: PRResult | null = await prRes.json()
+                            const newVolume = parsedWeight * parsedReps
+                            // It's a PR if there's no previous record, or the new set exceeds it
+                            if (!pr || newVolume >= pr.volume) {
+                                onPR?.(`🏆 Neuer PR: ${parsedWeight} kg × ${parsedReps} Wdh!`)
+                            }
+                        }
+                    } catch {
+                        // PR check is best-effort — never block the main save
+                    }
+                }
             } else {
-                // Just toggle off
+                // Toggle off (uncomplete)
                 toggleSetComplete(exerciseId, setEntry.id)
             }
         } catch (e) {
             console.error(e)
-            // Rollback optimistic off
+            // Rollback optimistic update
             toggleSetComplete(exerciseId, setEntry.id)
         } finally {
             setIsLoading(false)

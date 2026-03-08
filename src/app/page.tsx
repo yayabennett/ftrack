@@ -44,7 +44,7 @@ export default async function Home() {
     dayDate.setDate(now.getDate() - (currentDayIndex - index))
     dayDate.setHours(0, 0, 0, 0)
 
-    const hasWorkout = weekSessions.some(s => {
+    const hasWorkout = weekSessions.some((s: { startedAt: Date }) => {
       const sDate = new Date(s.startedAt)
       sDate.setHours(0, 0, 0, 0)
       return sDate.getTime() === dayDate.getTime()
@@ -62,9 +62,9 @@ export default async function Home() {
   let highlightIcon = <Zap className="w-5 h-5" />
 
   if (lastSession) {
-    const calculateVolume = (s: any) =>
-      s.exercises.reduce((acc: number, ex: any) =>
-        acc + ex.sets.reduce((setAcc: number, set: any) => setAcc + (set.weight * set.reps), 0), 0)
+    const calculateVolume = (s: { exercises: { sets: { weight: number; reps: number }[] }[] }) =>
+      s.exercises.reduce((acc, ex) =>
+        acc + ex.sets.reduce((setAcc, set) => setAcc + (set.weight * set.reps), 0), 0)
 
     const lastVol = calculateVolume(lastSession)
 
@@ -169,7 +169,7 @@ export default async function Home() {
                 <Plus className="w-6 h-6 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground font-medium">Noch keine Einheiten</p>
               </Card>
-            ) : templates.map(template => (
+            ) : templates.map((template: { id: string; name: string; exercises: { id: string }[] }) => (
               <Link key={template.id} href={`/workout/active?templateId=${template.id}`} className="min-w-[170px] active:scale-95 transition-transform">
                 <Card className="bg-card ring-1 ring-white/5 shadow-sm border-0 rounded-2xl overflow-hidden h-full card-hover">
                   <CardContent className="p-4 flex flex-col justify-between h-full">
@@ -208,7 +208,7 @@ export default async function Home() {
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-2xl text-foreground tracking-tighter">
-                    {(lastSession.exercises.reduce((v: number, ex: any) => v + ex.sets.reduce((sv: number, s: any) => sv + (s.weight * s.reps), 0), 0) / 1000).toFixed(1)}k
+                    {(lastSession.exercises.reduce((v: number, ex: { sets: { weight: number; reps: number }[] }) => v + ex.sets.reduce((sv: number, s: { weight: number; reps: number }) => sv + (s.weight * s.reps), 0), 0) / 1000).toFixed(1)}k
                   </p>
                   <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-extrabold opacity-70">Volumen</p>
                 </div>

@@ -6,14 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { cachedGet } from '@/lib/api-client'
+import type { TemplateDTO } from '@/lib/types'
 
 // We need to fetch the templates client-side or use a mixed approach. 
 // For simplicity and immediate feedback, we'll fetch them on mount.
-interface Template {
-    id: string
-    name: string
-    exercises: any[]
-}
+type Template = Pick<TemplateDTO, 'id' | 'name'> & { exercises: { id: string }[] }
 
 export default function StartWorkoutConfig() {
     const router = useRouter()
@@ -34,11 +32,8 @@ export default function StartWorkoutConfig() {
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
-                const res = await fetch('/api/templates')
-                if (res.ok) {
-                    const data = await res.json()
-                    setTemplates(data)
-                }
+                const data = await cachedGet<Template[]>('/api/templates', 'cache-templates')
+                if (data) setTemplates(data)
             } catch (error) {
                 console.error("Failed to load templates", error)
             } finally {

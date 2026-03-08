@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { z } from 'zod'
+import { getCurrentUserId } from '@/lib/auth'
 
 const CreateTemplateSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -14,7 +15,9 @@ const CreateTemplateSchema = z.object({
 
 export async function GET() {
     try {
+        const userId = await getCurrentUserId()
         const templates = await prisma.template.findMany({
+            where: userId ? { userId } : {},
             include: {
                 exercises: {
                     include: {
@@ -41,10 +44,12 @@ export async function POST(request: Request) {
         }
 
         const { name, exercises } = result.data
+        const userId = await getCurrentUserId()
 
         const template = await prisma.template.create({
             data: {
                 name,
+                userId,
                 exercises: {
                     create: exercises?.map((ex, index) => ({
                         exerciseId: ex.exerciseId,

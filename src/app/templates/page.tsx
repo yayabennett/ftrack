@@ -6,10 +6,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { cachedGet, invalidateCache } from '@/lib/api-client'
+import type { TemplateDTO } from '@/lib/types'
 
 interface TemplateExercise {
     id: string
-    exercise: { name: string }
+    exercise: Pick<TemplateDTO['exercises'][number]['exercise'], 'name'>
 }
 
 interface Template {
@@ -26,11 +28,8 @@ export default function EinheitenPage() {
 
     const fetchTemplates = async () => {
         try {
-            const res = await fetch('/api/templates')
-            if (res.ok) {
-                const data = await res.json()
-                setTemplates(data)
-            }
+            const data = await cachedGet<Template[]>('/api/templates', 'cache-templates')
+            if (data) setTemplates(data)
         } catch (e) {
             console.error('Failed to fetch templates:', e)
         } finally {
@@ -49,6 +48,8 @@ export default function EinheitenPage() {
             const res = await fetch(`/api/templates/${id}`, { method: 'DELETE' })
             if (res.ok) {
                 setTemplates(prev => prev.filter(t => t.id !== id))
+                // Invalidate cache so next visit shows fresh data
+                await invalidateCache('cache-templates')
             }
         } catch (e) {
             console.error('Failed to delete template:', e)
