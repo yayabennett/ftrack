@@ -7,6 +7,8 @@ import { Barbell, MagnifyingGlass, CaretRight, Sparkle, TrendUp, TrendDown, Minu
 import { cn } from '@/lib/utils'
 import { useMemo } from 'react'
 import type { ExerciseDTO } from '@/lib/types'
+import { ExerciseListItem } from '@/components/exercises/exercise-list-item'
+import { MuscleGroupSection } from '@/components/exercises/muscle-group-section'
 import { MiniSparkline } from '@/components/ui/mini-sparkline'
 
 type ExerciseWithTrend = ExerciseDTO & {
@@ -83,6 +85,14 @@ export default function ExercisesPage() {
 
     const grouped = useMemo(() => groupByMuscle(filtered), [filtered])
 
+    // "Recently Trained" personality section
+    const recentlyTrained = useMemo(() => {
+        return exercises
+            .filter(ex => (ex.history?.length || 0) > 0)
+            .sort((a, b) => (b.history?.length || 0) - (a.history?.length || 0)) // Just a proxy for now since we don't have dates
+            .slice(0, 3)
+    }, [exercises])
+
     return (
         <div className="min-h-screen bg-background pb-32">
             {/* Header */}
@@ -96,8 +106,23 @@ export default function ExercisesPage() {
                 </h1>
             </header>
 
+            {/* Recently Trained Personality Section */}
+            {!isLoading && search === '' && filter === 'all' && recentlyTrained.length > 0 && (
+                <div className="px-5 py-4 space-y-3">
+                    <h3 className="text-[10px] font-black tracking-widest text-primary uppercase flex items-center gap-2">
+                        <Sparkle weight="fill" className="w-3 h-3" />
+                        Zuletzt trainiert
+                    </h3>
+                    <div className="grid grid-cols-1 gap-2">
+                        {recentlyTrained.map(ex => (
+                            <ExerciseListItem key={`recent-${ex.id}`} exercise={ex} />
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Search & Filters */}
-            <div className="px-5 py-3 space-y-3">
+            <div className="px-5 py-3 space-y-3 sticky top-0 z-40 bg-background/80 backdrop-blur-md">
                 <div className="relative">
                     <MagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
@@ -105,11 +130,10 @@ export default function ExercisesPage() {
                         placeholder="Übung suchen…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full h-11 pl-10 pr-4 rounded-2xl bg-secondary/60 border border-border text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                        className="w-full h-11 pl-10 pr-4 rounded-2xl bg-secondary/40 border border-white/5 text-sm font-medium text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/40 transition-all"
                     />
                 </div>
 
-                {/* Smart Filter Pills */}
                 <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                     {[
                         { id: 'all', label: 'Alle' },
@@ -120,10 +144,10 @@ export default function ExercisesPage() {
                             key={f.id}
                             onClick={() => setFilter(f.id as 'all' | 'frequent' | 'focus')}
                             className={cn(
-                                "whitespace-nowrap px-3.5 py-1.5 rounded-full text-[12px] font-bold transition-all shrink-0",
+                                "whitespace-nowrap px-4 py-1.5 rounded-full text-[12px] font-bold transition-all shrink-0",
                                 filter === f.id
-                                    ? "bg-primary text-primary-foreground shadow-sm"
-                                    : "bg-secondary/40 text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
+                                    ? "bg-primary text-primary-foreground shadow-sm glow-primary"
+                                    : "bg-secondary/40 text-muted-foreground hover:text-foreground"
                             )}
                         >
                             {f.label}
@@ -132,8 +156,8 @@ export default function ExercisesPage() {
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="px-5 space-y-6 mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Content List */}
+            <div className="px-5 space-y-8 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {(isLoading || !mounted) ? (
                     <div className="space-y-4">
                         {[...Array(6)].map((_, i) => (
@@ -146,60 +170,14 @@ export default function ExercisesPage() {
                             <Barbell className="w-7 h-7 text-muted-foreground/40" />
                         </div>
                         <p className="text-sm font-bold text-muted-foreground">Keine Übungen gefunden</p>
-                        <p className="text-xs text-muted-foreground/60 mt-1">Versuch einen anderen Suchbegriff.</p>
                     </div>
                 ) : (
                     grouped.map(([group, items]) => (
-                        <section key={group}>
-                            <h2 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-2 px-1 flex items-center gap-1.5">
-                                <Sparkle className="w-3 h-3 text-primary/60" />
-                                {group}
-                                <span className="text-muted-foreground/40 ml-1">({items.length})</span>
-                            </h2>
-                            <div className="space-y-1.5">
-                                {items.map((ex) => (
-                                    <Link
-                                        key={ex.id}
-                                        href={`/exercises/${ex.id}`}
-                                        className={cn(
-                                            "flex items-center justify-between px-4 py-3.5 rounded-2xl",
-                                            "bg-card/60 ring-1 ring-white/[0.04] border-0",
-                                            "active:scale-[0.98] transition-all duration-150",
-                                            "hover:bg-card hover:ring-white/[0.08]",
-                                            "group"
-                                        )}
-                                    >
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                                <Barbell className="w-4 h-4 text-primary" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <p className="text-[14px] font-semibold truncate">{ex.name}</p>
-                                                <div className="flex items-center gap-1.5 mt-0.5">
-                                                    {ex.equipment && (
-                                                        <span className="text-xs text-muted-foreground/80 font-medium truncate bg-secondary/50 px-1.5 py-0.5 rounded-md">{ex.equipment}</span>
-                                                    )}
-                                                    {ex.history && ex.history.length > 0 && (
-                                                        <span className="text-xs text-primary/70 font-bold tracking-wider">Lvl {Math.min(ex.history.length, 10)}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3 shrink-0 ml-2">
-                                            {ex.history && ex.history.length > 1 && (
-                                                <MiniSparkline data={ex.history} trend={ex.trend || null} />
-                                            )}
-                                            <div className="flex items-center gap-1">
-                                                {ex.trend === 'up' && <TrendUp className="w-4 h-4 text-green-400" />}
-                                                {ex.trend === 'down' && <TrendDown className="w-4 h-4 text-red-400" />}
-                                                {ex.trend === 'flat' && <Minus className="w-4 h-4 text-muted-foreground/50" />}
-                                                <CaretRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary/60 transition-colors ml-1" />
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </section>
+                        <MuscleGroupSection key={group} group={group} count={items.length}>
+                            {items.map((ex) => (
+                                <ExerciseListItem key={ex.id} exercise={ex} />
+                            ))}
+                        </MuscleGroupSection>
                     ))
                 )}
             </div>
