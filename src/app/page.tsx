@@ -30,7 +30,7 @@ export default async function Home() {
         <div>
           <p className="text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase opacity-60 mb-1">{greeting}</p>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Hi, {userName}<span className="text-primary">.</span>
+            Hi, {userName}
           </h1>
         </div>
         <div className="w-10 h-10 rounded-full bg-secondary ring-1 ring-white/5 flex items-center justify-center overflow-hidden">

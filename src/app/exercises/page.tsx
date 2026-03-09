@@ -92,7 +92,7 @@ export default function ExercisesPage() {
                     <p className="text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase opacity-60">Bibliothek</p>
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                    Übungen<span className="text-primary">.</span>
+                    Übungen
                 </h1>
             </header>
 
