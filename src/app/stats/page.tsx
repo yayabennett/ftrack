@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Activity, Flame, TrendingUp, Dumbbell, Zap } from 'lucide-react'
 import Link from 'next/link'
@@ -59,15 +60,14 @@ function CustomTooltip({ active, payload, label }: {
 }
 
 export default function StatsPage() {
-    const [data, setData] = useState<WeeklyResponse | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-
-    useEffect(() => {
-        fetch('/api/stats/weekly')
-            .then(r => r.json())
-            .then((d: WeeklyResponse) => { setData(d); setIsLoading(false) })
-            .catch(() => setIsLoading(false))
-    }, [])
+    const { data, isLoading } = useQuery({
+        queryKey: ['weekly-stats'],
+        queryFn: async () => {
+            const res = await fetch('/api/stats/weekly')
+            if (!res.ok) throw new Error('Failed to fetch stats')
+            return res.json() as Promise<WeeklyResponse>
+        }
+    })
 
     const totalVolume = data?.totalVolume ?? 0
     const volumeDisplay = totalVolume > 1000 ? `${(totalVolume / 1000).toFixed(1)}` : `${totalVolume}`
@@ -98,8 +98,9 @@ export default function StatsPage() {
                     <CardContent className="p-6 text-center">
                         <p className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase mb-2">Wochen-Volumen</p>
                         {isLoading ? (
-                            <div className="h-14 flex items-center justify-center">
-                                <div className="w-6 h-6 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+                            <div className="flex flex-col items-center justify-center gap-2 h-[88px]">
+                                <Skeleton className="h-12 w-32 rounded-lg bg-primary/20" />
+                                <Skeleton className="h-4 w-48 rounded-md bg-primary/10" />
                             </div>
                         ) : (
                             <>
@@ -130,8 +131,13 @@ export default function StatsPage() {
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
                         {isLoading ? (
-                            <div className="h-44 flex items-center justify-center text-muted-foreground text-sm animate-pulse">
-                                Lade Daten...
+                            <div className="h-[176px] flex items-end justify-between px-2 gap-2 pb-6 pt-8">
+                                <Skeleton className="w-8 h-12 rounded-t-sm bg-secondary" />
+                                <Skeleton className="w-8 h-24 rounded-t-sm bg-secondary" />
+                                <Skeleton className="w-8 h-16 rounded-t-sm bg-secondary" />
+                                <Skeleton className="w-8 h-32 rounded-t-sm bg-primary/40" />
+                                <Skeleton className="w-8 h-20 rounded-t-sm bg-secondary" />
+                                <Skeleton className="w-8 h-8 rounded-t-sm bg-secondary" />
                             </div>
                         ) : (
                             <ResponsiveContainer width="100%" height={176}>

@@ -62,6 +62,15 @@ export interface WorkoutSessionDTO {
   exercises: WorkoutExerciseDTO[]
 }
 
+export interface HistorySessionDTO {
+  id: string
+  startedAt: string
+  finishedAt: string | null
+  template: { name: string } | null
+  volume: number
+  durationMinutes: number
+}
+
 // ─── PR (Personal Record) ────────────────────────────────────────────────────
 
 export interface PRResult {
@@ -72,6 +81,19 @@ export interface PRResult {
   /** weight × reps */
   volume: number
   achievedAt: string
+}
+
+export interface ExerciseDetailDTO {
+  id: string
+  name: string
+  muscleGroup: string | null
+  equipment: string | null
+  history: {
+    sessionId: string
+    date: string
+    sets: SetEntryDTO[]
+    e1RM: number
+  }[]
 }
 
 // ─── Stats ───────────────────────────────────────────────────────────────────

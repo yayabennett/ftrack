@@ -7,8 +7,26 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { cachedGet, invalidateCache } from '@/lib/api-client'
 import type { ExerciseDTO } from '@/lib/types'
+import { toast } from 'sonner'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent
+} from '@dnd-kit/core'
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { SortableExerciseItem } from '@/components/ui/sortable-exercise-item'
 
 // Defines how muscle groups map to main categories
 const CATEGORY_MAP: Record<string, string[]> = {
@@ -20,12 +38,18 @@ const CATEGORY_MAP: Record<string, string[]> = {
 
 export default function CreateTemplatePage() {
     const router = useRouter()
+    const queryClient = useQueryClient()
     const [isPending, startTransition] = useTransition()
 
-    // Fetch data via an API call instead of direct prisma (since it's a Client Component)
-    // We'll manage state for the exercises here
-    const [exercises, setExercises] = useState<ExerciseDTO[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    // Fetch exercises via React Query
+    const { data: exercises = [], isLoading } = useQuery({
+        queryKey: ['exercises'],
+        queryFn: async () => {
+            const res = await fetch('/api/exercises')
+            if (!res.ok) throw new Error('Failed to fetch exercises')
+            return res.json() as Promise<ExerciseDTO[]>
+        }
+    })
 
     // UI State
     const [name, setName] = useState('')
@@ -35,19 +59,33 @@ export default function CreateTemplatePage() {
     // Selected exercises map (id -> order) to preserve selection sequence
     const [selectedIds, setSelectedIds] = useState<string[]>([])
 
-    // Load exercises on mount
-    useEffect(() => {
-        cachedGet<ExerciseDTO[]>('/api/exercises', 'cache-exercises')
-            .then(data => {
-                if (data) setExercises(data)
-                setIsLoading(false)
+    // DND Sensors (require 5px movement before drag starts so taps still work)
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    )
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event
+        if (over && active.id !== over.id) {
+            setSelectedIds((items) => {
+                const oldIndex = items.indexOf(active.id as string)
+                const newIndex = items.indexOf(over.id as string)
+                return arrayMove(items, oldIndex, newIndex)
             })
-            .catch(() => setIsLoading(false))
-    }, [])
+        }
+    }
 
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!name.trim() || selectedIds.length === 0) return
+        if (!name.trim()) {
+            toast.error('Kein Name', { description: 'Bitte gib deiner Einheit einen Namen.' })
+            return
+        }
+        if (selectedIds.length === 0) {
+            toast.error('Keine Übungen', { description: 'Wähle mindestens eine Übung aus.' })
+            return
+        }
 
         startTransition(async () => {
             const formData = new FormData()
@@ -70,10 +108,11 @@ export default function CreateTemplatePage() {
             })
 
             if (res.ok) {
-                await invalidateCache('cache-templates')
+                queryClient.invalidateQueries({ queryKey: ['templates'] })
+                toast.success('Einheit gespeichert!', { description: `"${name}" wurde erfolgreich erstellt.` })
                 router.push('/templates')
             } else {
-                alert('Fehler beim Speichern der Einheit.')
+                toast.error('Fehler', { description: 'Die Einheit konnte nicht gespeichert werden.' })
             }
         })
     }
@@ -133,6 +172,42 @@ export default function CreateTemplatePage() {
 
                 {/* Exercises Section */}
                 <div className="space-y-4">
+
+                    {/* Selected Exercises (Draggable) */}
+                    {selectedIds.length > 0 && (
+                        <div className="space-y-3 mb-8 bg-secondary/10 p-4 -mx-4 rounded-3xl border border-white/5">
+                            <label className="text-xs font-bold tracking-widest text-primary uppercase px-1">
+                                Reihenfolge anpassen ({selectedIds.length})
+                            </label>
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <SortableContext
+                                    items={selectedIds}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    <div className="space-y-2">
+                                        {selectedIds.map(id => {
+                                            const ex = exercises.find(e => e.id === id)
+                                            if (!ex) return null
+                                            return (
+                                                <SortableExerciseItem
+                                                    key={id}
+                                                    id={id}
+                                                    name={ex.name}
+                                                    muscleGroup={ex.muscleGroup}
+                                                    onRemove={() => toggleSelection(id)}
+                                                />
+                                            )
+                                        })}
+                                    </div>
+                                </SortableContext>
+                            </DndContext>
+                        </div>
+                    )}
+
                     <div className="flex items-center justify-between px-1">
                         <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
                             Übungen ({selectedIds.length} gewählt)
@@ -168,11 +243,17 @@ export default function CreateTemplatePage() {
                     </div>
 
                     {/* Exercise List */}
-                    <div className="space-y-2 max-h-[50vh] overflow-y-auto no-scrollbar pb-10">
+                    <div className="space-y-2 mt-4">
                         {isLoading ? (
-                            <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Lade Übungen...</div>
+                            <>
+                                <Skeleton className="h-[72px] w-full rounded-2xl bg-secondary/50" />
+                                <Skeleton className="h-[72px] w-full rounded-2xl bg-secondary/50" />
+                                <Skeleton className="h-[72px] w-full rounded-2xl bg-secondary/50" />
+                                <Skeleton className="h-[72px] w-full rounded-2xl bg-secondary/50" />
+                                <Skeleton className="h-[72px] w-full rounded-2xl bg-secondary/50" />
+                            </>
                         ) : filteredExercises.length === 0 ? (
-                            <div className="p-8 text-center text-sm text-muted-foreground">Keine Übungen gefunden.</div>
+                            <div className="text-center py-12 px-4 rounded-2xl bg-secondary/30 mt-8 border border-white/5">Keine Übungen gefunden.</div>
                         ) : (
                             filteredExercises.map(ex => {
                                 const isSelected = selectedIds.includes(ex.id)

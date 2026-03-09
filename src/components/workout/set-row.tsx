@@ -1,14 +1,16 @@
 "use client"
 
 import { useState } from 'react'
-import { Check } from 'lucide-react'
+import { Check, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { motion, useAnimation, useMotionValue } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { customFetch } from '@/lib/api-client'
 import { useWorkoutStore } from '@/store/use-workout-store'
 import type { SetEntry } from '@/store/use-workout-store'
 import type { PRResult } from '@/lib/types'
+import { toast } from 'sonner'
 
 interface SetRowProps {
     exerciseId: string      // The Zustand workout-exercise ID (client UUID)
@@ -19,10 +21,24 @@ interface SetRowProps {
 }
 
 export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }: SetRowProps) {
-    const { updateSet, toggleSetComplete } = useWorkoutStore()
+    const { updateSet, toggleSetComplete, removeSet } = useWorkoutStore()
     const [weight, setWeight] = useState(setEntry.weight ? setEntry.weight.toString() : "")
     const [reps, setReps] = useState(setEntry.reps ? setEntry.reps.toString() : "")
     const [isLoading, setIsLoading] = useState(false)
+
+    // Swipe to delete setup
+    const x = useMotionValue(0)
+    const controls = useAnimation()
+
+    const handleDragEnd = (event: any, info: any) => {
+        if (info.offset.x < -60) {
+            removeSet(exerciseId, setEntry.id)
+            toast('Satz gelöscht')
+            // Optionally delete from backend here if needed
+        } else {
+            controls.start({ x: 0 })
+        }
+    }
 
     const handleSave = async () => {
         if (!weight || !reps || isLoading) return
@@ -60,6 +76,10 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                             const newVolume = parsedWeight * parsedReps
                             // It's a PR if there's no previous record, or the new set exceeds it
                             if (!pr || newVolume >= pr.volume) {
+                                toast.success(`🏆 Neuer PR: ${parsedWeight} kg × ${parsedReps} Wdh!`, {
+                                    description: 'Richtig stark! Bleib dran.',
+                                    duration: 4000,
+                                })
                                 onPR?.(`🏆 Neuer PR: ${parsedWeight} kg × ${parsedReps} Wdh!`)
                             }
                         }
@@ -73,6 +93,9 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
             }
         } catch (e) {
             console.error(e)
+            toast.error('Fehler beim Speichern', {
+                description: 'Dein Satz konnte nicht gesichert werden.'
+            })
             // Rollback optimistic update
             toggleSetComplete(exerciseId, setEntry.id)
         } finally {
@@ -83,49 +106,70 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
     const isCompleted = setEntry.isCompleted
 
     return (
-        <div className={cn(
-            "grid grid-cols-[3rem_1fr_1fr_4rem] gap-2 items-center rounded-xl p-2 transition-colors",
-            isCompleted ? "bg-primary/10" : "bg-secondary/40"
-        )}>
-            <div className={cn("text-center text-[15px] font-bold", isCompleted ? "text-primary" : "text-muted-foreground")}>
-                {setEntry.setIndex}
+        <div className="relative overflow-hidden rounded-xl bg-destructive">
+            {/* Background Trash Icon */}
+            <div className="absolute inset-0 flex items-center justify-end px-4">
+                <Trash2 className="text-white w-5 h-5" />
             </div>
-            <Input
-                type="number"
-                value={weight}
-                onChange={e => setWeight(e.target.value)}
-                placeholder="0"
-                disabled={isCompleted}
+
+            {/* Foreground Draggable Row */}
+            <motion.div
+                drag="x"
+                dragConstraints={{ left: -100, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={handleDragEnd}
+                animate={controls}
+                style={{ x }}
                 className={cn(
-                    "h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none",
-                    isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
+                    "relative grid grid-cols-[3rem_1fr_1fr_4rem] gap-2 items-center rounded-xl p-1 transition-colors touch-pan-y shadow-sm",
+                    isCompleted ? "bg-[#182433]" : "bg-card border border-white/5"
                 )}
-            />
-            <Input
-                type="number"
-                value={reps}
-                onChange={e => setReps(e.target.value)}
-                placeholder="0"
-                disabled={isCompleted}
-                className={cn(
-                    "h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none",
-                    isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
-                )}
-            />
-            <div className="flex justify-end pr-1">
-                <Button
-                    onClick={handleSave}
-                    disabled={isLoading || !weight || !reps}
-                    size="icon"
-                    variant={isCompleted ? "default" : "outline"}
+            >
+                <div className={cn("text-center text-[15px] font-bold tracking-tight", isCompleted ? "text-primary" : "text-muted-foreground")}>
+                    {setEntry.setIndex}
+                </div>
+                <Input
+                    type="number"
+                    inputMode="decimal"
+                    pattern="[0-9]*"
+                    value={weight}
+                    onChange={e => setWeight(e.target.value)}
+                    placeholder="0"
+                    disabled={isCompleted}
                     className={cn(
-                        "h-9 w-9 rounded-[10px]",
-                        isCompleted ? "bg-primary text-primary-foreground border-0" : "bg-secondary/80 text-muted-foreground border-white/10"
+                        "h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none",
+                        isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
                     )}
-                >
-                    <Check className={cn("h-5 w-5", isLoading && "animate-pulse")} />
-                </Button>
-            </div>
+                />
+                <Input
+                    type="number"
+                    inputMode="decimal"
+                    pattern="[0-9]*"
+                    value={reps}
+                    onChange={e => setReps(e.target.value)}
+                    placeholder="0"
+                    disabled={isCompleted}
+                    className={cn(
+                        "h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none",
+                        isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
+                    )}
+                />
+                <div className="flex justify-end pr-1">
+                    <Button
+                        onClick={handleSave}
+                        disabled={isLoading || !weight || !reps}
+                        size="icon"
+                        variant={isCompleted ? "default" : "outline"}
+                        aria-label={isCompleted ? "Satz bearbeiten" : "Satz abspeichern"}
+                        className={cn(
+                            "h-10 w-10 text-[16px] rounded-[10px] active:scale-95 transition-transform",
+                            isCompleted ? "bg-primary text-primary-foreground border-0" : "bg-secondary/80 text-muted-foreground border-white/10"
+                        )}
+                    >
+                        <Check className={cn("h-5 w-5", isLoading && "animate-pulse")} />
+                    </Button>
+                </div>
+            </motion.div>
         </div>
     )
 }

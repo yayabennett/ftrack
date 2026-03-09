@@ -1,0 +1,104 @@
+"use client"
+
+import { useQuery } from '@tanstack/react-query'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Calendar, Clock, Dumbbell, Play } from 'lucide-react'
+import type { HistorySessionDTO } from '@/lib/types'
+import Link from 'next/link'
+
+export default function HistoryPage() {
+    const { data: sessions = [], isLoading } = useQuery({
+        queryKey: ['history-sessions'],
+        queryFn: async () => {
+            const res = await fetch('/api/sessions')
+            if (!res.ok) throw new Error('Failed to fetch history')
+            return res.json() as Promise<HistorySessionDTO[]>
+        }
+    })
+
+    // Grouping by Month/Year
+    const grouped = sessions.reduce((acc, session) => {
+        const d = new Date(session.startedAt)
+        const monthYear = d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
+        if (!acc[monthYear]) acc[monthYear] = []
+        acc[monthYear].push(session)
+        return acc
+    }, {} as Record<string, HistorySessionDTO[]>)
+
+    return (
+        <div className="min-h-screen bg-background pb-28">
+            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center border-b border-white/5">
+                <h1 className="text-[22px] font-bold tracking-tight text-foreground">Verlauf</h1>
+            </header>
+
+            <div className="container mx-auto p-4 space-y-6 mt-2">
+                {isLoading ? (
+                    <div className="space-y-4">
+                        <Skeleton className="h-4 w-32 bg-secondary/50 mb-2 mt-4" />
+                        <Skeleton className="h-[96px] w-full rounded-2xl bg-card border border-white/5" />
+                        <Skeleton className="h-[96px] w-full rounded-2xl bg-card border border-white/5" />
+                        <Skeleton className="h-4 w-32 bg-secondary/50 mb-2 mt-8" />
+                        <Skeleton className="h-[96px] w-full rounded-2xl bg-card border border-white/5" />
+                    </div>
+                ) : sessions.length === 0 ? (
+                    <div className="text-center mt-16 space-y-3">
+                        <div className="w-16 h-16 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Calendar className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <h3 className="font-bold text-lg">Kein Verlauf</h3>
+                        <p className="text-muted-foreground text-sm max-w-[250px] mx-auto">
+                            Du hast noch keine Workouts abgeschlossen.
+                        </p>
+                        <Link href="/workout/start">
+                            <button className="mt-4 px-6 py-2 bg-primary/10 text-primary font-bold rounded-xl active:scale-95 transition-transform">
+                                Erstes Workout starten
+                            </button>
+                        </Link>
+                    </div>
+                ) : (
+                    Object.entries(grouped).map(([month, monthSessions]) => (
+                        <div key={month} className="space-y-3">
+                            <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">
+                                {month}
+                            </h3>
+                            <div className="space-y-2">
+                                {monthSessions.map(session => {
+                                    const d = new Date(session.startedAt)
+                                    const dateStr = d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })
+                                    const volumeStr = session.volume > 1000 ? `${(session.volume / 1000).toFixed(1)}t` : `${session.volume}kg`
+
+                                    return (
+                                        <Link key={session.id} href={`/history/${session.id}`} className="block active:scale-[0.98] transition-transform">
+                                            <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
+                                                <CardContent className="p-4 flex items-center gap-4">
+                                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex flex-col items-center justify-center shrink-0">
+                                                        <span className="text-[10px] font-bold text-primary uppercase leading-tight">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</span>
+                                                        <span className="text-[16px] font-extrabold text-primary leading-tight">{d.getDate()}</span>
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="font-bold text-[15px] truncate">
+                                                            {session.template?.name || 'Freies Workout'}
+                                                        </h4>
+                                                        <div className="flex gap-3 text-[12px] text-muted-foreground mt-1">
+                                                            <span className="flex items-center gap-1 font-medium">
+                                                                <Dumbbell className="w-3.5 h-3.5" /> {volumeStr}
+                                                            </span>
+                                                            <span className="flex items-center gap-1 font-medium">
+                                                                <Clock className="w-3.5 h-3.5" /> {session.durationMinutes} min
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        </Link>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    )
+}
