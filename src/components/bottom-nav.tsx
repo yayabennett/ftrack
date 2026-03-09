@@ -1,60 +1,165 @@
 "use client"
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, User, Plus, History, BarChart2 } from 'lucide-react'
+import { Home, User, Plus, History, BarChart2, Dumbbell, LayoutGrid, MoreHorizontal, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export function BottomNav() {
     const pathname = usePathname()
-
-    const navItems = [
-        { name: 'Home', href: '/', icon: Home },
-        { name: 'Verlauf', href: '/history', icon: History },
-        { name: 'Start', href: '/workout/start', icon: Plus, isAction: true },
-        { name: 'Statistik', href: '/stats', icon: BarChart2 },
-        { name: 'Profil', href: '/settings', icon: User },
-    ]
+    const [isMoreOpen, setIsMoreOpen] = useState(false)
 
     // Don't show bottom nav inside an active workout
     if (pathname.startsWith('/workout/')) return null
 
+    const mainNavItems = [
+        { name: 'Home', href: '/', icon: Home },
+        { name: 'Übungen', href: '/exercises', icon: Dumbbell },
+        { name: 'Start', href: '/workout/start', icon: Plus, isAction: true },
+        { name: 'Vorlagen', href: '/templates', icon: LayoutGrid },
+        { name: 'Mehr', action: () => setIsMoreOpen(!isMoreOpen), icon: isMoreOpen ? X : MoreHorizontal, isMenu: true }
+    ]
+
+    const moreMenuLinks = [
+        { name: 'Verlauf', href: '/history', icon: History },
+        { name: 'Statistik', href: '/stats', icon: BarChart2 },
+        { name: 'Profil', href: '/settings', icon: User },
+    ]
+
+    // Determine if any of the "more" links are currently active
+    const isMoreActive = moreMenuLinks.some(link => pathname === link.href)
+
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 flex h-[76px] items-center justify-around border-t border-white-[0.03] bg-background/60 backdrop-blur-[32px] pb-safe px-2 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
-            {navItems.map((item) => {
-                const isActive = pathname === item.href
+        <>
+            {/* Backdrop for the expand menu */}
+            <AnimatePresence>
+                {isMoreOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-40 bg-background/40 backdrop-blur-sm"
+                        onClick={() => setIsMoreOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
 
-                if (item.isAction) {
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex flex-col items-center justify-center -mt-8 relative group"
+            <div className="fixed bottom-6 left-4 right-4 z-50">
+                {/* Expanded "More" Menu */}
+                <AnimatePresence>
+                    {isMoreOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                            transition={{ type: "spring", bounce: 0.25, duration: 0.4 }}
+                            className="absolute bottom-full right-0 mb-4 w-48 rounded-3xl bg-background/80 backdrop-blur-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-2"
                         >
-                            <div className="w-14 h-14 rounded-full btn-primary-gradient flex items-center justify-center text-primary-foreground transition-[transform,box-shadow] group-active:scale-90 ring-[6px] ring-background">
-                                <item.icon className="h-7 w-7 stroke-[3px]" />
+                            <div className="flex flex-col gap-1">
+                                {moreMenuLinks.map((link) => {
+                                    const isActive = pathname === link.href
+                                    return (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            onClick={() => setIsMoreOpen(false)}
+                                            className={cn(
+                                                "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200",
+                                                isActive
+                                                    ? "bg-primary/15 text-primary"
+                                                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground active:scale-95"
+                                            )}
+                                        >
+                                            <link.icon className={cn("h-5 w-5", isActive && "fill-primary/20")} />
+                                            <span className={cn("text-sm", isActive ? "font-bold" : "font-medium")}>
+                                                {link.name}
+                                            </span>
+                                        </Link>
+                                    )
+                                })}
                             </div>
-                            <span className="text-[10px] mt-1.5 font-bold text-primary">Start</span>
-                        </Link>
-                    )
-                }
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                return (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                            "flex flex-col items-center justify-center gap-1.5 w-16 h-12 rounded-xl transition-all duration-200",
-                            isActive
-                                ? "text-primary"
-                                : "text-muted-foreground hover:text-foreground"
-                        )}
-                    >
-                        <item.icon className={cn("h-5 w-5", isActive && "fill-primary/10")} />
-                        <span className={cn("text-[10px]", isActive ? "font-bold" : "font-medium")}>{item.name}</span>
-                    </Link>
-                )
-            })}
-        </div>
+                {/* Main Floating Dock */}
+                <div className="flex h-[72px] items-center justify-between rounded-[2rem] border border-white/10 bg-background/70 backdrop-blur-[32px] px-2 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+                    {mainNavItems.map((item, i) => {
+                        const isActive = item.href ? pathname === item.href : (item.isMenu && isMoreActive)
+
+                        if (item.isAction) {
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href || '#'}
+                                    className="relative flex flex-col items-center justify-center -mt-10 group px-2"
+                                >
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-blue-600 text-primary-foreground shadow-[0_8px_24px_rgba(59,130,246,0.3)] ring-[6px] ring-background transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)] group-active:scale-95 group-active:shadow-none">
+                                        <item.icon className="h-8 w-8 stroke-[2.5px] transition-transform duration-300 group-hover:rotate-90" />
+                                    </div>
+                                    <span className="mt-2 text-[10px] font-extrabold uppercase tracking-wider text-primary">Start</span>
+                                </Link>
+                            )
+                        }
+
+                        if (item.isMenu) {
+                            return (
+                                <button
+                                    key="menu"
+                                    onClick={item.action}
+                                    className={cn(
+                                        "relative flex flex-col items-center justify-center gap-1.5 w-[52px] h-[52px] rounded-2xl transition-all duration-300",
+                                        isMoreOpen || isMoreActive
+                                            ? "text-primary"
+                                            : "text-muted-foreground hover:text-foreground active:scale-90"
+                                    )}
+                                >
+                                    {isMoreOpen || isMoreActive ? (
+                                        <motion.div layoutId="activeTab" className="absolute inset-0 bg-primary/10 rounded-2xl" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                                    ) : null}
+                                    <AnimatePresence mode="wait">
+                                        <motion.div
+                                            key={isMoreOpen ? 'close' : 'open'}
+                                            initial={{ opacity: 0, scale: 0.8, rotate: -90 }}
+                                            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                            exit={{ opacity: 0, scale: 0.8, rotate: 90 }}
+                                            transition={{ duration: 0.15 }}
+                                        >
+                                            <item.icon className={cn("relative z-10 h-[22px] w-[22px]", isMoreActive && "fill-primary/20")} strokeWidth={isMoreOpen ? 2.5 : 2} />
+                                        </motion.div>
+                                    </AnimatePresence>
+                                    <span className={cn("relative z-10 text-[9px]", (isMoreOpen || isMoreActive) ? "font-bold" : "font-medium")}>
+                                        {item.name}
+                                    </span>
+                                </button>
+                            )
+                        }
+
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href || '#'}
+                                className={cn(
+                                    "relative flex flex-col items-center justify-center gap-1.5 w-[52px] h-[52px] rounded-2xl transition-all duration-300",
+                                    isActive
+                                        ? "text-primary"
+                                        : "text-muted-foreground hover:text-foreground active:scale-90"
+                                )}
+                            >
+                                {isActive && (
+                                    <motion.div layoutId="activeTab" className="absolute inset-0 bg-primary/10 rounded-2xl" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                                )}
+                                <item.icon className={cn("relative z-10 h-[22px] w-[22px] transition-all duration-300", isActive ? "scale-110 fill-primary/20" : "")} strokeWidth={isActive ? 2.5 : 2} />
+                                <span className={cn("relative z-10 text-[9px]", isActive ? "font-bold" : "font-medium")}>
+                                    {item.name}
+                                </span>
+                            </Link>
+                        )
+                    })}
+                </div>
+            </div>
+        </>
     )
 }
