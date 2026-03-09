@@ -58,7 +58,7 @@ export default function EinheitenPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background pb-24">
-                <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
+                <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center justify-between border-b border-white/5">
                     <div className="flex items-center gap-2">
                         <Copy className="h-5 w-5 text-primary" />
                         <h1 className="text-[22px] font-bold tracking-tight text-foreground">Einheiten</h1>
@@ -76,7 +76,7 @@ export default function EinheitenPage() {
 
     return (
         <div className="min-h-screen bg-background pb-24">
-            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
+            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center justify-between border-b border-white/5">
                 <div className="flex items-center gap-2">
                     <Copy className="h-5 w-5 text-primary" />
                     <h1 className="text-[22px] font-bold tracking-tight text-foreground">Einheiten</h1>
@@ -90,8 +90,8 @@ export default function EinheitenPage() {
 
             <div className="container mx-auto p-4 space-y-4 animate-in fade-in duration-300 mt-2">
                 {templates.length === 0 ? (
-                    <div className="text-center mt-16 space-y-4">
-                        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="text-center mt-12 mb-12 space-y-4 p-8 glass-panel rounded-3xl mx-2 shadow-soft">
+                        <div className="w-20 h-20 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 inner-highlight shadow-sm shadow-primary/20">
                             <Copy className="w-10 h-10 text-primary" />
                         </div>
                         <h3 className="font-bold text-[20px] text-foreground">Keine Einheiten</h3>

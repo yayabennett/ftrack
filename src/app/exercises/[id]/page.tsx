@@ -27,7 +27,7 @@ export default function ExerciseDetailPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background pb-28">
-                <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center gap-4 border-b border-white/5">
+                <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center gap-4 border-b border-white/5">
                     <Skeleton className="w-9 h-9 rounded-full bg-secondary" />
                     <Skeleton className="w-32 h-6 bg-secondary" />
                 </header>
@@ -68,7 +68,7 @@ export default function ExerciseDetailPage() {
 
     return (
         <div className="min-h-screen bg-background pb-28">
-            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center gap-4 border-b border-white/5">
+            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center gap-4 border-b border-white/5">
                 <Button onClick={() => router.back()} size="icon" variant="ghost" className="h-9 w-9 rounded-full -ml-2 text-foreground hover:bg-secondary/80">
                     <ArrowLeft className="h-5 w-5" />
                 </Button>

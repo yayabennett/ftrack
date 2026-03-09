@@ -81,7 +81,7 @@ export default function StatsPage() {
 
     return (
         <div className="min-h-screen bg-background pb-24">
-            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
+            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center justify-between border-b border-white/5">
                 <h1 className="text-[22px] font-bold tracking-tight text-foreground">Statistiken</h1>
                 <Link href="/settings">
                     <div className="h-9 w-9 rounded-full bg-secondary ring-1 ring-white/5 flex items-center justify-center text-muted-foreground hover:bg-secondary/80 transition-colors">

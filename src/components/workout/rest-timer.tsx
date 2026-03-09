@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
 export function RestTimerPill({ endsAt, onDismiss }: { endsAt: number; onDismiss: () => void }) {
-    const [remaining, setRemaining] = useState(Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)))
+    const [remaining, setRemaining] = useState(() => Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)))
 
     useEffect(() => {
         const interval = setInterval(() => {

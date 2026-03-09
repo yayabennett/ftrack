@@ -124,7 +124,7 @@ function WorkoutContent() {
 
     return (
         <div className="min-h-screen bg-background pb-32">
-            <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-white/5 h-14 px-4 flex items-center justify-between">
+            <div className="sticky top-0 z-40 bg-background/60 backdrop-blur-[32px] border-b border-white/5 h-14 px-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     <WorkoutTimer startedAt={startedAt} />

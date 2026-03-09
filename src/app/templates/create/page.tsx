@@ -143,7 +143,7 @@ export default function CreateTemplatePage() {
 
     return (
         <div className="min-h-screen bg-background pb-28">
-            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
+            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center justify-between border-b border-white/5">
                 <div className="flex items-center gap-2">
                     <Link href="/templates">
                         <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full -ml-2 text-foreground hover:bg-secondary/80">
@@ -253,7 +253,7 @@ export default function CreateTemplatePage() {
                                 <Skeleton className="h-[72px] w-full rounded-2xl bg-secondary/50" />
                             </>
                         ) : filteredExercises.length === 0 ? (
-                            <div className="text-center py-12 px-4 rounded-2xl bg-secondary/30 mt-8 border border-white/5">Keine Übungen gefunden.</div>
+                            <div className="text-center py-12 px-4 rounded-3xl glass-panel mt-8 shadow-sm">Keine Übungen gefunden.</div>
                         ) : (
                             filteredExercises.map(ex => {
                                 const isSelected = selectedIds.includes(ex.id)

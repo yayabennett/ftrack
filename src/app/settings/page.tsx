@@ -32,7 +32,7 @@ export default async function SettingsPage() {
 
     return (
         <div className="min-h-screen bg-background pb-24">
-            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center border-b border-white/5">
+            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center border-b border-white/5">
                 <h1 className="text-[22px] font-bold tracking-tight text-foreground">Profil</h1>
             </header>
 

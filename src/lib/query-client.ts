@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+import { Persister } from '@tanstack/react-query-persist-client'
 
 export const queryClient = new QueryClient({
     defaultOptions: {
@@ -12,15 +12,9 @@ export const queryClient = new QueryClient({
     },
 })
 
-// Custom persister interface
-export interface Persister {
-    persistClient(persistClient: any): void
-    restoreClient(): Promise<any>
-    removeClient(): void
-}
-
 export function createIDBPersister(idbValidKey: string): Persister {
     return {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         persistClient: async (client: any) => {
             if (typeof window !== 'undefined') {
                 const { set } = await import('idb-keyval')

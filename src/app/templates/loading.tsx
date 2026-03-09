@@ -1,7 +1,7 @@
 export default function TemplatesLoading() {
     return (
         <div className="min-h-screen bg-background pb-24">
-            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center justify-between border-b border-white/5">
+            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center justify-between border-b border-white/5">
                 <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded bg-secondary/50 animate-pulse" />
                     <div className="h-6 w-24 bg-secondary/60 rounded-lg animate-pulse" />

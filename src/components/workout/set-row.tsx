@@ -30,7 +30,7 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
     const x = useMotionValue(0)
     const controls = useAnimation()
 
-    const handleDragEnd = (event: any, info: any) => {
+    const handleDragEnd = (_event: unknown, info: { offset: { x: number } }) => {
         if (info.offset.x < -60) {
             removeSet(exerciseId, setEntry.id)
             toast('Satz gelöscht')

@@ -43,7 +43,7 @@ const generateId = () => {
 
 export const useWorkoutStore = create<WorkoutState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             isActive: false,
             sessionId: null,
             startedAt: null,

@@ -20,7 +20,7 @@ export function BottomNav() {
     if (pathname.startsWith('/workout/')) return null
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 flex h-[76px] items-center justify-around border-t border-white/5 bg-[#0A0B10]/90 backdrop-blur-xl pb-safe px-2">
+        <div className="fixed bottom-0 left-0 right-0 z-50 flex h-[76px] items-center justify-around border-t border-white-[0.03] bg-background/60 backdrop-blur-[32px] pb-safe px-2 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
             {navItems.map((item) => {
                 const isActive = pathname === item.href
 
@@ -31,7 +31,7 @@ export function BottomNav() {
                             href={item.href}
                             className="flex flex-col items-center justify-center -mt-8 relative group"
                         >
-                            <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] transition-transform group-active:scale-90 ring-4 ring-[#0A0B10]">
+                            <div className="w-14 h-14 rounded-full btn-primary-gradient flex items-center justify-center text-primary-foreground transition-[transform,box-shadow] group-active:scale-90 ring-[6px] ring-background">
                                 <item.icon className="h-7 w-7 stroke-[3px]" />
                             </div>
                             <span className="text-[10px] mt-1.5 font-bold text-primary">Start</span>

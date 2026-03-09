@@ -28,7 +28,7 @@ export default function HistoryPage() {
 
     return (
         <div className="min-h-screen bg-background pb-28">
-            <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-xl px-4 flex items-center border-b border-white/5">
+            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center border-b border-white/5">
                 <h1 className="text-[22px] font-bold tracking-tight text-foreground">Verlauf</h1>
             </header>
 
@@ -42,9 +42,9 @@ export default function HistoryPage() {
                         <Skeleton className="h-[96px] w-full rounded-2xl bg-card border border-white/5" />
                     </div>
                 ) : sessions.length === 0 ? (
-                    <div className="text-center mt-16 space-y-3">
-                        <div className="w-16 h-16 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Calendar className="w-8 h-8 text-muted-foreground" />
+                    <div className="text-center mt-12 mb-12 space-y-3 p-8 glass-panel rounded-3xl mx-2 shadow-soft">
+                        <div className="w-20 h-20 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 inner-highlight shadow-sm shadow-primary/20">
+                            <Calendar className="w-10 h-10 text-primary" />
                         </div>
                         <h3 className="font-bold text-lg">Kein Verlauf</h3>
                         <p className="text-muted-foreground text-sm max-w-[250px] mx-auto">

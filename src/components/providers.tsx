@@ -5,11 +5,7 @@ import { queryClient, createIDBPersister } from '@/lib/query-client'
 import { useEffect, useState } from 'react'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-    const [persister, setPersister] = useState<any>(null)
-
-    useEffect(() => {
-        setPersister(createIDBPersister('ftrack-query-cache'))
-    }, [])
+    const [persister] = useState(() => typeof window !== 'undefined' ? createIDBPersister('ftrack-query-cache') : null)
 
     if (!persister) return <>{children}</>
 

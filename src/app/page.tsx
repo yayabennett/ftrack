@@ -165,7 +165,7 @@ export default async function Home() {
 
           <div className="flex gap-4 overflow-x-auto px-5 pb-2 no-scrollbar scroll-smooth">
             {templates.length === 0 ? (
-              <Card className="min-w-[240px] bg-secondary/30 ring-1 ring-white/5 border-0 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2">
+              <Card className="min-w-[240px] glass-panel rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2">
                 <Plus className="w-6 h-6 text-muted-foreground" />
                 <p className="text-xs text-muted-foreground font-medium">Noch keine Einheiten</p>
               </Card>
@@ -243,7 +243,7 @@ function UserIcon() {
   )
 }
 
-function Plus(props: any) {
+function Plus(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg {...props} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M5 12h14"></path>

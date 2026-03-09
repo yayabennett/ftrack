@@ -5,12 +5,10 @@ import { getSyncQueueCount, processSyncQueue } from '@/lib/api-client';
 
 export function useSyncQueue() {
     const [queueCount, setQueueCount] = useState(0);
-    const [isOnline, setIsOnline] = useState(true);
+    const [isOnline, setIsOnline] = useState(typeof window !== 'undefined' ? navigator.onLine : true);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-
-        setIsOnline(navigator.onLine);
 
         const checkQueue = async () => {
             const count = await getSyncQueueCount();
