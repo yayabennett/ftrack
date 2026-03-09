@@ -37,18 +37,23 @@ export async function GET(
             }
         })
 
-        const history = workoutExercises.map(we => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const history = workoutExercises.map((we: any) => {
             // Calculate best e1RM from this session's sets
             // e1RM = weight * (1 + reps/30) (Brzycki formula)
             let maxE1RM = 0
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             we.sets.forEach((set: any) => {
                 const e1rm = set.weight * (1 + set.reps / 30)
                 if (e1rm > maxE1RM) maxE1RM = e1rm
             })
 
             return {
-                sessionId: (we as any).session.id,
-                date: (we as any).session.startedAt.toISOString(),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                sessionId: (we as any).session?.id || '',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                date: (we as any).session?.startedAt?.toISOString() || '',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 sets: (we as any).sets.map((s: any) => ({
                     id: s.id,
                     workoutExerciseId: s.workoutExerciseId,

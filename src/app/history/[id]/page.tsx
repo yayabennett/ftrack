@@ -107,7 +107,7 @@ export default function SessionDetailPage() {
 
                         {session.notes && (
                             <div className="mt-4 p-3 bg-secondary/30 rounded-xl text-sm italic text-muted-foreground">
-                                "{session.notes}"
+                                &quot;{session.notes}&quot;
                             </div>
                         )}
                     </CardContent>

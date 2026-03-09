@@ -21,9 +21,12 @@ export async function GET() {
             }
         })
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mapped = sessions.map((session: any) => {
             let volume = 0
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             session.exercises.forEach((ex: any) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 ex.sets.forEach((set: any) => {
                     volume += set.weight * set.reps
                 })

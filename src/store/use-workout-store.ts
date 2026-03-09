@@ -35,6 +35,7 @@ interface WorkoutState {
     removeSet: (exerciseId: string, setId: string) => void;
     updateSet: (exerciseId: string, setId: string, updates: Partial<SetEntry>) => void;
     toggleSetComplete: (exerciseId: string, setId: string) => void;
+    reorderExercises: (startIndex: number, endIndex: number) => void;
 }
 
 const generateId = () => {
@@ -132,6 +133,18 @@ export const useWorkoutStore = create<WorkoutState>()(
                         return ex;
                     })
                 }))
+            },
+
+            reorderExercises: (startIndex, endIndex) => {
+                set((state) => {
+                    const result = Array.from(state.exercises);
+                    const [removed] = result.splice(startIndex, 1);
+                    result.splice(endIndex, 0, removed);
+
+                    // Update order fields to maintain consistency
+                    const reordered = result.map((ex, index) => ({ ...ex, order: index }));
+                    return { exercises: reordered };
+                });
             }
         }),
         {

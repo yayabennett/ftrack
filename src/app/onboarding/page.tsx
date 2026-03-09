@@ -50,10 +50,10 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
                 <div
                     key={i}
                     className={`h-1.5 rounded-full transition-all duration-500 ${i < current
-                            ? 'w-8 bg-primary'
-                            : i === current
-                                ? 'w-8 bg-primary/60'
-                                : 'w-4 bg-white/10'
+                        ? 'w-8 bg-primary'
+                        : i === current
+                            ? 'w-8 bg-primary/60'
+                            : 'w-4 bg-white/10'
                         }`}
                 />
             ))}
@@ -86,7 +86,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
                 onClick={onNext}
                 className="h-14 px-10 rounded-2xl text-[16px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_30px_-6px_rgba(59,130,246,0.5)] transition-all active:scale-95 flex items-center gap-2"
             >
-                Los geht's
+                Los geht&apos;s
                 <ArrowRight className="w-5 h-5" />
             </Button>
         </div>
@@ -164,8 +164,8 @@ function PersonalStep({
                                 type="button"
                                 onClick={() => onChange('gender', g.id)}
                                 className={`p-3 rounded-xl text-center transition-all active:scale-95 ${data.gender === g.id
-                                        ? 'bg-primary/15 ring-2 ring-primary text-foreground'
-                                        : 'bg-secondary/40 ring-1 ring-white/5 text-muted-foreground hover:bg-secondary/60'
+                                    ? 'bg-primary/15 ring-2 ring-primary text-foreground'
+                                    : 'bg-secondary/40 ring-1 ring-white/5 text-muted-foreground hover:bg-secondary/60'
                                     }`}
                             >
                                 <span className="text-lg">{g.emoji}</span>
@@ -203,8 +203,8 @@ function GoalStep({
                         type="button"
                         onClick={() => onSelect(goal.id)}
                         className={`w-full p-4 rounded-2xl text-left transition-all active:scale-[0.98] flex items-center gap-4 ${selected === goal.id
-                                ? 'bg-primary/15 ring-2 ring-primary shadow-[0_4px_20px_-4px_rgba(59,130,246,0.3)]'
-                                : 'bg-secondary/30 ring-1 ring-white/5 hover:bg-secondary/50'
+                            ? 'bg-primary/15 ring-2 ring-primary shadow-[0_4px_20px_-4px_rgba(59,130,246,0.3)]'
+                            : 'bg-secondary/30 ring-1 ring-white/5 hover:bg-secondary/50'
                             }`}
                     >
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${selected === goal.id ? 'bg-primary/20' : 'bg-secondary/60'
@@ -246,8 +246,8 @@ function ExperienceStep({
                         type="button"
                         onClick={() => onSelect(level.id)}
                         className={`w-full p-4 rounded-2xl text-left transition-all active:scale-[0.98] flex items-center gap-4 ${selected === level.id
-                                ? 'bg-primary/15 ring-2 ring-primary shadow-[0_4px_20px_-4px_rgba(59,130,246,0.3)]'
-                                : 'bg-secondary/30 ring-1 ring-white/5 hover:bg-secondary/50'
+                            ? 'bg-primary/15 ring-2 ring-primary shadow-[0_4px_20px_-4px_rgba(59,130,246,0.3)]'
+                            : 'bg-secondary/30 ring-1 ring-white/5 hover:bg-secondary/50'
                             }`}
                     >
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${selected === level.id ? 'bg-primary/20' : 'bg-secondary/60'

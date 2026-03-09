@@ -1,4 +1,3 @@
-```typescript
 "use client"
 
 import { useState, useEffect } from 'react'
@@ -9,8 +8,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { TemplateDTO } from '@/lib/types'
 
-// We need to fetch the templates client-side or use a mixed approach. 
-// For simplicity and immediate feedback, we'll fetch them on mount.
 type Template = Pick<TemplateDTO, 'id' | 'name'> & { exercises: { id: string }[] }
 
 export default function StartWorkoutConfig() {
@@ -26,14 +23,21 @@ export default function StartWorkoutConfig() {
     })
     const [time, setTime] = useState(() => {
         const d = new Date()
-        return `${ d.getHours().toString().padStart(2, '0') }:${ d.getMinutes().toString().padStart(2, '0') } `
+        return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
     })
 
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
-                const data = await cachedGet<Template[]>('/api/templates', 'cache-templates')
-                if (data) setTemplates(data)
+                const res = await fetch('/api/templates')
+                if (res.ok) {
+                    const data = await res.json()
+                    setTemplates(data)
+                    if (data.length > 0) {
+                        const first = data.sort((a: { order?: number }, b: { order?: number }) => (a.order || 0) - (b.order || 0))[0]
+                        setSelectedTemplateId(first.id)
+                    }
+                }
             } catch (error) {
                 console.error("Failed to load templates", error)
             } finally {
@@ -44,14 +48,19 @@ export default function StartWorkoutConfig() {
     }, [])
 
     const handleStart = () => {
-        // Construct ISO string from local date and time
-        const startDateTime = new Date(`${ date }T${ time } `)
+        try {
+            const startDateTime = new Date(`${date}T${time}:00`)
 
-        let url = '/workout/active?'
-        if (selectedTemplateId) url += `templateId = ${ selectedTemplateId }& `
-        url += `startedAt = ${ startDateTime.toISOString() } `
+            // Build URL manually
+            let url = `/workout/active?startedAt=${startDateTime.toISOString()}`
+            if (selectedTemplateId) {
+                url += `&templateId=${selectedTemplateId}`
+            }
 
-        router.push(url)
+            router.push(url)
+        } catch (error) {
+            console.error("Failed to start workout", error)
+        }
     }
 
     return (
@@ -115,17 +124,17 @@ export default function StartWorkoutConfig() {
                     <div className="space-y-3">
                         {/* Empty Workout / Free Training */}
                         <div onClick={() => setSelectedTemplateId(null)} className="cursor-pointer">
-                            <Card className={`relative bg - card ring - 2 transition - all shadow - sm rounded - 2xl border - 0 overflow - hidden active: scale - [0.98] ${ selectedTemplateId === null ? 'ring-primary bg-primary/5' : 'ring-white/5' } `}>
+                            <Card className={`relative bg - card ring - 2 transition - all shadow - sm rounded - 2xl border - 0 overflow - hidden active: scale - [0.98] ${selectedTemplateId === null ? 'ring-primary bg-primary/5' : 'ring-white/5'} `}>
                                 <CardContent className="p-4 flex items-center gap-4">
-                                    <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - colors ${ selectedTemplateId === null ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground' } `}>
+                                    <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - colors ${selectedTemplateId === null ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'} `}>
                                         <Dumbbell className="w-6 h-6" />
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-bold text-[16px] text-foreground">Freies Training</h3>
                                         <p className="text-[13px] text-muted-foreground font-medium">Leere Einheit starten</p>
                                     </div>
-                                    <div className={`w - 6 h - 6 rounded - full border - 2 flex items - center justify - center transition - all ${ selectedTemplateId === null ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30' } `}>
-                                        <Check className={`w - 3.5 h - 3.5 transition - opacity ${ selectedTemplateId === null ? 'opacity-100' : 'opacity-0' } `} strokeWidth={3} />
+                                    <div className={`w - 6 h - 6 rounded - full border - 2 flex items - center justify - center transition - all ${selectedTemplateId === null ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'} `}>
+                                        <Check className={`w - 3.5 h - 3.5 transition - opacity ${selectedTemplateId === null ? 'opacity-100' : 'opacity-0'} `} strokeWidth={3} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -137,17 +146,17 @@ export default function StartWorkoutConfig() {
                         ) : (
                             templates.map(template => (
                                 <div key={template.id} onClick={() => setSelectedTemplateId(template.id)} className="cursor-pointer">
-                                    <Card className={`relative bg - card ring - 2 transition - all shadow - sm rounded - 2xl border - 0 overflow - hidden active: scale - [0.98] ${ selectedTemplateId === template.id ? 'ring-primary bg-primary/5' : 'ring-white/5' } `}>
+                                    <Card className={`relative bg - card ring - 2 transition - all shadow - sm rounded - 2xl border - 0 overflow - hidden active: scale - [0.98] ${selectedTemplateId === template.id ? 'ring-primary bg-primary/5' : 'ring-white/5'} `}>
                                         <CardContent className="p-4 flex items-center gap-4">
-                                            <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - colors ${ selectedTemplateId === template.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground' } `}>
+                                            <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - colors ${selectedTemplateId === template.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'} `}>
                                                 <Copy className="w-6 h-6" />
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="font-bold text-[16px] text-foreground">{template.name}</h3>
                                                 <p className="text-[12px] uppercase tracking-wider text-muted-foreground font-bold">{template.exercises?.length || 0} Übungen</p>
                                             </div>
-                                            <div className={`w - 6 h - 6 rounded - full border - 2 flex items - center justify - center transition - all ${ selectedTemplateId === template.id ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30' } `}>
-                                                <Check className={`w - 3.5 h - 3.5 transition - opacity ${ selectedTemplateId === template.id ? 'opacity-100' : 'opacity-0' } `} strokeWidth={3} />
+                                            <div className={`w - 6 h - 6 rounded - full border - 2 flex items - center justify - center transition - all ${selectedTemplateId === template.id ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'} `}>
+                                                <Check className={`w - 3.5 h - 3.5 transition - opacity ${selectedTemplateId === template.id ? 'opacity-100' : 'opacity-0'} `} strokeWidth={3} />
                                             </div>
                                         </CardContent>
                                     </Card>
