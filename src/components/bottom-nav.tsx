@@ -94,12 +94,12 @@ export function BottomNav() {
                                 <Link
                                     key={item.href}
                                     href={item.href || '#'}
-                                    className="relative flex flex-col items-center justify-center -mt-10 group px-2"
+                                    className="relative flex flex-col items-center justify-center -mt-4 group px-2"
                                 >
-                                    <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-blue-600 text-primary-foreground shadow-[0_8px_24px_rgba(59,130,246,0.3)] ring-[6px] ring-background transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_12px_32px_rgba(59,130,246,0.4)] group-active:scale-95 group-active:shadow-none">
-                                        <item.icon className="h-8 w-8 stroke-[2.5px] transition-transform duration-300 group-hover:rotate-90" />
+                                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-blue-600 text-primary-foreground shadow-[0_4px_16px_rgba(59,130,246,0.2)] ring-[4px] ring-background transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_8px_24px_rgba(59,130,246,0.3)] group-active:scale-95 group-active:shadow-none">
+                                        <item.icon className="h-7 w-7 stroke-[2px] transition-transform duration-300 group-hover:rotate-90" />
                                     </div>
-                                    <span className="mt-2 text-[10px] font-extrabold uppercase tracking-wider text-primary">Start</span>
+                                    <span className="mt-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 group-hover:text-primary transition-colors">Start</span>
                                 </Link>
                             )
                         }
