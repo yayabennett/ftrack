@@ -1,10 +1,12 @@
 "use client"
 
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Activity, Flame, TrendingUp, Dumbbell, Zap } from 'lucide-react'
+import { Pulse, Flame, TrendUp, Barbell, Lightning } from '@phosphor-icons/react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 import {
     BarChart,
     Bar,
@@ -60,10 +62,17 @@ function CustomTooltip({ active, payload, label }: {
 }
 
 export default function StatsPage() {
+    const [range, setRange] = useState(7)
+    const rangeOptions = [
+        { label: 'Woche', value: 7 },
+        { label: 'Monat', value: 30 },
+        { label: '3 Monate', value: 90 },
+    ]
+
     const { data, isLoading } = useQuery({
-        queryKey: ['weekly-stats'],
+        queryKey: ['weekly-stats', range],
         queryFn: async () => {
-            const res = await fetch('/api/stats/weekly')
+            const res = await fetch(`/api/stats/weekly?range=${range}`)
             if (!res.ok) throw new Error('Failed to fetch stats')
             return res.json() as Promise<WeeklyResponse>
         }
@@ -93,6 +102,23 @@ export default function StatsPage() {
             </header>
 
             <div className="container mx-auto p-4 space-y-5 animate-in fade-in duration-300">
+                {/* Time Range Tabs */}
+                <div className="flex gap-1.5 bg-secondary/40 rounded-2xl p-1">
+                    {rangeOptions.map(opt => (
+                        <button
+                            key={opt.value}
+                            onClick={() => setRange(opt.value)}
+                            className={cn(
+                                "flex-1 py-2 rounded-xl text-[12px] font-bold transition-all",
+                                range === opt.value
+                                    ? "bg-primary text-primary-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>
                 {/* Hero Volume Card */}
                 <Card className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden glow-primary">
                     <CardContent className="p-6 text-center">
@@ -117,15 +143,15 @@ export default function StatsPage() {
                 {/* Stat Tiles */}
                 <div className="grid grid-cols-3 gap-3">
                     <StatTile icon={<Flame className="h-5 w-5" />} value={weeklyStreak} label="Streak" color="text-orange-400" bgColor="bg-orange-400/10" />
-                    <StatTile icon={<Activity className="h-5 w-5" />} value={sessionsCount} label="Diese Woche" color="text-primary" bgColor="bg-primary/10" />
-                    <StatTile icon={<Dumbbell className="h-5 w-5" />} value={totalSessionsEver} label="Gesamt" color="text-emerald-400" bgColor="bg-emerald-400/10" />
+                    <StatTile icon={<Pulse className="h-5 w-5" />} value={sessionsCount} label="Diese Woche" color="text-primary" bgColor="bg-primary/10" />
+                    <StatTile icon={<Barbell className="h-5 w-5" />} value={totalSessionsEver} label="Gesamt" color="text-emerald-400" bgColor="bg-emerald-400/10" />
                 </div>
 
                 {/* Real Recharts Bar Chart */}
                 <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
                     <CardHeader className="p-4 pb-2">
                         <CardTitle className="text-[15px] font-semibold flex items-center gap-2 text-foreground">
-                            <TrendingUp className="h-4 w-4 text-primary" />
+                            <TrendUp className="h-4 w-4 text-primary" />
                             Wochenübersicht — Volumen (kg)
                         </CardTitle>
                     </CardHeader>
@@ -182,7 +208,7 @@ export default function StatsPage() {
                 {/* Motivation Card */}
                 <div className="bg-secondary/20 rounded-2xl p-4 flex gap-3 items-center border border-white/5">
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <Zap className="w-5 h-5" />
+                        <Lightning className="w-5 h-5" />
                     </div>
                     <div>
                         <p className="text-[13px] font-semibold text-foreground">

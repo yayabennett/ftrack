@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, User, Plus, History, BarChart2, Dumbbell, LayoutGrid, MoreHorizontal, X } from 'lucide-react'
+import { House, UserCircle, Plus, ClockCounterClockwise, ChartBar, Barbell, SquaresFour, DotsThree, X } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -15,17 +15,17 @@ export function BottomNav() {
     if (pathname.startsWith('/workout/')) return null
 
     const mainNavItems = [
-        { name: 'Home', href: '/', icon: Home },
-        { name: 'Übungen', href: '/exercises', icon: Dumbbell },
+        { name: 'Home', href: '/', icon: House },
+        { name: 'Übungen', href: '/exercises', icon: Barbell },
         { name: 'Start', href: '/workout/start', icon: Plus, isAction: true },
-        { name: 'Vorlagen', href: '/templates', icon: LayoutGrid },
-        { name: 'Mehr', action: () => setIsMoreOpen(!isMoreOpen), icon: isMoreOpen ? X : MoreHorizontal, isMenu: true }
+        { name: 'Vorlagen', href: '/templates', icon: SquaresFour },
+        { name: 'Mehr', action: () => setIsMoreOpen(!isMoreOpen), icon: isMoreOpen ? X : DotsThree, isMenu: true }
     ]
 
     const moreMenuLinks = [
-        { name: 'Verlauf', href: '/history', icon: History },
-        { name: 'Statistik', href: '/stats', icon: BarChart2 },
-        { name: 'Profil', href: '/settings', icon: User },
+        { name: 'Verlauf', href: '/history', icon: ClockCounterClockwise },
+        { name: 'Statistik', href: '/stats', icon: ChartBar },
+        { name: 'Profil', href: '/settings', icon: UserCircle },
     ]
 
     // Determine if any of the "more" links are currently active

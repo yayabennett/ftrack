@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Dumbbell, TrendingUp, Info } from 'lucide-react'
+import { ArrowLeft, Barbell, TrendUp, Info } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -83,7 +83,7 @@ export default function ExerciseDetailPage() {
                     <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-bold tracking-widest text-muted-foreground uppercase flex items-center gap-2">
-                                <TrendingUp className="w-4 h-4" /> Progression (e1RM)
+                                <TrendUp className="w-4 h-4" /> Progression (e1RM)
                             </CardTitle>
                         </div>
                         <div className="mt-2 flex items-baseline gap-1">
@@ -120,7 +120,7 @@ export default function ExerciseDetailPage() {
                             </div>
                         ) : (
                             <div className="h-[200px] flex flex-col items-center justify-center text-center text-muted-foreground bg-secondary/10 rounded-2xl mx-4">
-                                <Dumbbell className="w-8 h-8 mb-2 opacity-20" />
+                                <Barbell className="w-8 h-8 mb-2 opacity-20" />
                                 <p className="text-sm font-medium">Nicht genug Daten für einen Chart.</p>
                                 <p className="text-xs">Trainiere diese Übung öfter!</p>
                             </div>

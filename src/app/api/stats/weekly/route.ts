@@ -5,10 +5,14 @@ import { getCurrentUserId } from '@/lib/auth'
 
 const DAY_LABELS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'] // Maps JS getDay() (0=Sun)
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url)
+        const rangeDays = parseInt(searchParams.get('range') ?? '7', 10)
+        const validRange = [7, 30, 90].includes(rangeDays) ? rangeDays : 7
+
         const today = new Date()
-        const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+        const lastWeek = new Date(today.getTime() - validRange * 24 * 60 * 60 * 1000)
         const twelveWeeksAgo = new Date(today.getTime() - 12 * 7 * 24 * 60 * 60 * 1000)
         const userId = await getCurrentUserId()
         const userFilter = userId ? { userId } : {}

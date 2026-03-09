@@ -24,11 +24,39 @@ export async function GET() {
                         exercise: true
                     },
                     orderBy: { order: 'asc' }
+                },
+                sessions: {
+                    select: { startedAt: true },
+                    orderBy: { startedAt: 'desc' },
+                    take: 1
+                },
+                _count: {
+                    select: { sessions: true }
                 }
             },
             orderBy: { order: 'asc' }
         })
-        return NextResponse.json(templates)
+
+        // Sort by usage frequency (most used first), then by most recently used
+        const sorted = [...templates].sort((a: typeof templates[number], b: typeof templates[number]) => {
+            const aCount = a._count.sessions
+            const bCount = b._count.sessions
+            if (aCount !== bCount) return bCount - aCount
+            const aLast = a.sessions[0]?.startedAt?.getTime() ?? 0
+            const bLast = b.sessions[0]?.startedAt?.getTime() ?? 0
+            return bLast - aLast
+        })
+
+        // Enhance response with usage stats
+        const enhanced = sorted.map((t: typeof templates[number]) => ({
+            ...t,
+            usageCount: t._count.sessions,
+            lastUsed: t.sessions[0]?.startedAt?.toISOString() ?? null,
+            sessions: undefined,
+            _count: undefined
+        }))
+
+        return NextResponse.json(enhanced)
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 })
     }

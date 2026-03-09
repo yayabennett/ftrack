@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { User, Download, Moon, Info, ChevronRight, Smartphone, Ruler, Target, Dumbbell } from 'lucide-react'
+import { User, DownloadSimple, Moon, Info, CaretRight, DeviceMobile, Ruler, Target, Barbell } from '@phosphor-icons/react/dist/ssr'
 import prisma from '@/lib/prisma'
 import Link from 'next/link'
 import { getCurrentUserId } from '@/lib/auth'
@@ -65,7 +65,7 @@ export default async function SettingsPage() {
                                 bg="bg-blue-400/10"
                             />
                             <ProfileTile
-                                icon={<Dumbbell className="w-4 h-4" />}
+                                icon={<Barbell className="w-4 h-4" />}
                                 label="Gewicht"
                                 value={user.weight ? `${user.weight} kg` : '–'}
                                 color="text-emerald-400"
@@ -95,7 +95,7 @@ export default async function SettingsPage() {
                             <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0">
                                 <CardContent className="p-3 flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-xl bg-amber-400/10 flex items-center justify-center text-amber-400">
-                                        <Dumbbell className="w-4 h-4" />
+                                        <Barbell className="w-4 h-4" />
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Level</p>
@@ -111,7 +111,7 @@ export default async function SettingsPage() {
                 <div className="space-y-2">
                     <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1 mb-3">Einstellungen</h3>
                     <SettingsItem icon={Moon} label="Dark Mode" detail="Aktiv" />
-                    <SettingsItem icon={Smartphone} label="Benachrichtigungen" detail="Bald verfügbar" />
+                    <SettingsItem icon={DeviceMobile} label="Streak-Erinnerungen" detail="Bald verfügbar" />
                 </div>
 
                 {/* Actions */}
@@ -121,13 +121,13 @@ export default async function SettingsPage() {
                         <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden hover:bg-secondary/60 transition-colors cursor-pointer active:scale-[0.98]">
                             <CardContent className="p-4 flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                                    <Download className="w-5 h-5" />
+                                    <DownloadSimple className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1">
                                     <p className="font-semibold text-[15px] text-foreground">Daten exportieren</p>
                                     <p className="text-[12px] text-muted-foreground">Alle Workouts als JSON herunterladen</p>
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+                                <CaretRight className="w-4 h-4 text-muted-foreground/40" />
                             </CardContent>
                         </Card>
                     </Link>

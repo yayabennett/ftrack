@@ -30,7 +30,7 @@ import { CSS } from '@dnd-kit/utilities'
 
 interface SortableExerciseCardProps {
     exercise: WorkoutExercise
-    onCompleteSet: () => void
+    onCompleteSet: (exerciseName: string) => void
     onPR: (message: string) => void
 }
 
@@ -84,7 +84,7 @@ function SortableExerciseCard({ exercise, onCompleteSet, onPR }: SortableExercis
                             exerciseId={exercise.id}
                             exerciseDbId={exercise.exerciseId}
                             setEntry={set}
-                            onComplete={onCompleteSet}
+                            onComplete={() => onCompleteSet(exercise.name)}
                             onPR={onPR}
                         />
                     ))}
@@ -103,7 +103,7 @@ function WorkoutContent() {
     const searchParams = useSearchParams()
     const templateId = searchParams.get('templateId')
     const startedAtQuery = searchParams.get('startedAt')
-    const { isActive, sessionId, startedAt, exercises, startWorkout, endWorkout, addExercise, removeExercise, addSet, reorderExercises } = useWorkoutStore()
+    const { isActive, sessionId, startedAt, exercises, startWorkout, endWorkout, addExercise, removeExercise, addSet, updateSet, reorderExercises } = useWorkoutStore()
     const [isLoading, setIsLoading] = useState(!isActive)
     const [showPicker, setShowPicker] = useState(false)
     const [restTimerEnd, setRestTimerEnd] = useState<number | null>(null)
@@ -154,6 +154,35 @@ function WorkoutContent() {
                             })) : []
 
                         startWorkout(session.id, mappedExercises)
+
+                        // Smart Weight Suggestions: fetch last session's sets for each exercise
+                        for (const ex of mappedExercises) {
+                            try {
+                                const lastSetsRes = await fetch(`/api/exercises/${ex.exerciseId}/last-sets`)
+                                if (lastSetsRes.ok) {
+                                    const { sets: lastSets } = await lastSetsRes.json()
+                                    if (lastSets && lastSets.length > 0) {
+                                        // Pre-populate sets from last session
+                                        for (const lastSet of lastSets) {
+                                            addSet(ex.id) // This creates a new set
+                                        }
+                                        // Now update the sets with last session's values
+                                        const store = useWorkoutStore.getState()
+                                        const currentEx = store.exercises.find(e => e.id === ex.id)
+                                        if (currentEx) {
+                                            for (let i = 0; i < Math.min(currentEx.sets.length, lastSets.length); i++) {
+                                                updateSet(ex.id, currentEx.sets[i].id, {
+                                                    weight: lastSets[i].weight,
+                                                    reps: lastSets[i].reps
+                                                })
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch {
+                                // Non-critical: suggestions are best-effort
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error("Failed to start session:", error)
@@ -169,15 +198,17 @@ function WorkoutContent() {
     }, [isActive, startWorkout, templateId, startedAtQuery])
 
     const handleEndWorkout = async () => {
-        if (sessionId) {
+        const currentSessionId = sessionId
+        if (currentSessionId) {
             try {
-                await fetch(`/api/sessions/${sessionId}/finish`, { method: 'POST' })
+                await fetch(`/api/sessions/${currentSessionId}/finish`, { method: 'POST' })
             } catch (e) {
                 console.error('Failed to finish session:', e)
             }
         }
         endWorkout()
-        router.push('/')
+        // Redirect to recap page instead of home
+        router.push(currentSessionId ? `/workout/recap?sessionId=${currentSessionId}` : '/')
     }
 
     const handleAddExercise = async (picked: { id: string; exerciseId: string; name: string }) => {
@@ -207,9 +238,12 @@ function WorkoutContent() {
         setShowPicker(false)
     }
 
-    const handleSetCompleted = () => {
-        // Start 90s rest timer
-        setRestTimerEnd(Date.now() + 90 * 1000)
+    const handleSetCompleted = (exerciseName?: string) => {
+        // Adaptive rest timer based on exercise type
+        const compoundPatterns = ['squat', 'bench', 'deadlift', 'press', 'row', 'kniebeuge', 'bankdrücken', 'kreuzheben', 'drücken', 'rudern']
+        const isCompound = exerciseName && compoundPatterns.some(p => exerciseName.toLowerCase().includes(p))
+        const restDuration = isCompound ? 150 : 75 // 2:30 for compounds, 1:15 for isolation
+        setRestTimerEnd(Date.now() + restDuration * 1000)
     }
 
     if (isLoading) {
@@ -219,12 +253,15 @@ function WorkoutContent() {
         </div>
     }
 
+    const totalSets = exercises.reduce((sum, ex) => sum + (ex.sets?.length || 0), 0)
+    const completedSets = exercises.reduce((sum, ex) => sum + (ex.sets?.filter(s => s.isCompleted).length || 0), 0)
+
     return (
         <div className="min-h-screen bg-background pb-32">
             <div className="sticky top-0 z-40 bg-background/60 backdrop-blur-[32px] border-b border-white/5 h-14 px-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <WorkoutTimer startedAt={startedAt} />
+                    <WorkoutTimer startedAt={startedAt} totalSets={totalSets} completedSets={completedSets} />
                 </div>
                 <Button onClick={handleEndWorkout} variant="default" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-4 h-8 rounded-full shadow-sm">
                     Beenden

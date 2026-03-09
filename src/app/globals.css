@@ -65,167 +65,145 @@
   --radius-4xl: calc(var(--radius) + 24px);
 }
 
-/* Light mode (optional – sauber, nicht blendend) */
+/* Light mode */
 :root {
-  --radius: 0.75rem;
+  --radius: 0.9rem;
 
-  --background: oklch(0.99 0.003 255);
-  --foreground: oklch(0.18 0.01 255);
+  --background: oklch(0.985 0.004 320);
+  --foreground: oklch(0.19 0.01 320);
 
-  --card: oklch(0.995 0.002 255);
-  --card-foreground: oklch(0.18 0.01 255);
+  --card: oklch(0.995 0.002 320);
+  --card-foreground: oklch(0.19 0.01 320);
 
-  --popover: oklch(0.995 0.002 255);
-  --popover-foreground: oklch(0.18 0.01 255);
+  --popover: oklch(0.995 0.002 320);
+  --popover-foreground: oklch(0.19 0.01 320);
 
-  --primary: oklch(0.44 0.18 256);
+  /* Brand */
+  --primary: oklch(0.64 0.26 352);
   --primary-foreground: oklch(0.99 0.003 255);
 
-  --secondary: oklch(0.965 0.005 255);
-  --secondary-foreground: oklch(0.22 0.01 255);
+  --secondary: oklch(0.962 0.006 320);
+  --secondary-foreground: oklch(0.24 0.012 320);
 
-  --muted: oklch(0.965 0.005 255);
-  --muted-foreground: oklch(0.52 0.02 255);
+  --muted: oklch(0.965 0.004 320);
+  --muted-foreground: oklch(0.54 0.018 320);
 
-  --accent: oklch(0.965 0.005 255);
-  --accent-foreground: oklch(0.22 0.01 255);
+  --accent: oklch(0.958 0.012 340);
+  --accent-foreground: oklch(0.24 0.012 320);
 
   --destructive: oklch(0.58 0.23 27.3);
   --destructive-foreground: oklch(0.99 0.003 255);
 
-  --border: oklch(0.92 0.01 255);
-  --input: oklch(0.97 0.006 255);
-  --ring: oklch(0.58 0.16 256 / 0.45);
+  --border: oklch(0.91 0.008 320);
+  --input: oklch(0.97 0.004 320);
+  --ring: oklch(0.64 0.22 352 / 0.28);
 
-  --chart-1: oklch(0.55 0.19 256);
-  --chart-2: oklch(0.6 0.14 240);
-  --chart-3: oklch(0.48 0.09 230);
-  --chart-4: oklch(0.72 0.12 265);
-  --chart-5: oklch(0.66 0.16 256);
+  --chart-1: oklch(0.64 0.26 352);
+  --chart-2: oklch(0.67 0.19 20);
+  --chart-3: oklch(0.7 0.16 305);
+  --chart-4: oklch(0.73 0.17 145);
+  --chart-5: oklch(0.69 0.14 250);
 
-  --sidebar: oklch(0.985 0.003 255);
-  --sidebar-foreground: oklch(0.18 0.01 255);
-  --sidebar-primary: oklch(0.44 0.18 256);
+  --sidebar: oklch(0.982 0.003 320);
+  --sidebar-foreground: oklch(0.19 0.01 320);
+  --sidebar-primary: oklch(0.64 0.26 352);
   --sidebar-primary-foreground: oklch(0.99 0.003 255);
-  --sidebar-accent: oklch(0.965 0.005 255);
-  --sidebar-accent-foreground: oklch(0.22 0.01 255);
-  --sidebar-border: oklch(0.92 0.01 255);
-  --sidebar-ring: oklch(0.58 0.16 256 / 0.45);
+  --sidebar-accent: oklch(0.958 0.012 340);
+  --sidebar-accent-foreground: oklch(0.24 0.012 320);
+  --sidebar-border: oklch(0.91 0.008 320);
+  --sidebar-ring: oklch(0.64 0.22 352 / 0.28);
+
+  --success: oklch(0.72 0.2 152);
+  --energy: oklch(0.74 0.18 40);
+  --xp: oklch(0.68 0.16 315);
 
   color-scheme: light;
 }
 
-/* Dark Neon Fitness Theme (mix of Apple Fitness, cyber, modern SaaS) */
+/* Dark Neon Fitness Theme – refined */
 .dark {
   /* Base layers */
-  --background: #09090B;
-  /* very dark neutral */
-  --foreground: #FFFFFF;
-  /* crisp pure white */
+  --background: #08080A;
+  --foreground: #FCFCFD;
 
   /* Surfaces */
-  --card: #121214;
-  /* primary surface */
-  --card-foreground: #FAFAFA;
+  --card: #111114;
+  --card-foreground: #FAFAFB;
 
-  --popover: #121214;
-  --popover-foreground: #FAFAFA;
+  --popover: #111114;
+  --popover-foreground: #FAFAFB;
 
-  /* Brand Colors: The Glowing Neon Pink */
-  --primary: #FF1A75;
-  /* slightly deeper neon pink for better base contrast */
+  /* Brand Hero Color */
+  --primary: #FF147A;
   --primary-foreground: #FFFFFF;
 
-  /* Secondary layers (buttons, chips, subtle panels) */
-  --secondary: #1F1F22;
-  /* brightened dark surface */
-  --secondary-foreground: #FFFFFF;
+  /* Supporting surfaces */
+  --secondary: #18181C;
+  --secondary-foreground: #F5F5F7;
 
-  /* Muted elements */
-  --muted: #18181A;
-  --muted-foreground: #A1A1AA;
-  /* zinc-400 equivalent */
+  --muted: #151519;
+  --muted-foreground: #A7A7B2;
 
-  /* Accent (hover states, subtle highlights) */
-  --accent: #1F1F22;
-  --accent-foreground: #FFFFFF;
+  --accent: #1B1B20;
+  --accent-foreground: #F8F8FA;
 
-  /* System Context Colors */
-  --destructive: #FF3B30;
-  /* apple warning red */
+  /* System */
+  --destructive: #FF453A;
   --destructive-foreground: #FFFFFF;
 
-  /* Gamification & Motivation Custom Tokens */
-  --success: #00E676;
-  /* vibrantly complete green */
-  --energy: #FF9500;
-  /* active orange */
-  --xp: #B500FF;
-  /* achievement purple */
+  /* Gamification */
+  --success: #22E58B;
+  --energy: #FF8A1A;
+  --xp: #D946EF;
 
-  /* Lines + inputs (hairline feel) */
-  --border: #27272A;
-  /* zinc-800 border */
-  --input: #1F1F22;
-  /* subtle input fill */
-  --ring: rgba(255, 26, 117, 0.45);
-  /* pink focus ring */
+  /* Structure */
+  --border: #26262C;
+  --input: #17171B;
+  --ring: rgba(255, 20, 122, 0.34);
 
-  /* Charts (Energetic gradient friendly) */
-  --chart-1: #FF1A75;
-  /* neon pink */
-  --chart-2: #B500FF;
-  /* purple */
-  --chart-3: #FF9500;
-  /* orange */
-  --chart-4: #00E676;
-  /* green */
-  --chart-5: #00E6E6;
-  /* cyan */
+  /* Charts – pink remains dominant */
+  --chart-1: #FF147A;
+  --chart-2: #FF5AA5;
+  --chart-3: #D946EF;
+  --chart-4: #FF8A1A;
+  --chart-5: #22E58B;
 
-  /* Sidebar (if used) */
-  --sidebar: #121214;
-  --sidebar-foreground: #FAFAFA;
-  --sidebar-primary: #FF1A75;
+  /* Sidebar */
+  --sidebar: #101013;
+  --sidebar-foreground: #FAFAFB;
+  --sidebar-primary: #FF147A;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1F1F22;
-  --sidebar-accent-foreground: #FAFAFA;
-  --sidebar-border: #27272A;
-  --sidebar-ring: rgba(255, 26, 117, 0.45);
+  --sidebar-accent: #1A1A1F;
+  --sidebar-accent-foreground: #FAFAFB;
+  --sidebar-border: #26262C;
+  --sidebar-ring: rgba(255, 20, 122, 0.34);
 
   --radius: 1rem;
-  /* keep the increased base radius for smooth modern squircles */
 
   color-scheme: dark;
 }
 
-/* Small utility set for "app feeling" */
 @layer utilities {
-
-  /* Press feedback without glow */
   .action-press {
-    @apply transition-transform duration-150 active:scale-[0.98];
+    @apply transition-transform duration-150 active:scale-[0.985];
   }
 
-  /* Hairline borders that look premium on dark */
   .hairline {
-    border-color: color-mix(in srgb, var(--border) 85%, transparent);
+    border-color: color-mix(in srgb, var(--border) 88%, transparent);
   }
 
-  /* Soft elevation for cards/sheets (subtle) */
   .shadow-soft {
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.03) inset,
-      0 10px 30px rgba(0, 0, 0, 0.35);
+      0 1px 0 rgba(255, 255, 255, 0.035) inset,
+      0 12px 34px rgba(0, 0, 0, 0.34);
   }
 
-  /* iOS-like sheet backdrop */
   .backdrop-dim {
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.58);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
-  /* Hide scrollbar for horizontal carousels */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -235,38 +213,53 @@
     scrollbar-width: none;
   }
 
-  /* Gradient text (for hero numbers) */
+  /* Brand gradient text */
   .text-gradient {
-    background: linear-gradient(135deg, var(--primary) 0%, #B500FF 100%);
+    background: linear-gradient(135deg, #ff147a 0%, #ff5aa5 52%, #d946ef 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Gradient text specifically for pure Neon Pink energy */
+  /* Stronger motivational gradient */
   .text-gradient-neon {
-    background: linear-gradient(135deg, var(--primary) 0%, #FF9500 100%);
+    background: linear-gradient(135deg, #ff147a 0%, #ff5aa5 45%, #ff8a1a 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Card lift on hover */
   .card-hover {
-    transition: transform 200ms ease, box-shadow 200ms ease;
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease,
+      background-color 180ms ease;
   }
 
   .card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.34),
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    border-color: color-mix(in srgb, var(--border) 80%, var(--primary) 20%);
   }
 
-  /* Ambient glow for primary elements - Neon Edition */
+  /* Controlled primary glow */
   .glow-primary {
-    box-shadow: 0 0 20px rgba(255, 26, 117, 0.25), 0 0 60px rgba(255, 26, 117, 0.1);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+      0 0 18px rgba(255, 20, 122, 0.22),
+      0 0 42px rgba(255, 20, 122, 0.10);
   }
 
-  /* Number input: hide arrows for clean look */
+  .glow-primary-strong {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+      0 0 24px rgba(255, 20, 122, 0.28),
+      0 0 60px rgba(255, 20, 122, 0.14);
+  }
+
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -278,27 +271,48 @@
     appearance: textfield;
   }
 
-  /* True Glassmorphism Backgrounds */
+  /* More disciplined glass */
   .glass-panel {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 8px 28px rgba(0, 0, 0, 0.24);
   }
 
-  /* Premium inset light source for buttons/cards */
   .inner-highlight {
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.14);
   }
 
-  /* Primary Button Gradient - Neon Pink Edition */
+  /* Primary CTA */
   .btn-primary-gradient {
-    background: linear-gradient(180deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 80%, black 20%) 100%);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 16px rgba(255, 26, 117, 0.35);
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--primary) 88%, white 12%) 0%,
+        var(--primary) 42%,
+        color-mix(in srgb, var(--primary) 82%, black 18%) 100%);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.22),
+      0 8px 20px rgba(255, 20, 122, 0.28),
+      0 0 28px rgba(255, 20, 122, 0.12);
   }
 
-  /* Safe area padding for modern phones */
+  .btn-primary-gradient:hover {
+    filter: brightness(1.04);
+  }
+
+  .surface-elevated {
+    background: color-mix(in srgb, var(--card) 92%, white 8%);
+    border: 1px solid color-mix(in srgb, var(--border) 84%, white 16%);
+  }
+
+  .surface-interactive {
+    background: color-mix(in srgb, var(--card) 88%, var(--primary) 12%);
+    border: 1px solid color-mix(in srgb, var(--border) 75%, var(--primary) 25%);
+  }
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -322,28 +336,35 @@
     @apply bg-background text-foreground antialiased;
   }
 
-  /* Selection looks clean on navy */
   ::selection {
-    background: rgba(43, 111, 255, 0.28);
+    background: rgba(255, 20, 122, 0.22);
+    color: #ffffff;
   }
 
-  /* Focus ring: crisp, SaaS-clean */
   :where(button, a, input, textarea, select, [role="button"], [tabindex]):focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.06),
-      0 0 0 4px var(--ring);
+      0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 0 0 4px var(--ring),
+      0 0 18px rgba(255, 20, 122, 0.10);
     border-radius: var(--radius);
   }
 
-  /* Inputs: subtle border + better hover */
   input,
   textarea,
   select {
-    transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease,
+      box-shadow 150ms ease,
+      color 150ms ease;
   }
 
   :where(input, textarea, select):hover {
-    border-color: color-mix(in srgb, var(--border) 75%, var(--primary) 25%);
+    border-color: color-mix(in srgb, var(--border) 72%, var(--primary) 28%);
+  }
+
+  :where(input, textarea, select):focus {
+    background: color-mix(in srgb, var(--input) 90%, white 10%);
   }
 }

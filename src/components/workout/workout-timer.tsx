@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from 'react'
 
-export function WorkoutTimer({ startedAt }: { startedAt: string | null }) {
+interface WorkoutTimerProps {
+    startedAt: string | null
+    totalSets?: number
+    completedSets?: number
+}
+
+export function WorkoutTimer({ startedAt, totalSets, completedSets }: WorkoutTimerProps) {
     const [elapsed, setElapsed] = useState<number>(0)
 
     useEffect(() => {
@@ -26,10 +32,24 @@ export function WorkoutTimer({ startedAt }: { startedAt: string | null }) {
     const minutes = Math.floor((elapsed % 3600) / 60)
     const seconds = elapsed % 60
 
+    // Estimate remaining time based on completed sets
+    const estimatedRemaining = (completedSets && completedSets > 0 && totalSets && totalSets > completedSets)
+        ? Math.round((elapsed / completedSets) * (totalSets - completedSets))
+        : null
+
+    const estMin = estimatedRemaining ? Math.floor(estimatedRemaining / 60) : null
+
     return (
-        <span className="font-mono font-bold text-[17px] tracking-widest text-primary">
-            {hours > 0 ? `${hours.toString().padStart(2, '0')}:` : ''}
-            {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
-        </span>
+        <div className="flex items-center gap-2">
+            <span className="font-mono font-bold text-[17px] tracking-widest text-primary">
+                {hours > 0 ? `${hours.toString().padStart(2, '0')}:` : ''}
+                {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+            </span>
+            {estMin !== null && estMin > 0 && (
+                <span className="text-[11px] font-medium text-muted-foreground/70">
+                    ~{estMin}min übrig
+                </span>
+            )}
+        </div>
     )
 }

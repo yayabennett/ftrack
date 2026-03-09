@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { X, Search, Dumbbell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { ExerciseDTO } from '@/lib/types'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 export function ExercisePickerDialog({
     isOpen,
@@ -16,6 +17,7 @@ export function ExercisePickerDialog({
     onSelect: (exercise: { id: string; exerciseId: string; name: string }) => void
 }) {
     const [search, setSearch] = useState('')
+    const [selectedGroup, setSelectedGroup] = useState<string>('Alle')
 
     const { data: exercises = [], isLoading } = useQuery({
         queryKey: ['exercises'],
@@ -26,17 +28,25 @@ export function ExercisePickerDialog({
         }
     })
 
+    const muscleGroups = useMemo(() => {
+        const groups = [...new Set(exercises.map(e => e.muscleGroup).filter(Boolean))] as string[]
+        return ['Alle', ...groups.sort((a, b) => a.localeCompare(b, 'de'))]
+    }, [exercises])
+
     if (!isOpen) return null
 
-    const filtered = exercises.filter(e =>
-        e.name.toLowerCase().includes(search.toLowerCase())
-    )
+    const filtered = exercises.filter(e => {
+        const matchesSearch = e.name.toLowerCase().includes(search.toLowerCase()) ||
+            (e.muscleGroup?.toLowerCase().includes(search.toLowerCase()))
+        const matchesGroup = selectedGroup === 'Alle' || e.muscleGroup === selectedGroup
+        return matchesSearch && matchesGroup
+    })
 
     return (
         <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             <div
-                className="relative w-full max-w-lg bg-background rounded-t-3xl border-t border-white/10 max-h-[75vh] flex flex-col animate-in slide-in-from-bottom duration-300"
+                className="relative w-full max-w-lg bg-background rounded-t-3xl border-t border-white/10 max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-300"
                 onClick={e => e.stopPropagation()}
             >
                 <div className="p-4 border-b border-white/5 flex items-center justify-between">
@@ -45,7 +55,7 @@ export function ExercisePickerDialog({
                         <X className="h-5 w-5" />
                     </Button>
                 </div>
-                <div className="p-4 pb-2">
+                <div className="p-4 pb-2 space-y-3">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -54,6 +64,23 @@ export function ExercisePickerDialog({
                             onChange={e => setSearch(e.target.value)}
                             className="pl-10 h-11 bg-secondary/50 border-0 rounded-xl"
                         />
+                    </div>
+                    {/* Muscle Group Filter Tabs */}
+                    <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                        {muscleGroups.map(group => (
+                            <button
+                                key={group}
+                                onClick={() => setSelectedGroup(group)}
+                                className={cn(
+                                    "whitespace-nowrap px-3 py-1.5 rounded-full text-[12px] font-bold transition-all shrink-0",
+                                    selectedGroup === group
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+                                )}
+                            >
+                                {group}
+                            </button>
+                        ))}
                     </div>
                 </div>
                 <div className="overflow-y-auto flex-1 p-2 space-y-1">
@@ -78,7 +105,7 @@ export function ExercisePickerDialog({
                                 </div>
                                 <div>
                                     <p className="font-semibold text-[14px]">{ex.name}</p>
-                                    <p className="text-[11px] text-muted-foreground">{ex.muscleGroup || 'Allgemein'}</p>
+                                    <p className="text-[11px] text-muted-foreground">{ex.muscleGroup || 'Allgemein'}{ex.equipment ? ` · ${ex.equipment}` : ''}</p>
                                 </div>
                             </button>
                         ))

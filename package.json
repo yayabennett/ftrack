@@ -13,6 +13,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@ducanh2912/next-pwa": "^10.2.9",
+    "@phosphor-icons/react": "^2.1.10",
     "@prisma/client": "^6.19.2",
     "@tanstack/query-sync-storage-persister": "^5.90.24",
     "@tanstack/react-query": "^5.90.21",

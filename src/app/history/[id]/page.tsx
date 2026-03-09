@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Check, Clock, Dumbbell, Calendar, Info } from 'lucide-react'
+import { ArrowLeft, Check, Clock, Barbell, Calendar, Info } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'

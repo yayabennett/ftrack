@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Calendar, Clock, Dumbbell, Play } from 'lucide-react'
+import { Calendar, Clock, Barbell, Play } from '@phosphor-icons/react'
 import type { HistorySessionDTO } from '@/lib/types'
 import Link from 'next/link'
 
@@ -82,7 +82,7 @@ export default function HistoryPage() {
                                                         </h4>
                                                         <div className="flex gap-3 text-[12px] text-muted-foreground mt-1">
                                                             <span className="flex items-center gap-1 font-medium">
-                                                                <Dumbbell className="w-3.5 h-3.5" /> {volumeStr}
+                                                                <Barbell className="w-3.5 h-3.5" /> {volumeStr}
                                                             </span>
                                                             <span className="flex items-center gap-1 font-medium">
                                                                 <Clock className="w-3.5 h-3.5" /> {session.durationMinutes} min
