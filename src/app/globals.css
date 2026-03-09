@@ -51,6 +51,11 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
+  /* Gamification Colors */
+  --color-success: var(--success);
+  --color-energy: var(--energy);
+  --color-xp: var(--xp);
+
   --radius-sm: calc(var(--radius) - 6px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
@@ -110,68 +115,86 @@
   color-scheme: light;
 }
 
-/* Dark Navy SaaS theme (clean, layered, no glow spam) */
+/* Dark Neon Fitness Theme (mix of Apple Fitness, cyber, modern SaaS) */
 .dark {
   /* Base layers */
-  --background: #070A12;
-  /* very dark navy */
-  --foreground: #F1F5F9;
-  /* slate-100 */
+  --background: #09090B;
+  /* very dark neutral */
+  --foreground: #FFFFFF;
+  /* crisp pure white */
 
-  --card: #0B1222;
+  /* Surfaces */
+  --card: #121214;
   /* primary surface */
-  --card-foreground: #F1F5F9;
+  --card-foreground: #FAFAFA;
 
-  --popover: #0B1222;
-  --popover-foreground: #F1F5F9;
+  --popover: #121214;
+  --popover-foreground: #FAFAFA;
 
-  /* Brand */
-  --primary: #2B6FFF;
-  /* crisp SaaS blue */
+  /* Brand Colors: The Glowing Neon Pink */
+  --primary: #FF1A75;
+  /* slightly deeper neon pink for better base contrast */
   --primary-foreground: #FFFFFF;
 
   /* Secondary layers (buttons, chips, subtle panels) */
-  --secondary: #0E1730;
-  /* a bit brighter than card */
-  --secondary-foreground: #F1F5F9;
+  --secondary: #1F1F22;
+  /* brightened dark surface */
+  --secondary-foreground: #FFFFFF;
 
-  --muted: #0A1224;
-  /* muted background */
-  --muted-foreground: #94A3B8;
-  /* slate-400 */
+  /* Muted elements */
+  --muted: #18181A;
+  --muted-foreground: #A1A1AA;
+  /* zinc-400 equivalent */
 
-  --accent: #0E1730;
-  --accent-foreground: #F1F5F9;
+  /* Accent (hover states, subtle highlights) */
+  --accent: #1F1F22;
+  --accent-foreground: #FFFFFF;
 
-  /* System */
-  --destructive: #EF4444;
+  /* System Context Colors */
+  --destructive: #FF3B30;
+  /* apple warning red */
   --destructive-foreground: #FFFFFF;
 
+  /* Gamification & Motivation Custom Tokens */
+  --success: #00E676;
+  /* vibrantly complete green */
+  --energy: #FF9500;
+  /* active orange */
+  --xp: #B500FF;
+  /* achievement purple */
+
   /* Lines + inputs (hairline feel) */
-  --border: #182443;
-  /* navy border */
-  --input: #0E1730;
-  /* input fill */
-  --ring: rgba(43, 111, 255, 0.45);
+  --border: #27272A;
+  /* zinc-800 border */
+  --input: #1F1F22;
+  /* subtle input fill */
+  --ring: rgba(255, 26, 117, 0.45);
+  /* pink focus ring */
 
-  /* Charts (monochrome-blue friendly) */
-  --chart-1: #2B6FFF;
-  --chart-2: #245FE0;
-  --chart-3: #1B49B8;
-  --chart-4: #6FA3FF;
-  --chart-5: #3F7DFF;
+  /* Charts (Energetic gradient friendly) */
+  --chart-1: #FF1A75;
+  /* neon pink */
+  --chart-2: #B500FF;
+  /* purple */
+  --chart-3: #FF9500;
+  /* orange */
+  --chart-4: #00E676;
+  /* green */
+  --chart-5: #00E6E6;
+  /* cyan */
 
-  /* Sidebar */
-  --sidebar: #0B1222;
-  --sidebar-foreground: #F1F5F9;
-  --sidebar-primary: #2B6FFF;
+  /* Sidebar (if used) */
+  --sidebar: #121214;
+  --sidebar-foreground: #FAFAFA;
+  --sidebar-primary: #FF1A75;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #0E1730;
-  --sidebar-accent-foreground: #F1F5F9;
-  --sidebar-border: #182443;
-  --sidebar-ring: rgba(43, 111, 255, 0.45);
+  --sidebar-accent: #1F1F22;
+  --sidebar-accent-foreground: #FAFAFA;
+  --sidebar-border: #27272A;
+  --sidebar-ring: rgba(255, 26, 117, 0.45);
 
-  --radius: 1rem; /* Increased base radius for smoother squircles */
+  --radius: 1rem;
+  /* keep the increased base radius for smooth modern squircles */
 
   color-scheme: dark;
 }
@@ -214,7 +237,15 @@
 
   /* Gradient text (for hero numbers) */
   .text-gradient {
-    background: linear-gradient(135deg, var(--primary) 0%, #6FA3FF 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, #B500FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient text specifically for pure Neon Pink energy */
+  .text-gradient-neon {
+    background: linear-gradient(135deg, var(--primary) 0%, #FF9500 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -230,9 +261,9 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   }
 
-  /* Ambient glow for primary elements */
+  /* Ambient glow for primary elements - Neon Edition */
   .glow-primary {
-    box-shadow: 0 0 20px rgba(43, 111, 255, 0.15), 0 0 60px rgba(43, 111, 255, 0.05);
+    box-shadow: 0 0 20px rgba(255, 26, 117, 0.25), 0 0 60px rgba(255, 26, 117, 0.1);
   }
 
   /* Number input: hide arrows for clean look */
@@ -260,11 +291,11 @@
   .inner-highlight {
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
   }
-  
-  /* Primary Button Gradient */
+
+  /* Primary Button Gradient - Neon Pink Edition */
   .btn-primary-gradient {
     background: linear-gradient(180deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 80%, black 20%) 100%);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 14px rgba(43, 111, 255, 0.25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 16px rgba(255, 26, 117, 0.35);
   }
 
   /* Safe area padding for modern phones */
