@@ -104,7 +104,7 @@ export default function ExerciseDetailPage() {
                                                     const data = payload[0].payload
                                                     return (
                                                         <div className="bg-background/95 backdrop-blur-md ring-1 ring-white/10 p-3 rounded-xl shadow-lg">
-                                                            <p className="text-[11px] font-bold text-muted-foreground mb-1 uppercase tracking-wider">{data.tooltipDate}</p>
+                                                            <p className="text-xs font-bold text-muted-foreground mb-1 uppercase tracking-wider">{data.tooltipDate}</p>
                                                             <p className="text-sm font-extrabold text-primary flex items-center gap-1">
                                                                 {payload[0].value} kg e1RM
                                                             </p>
@@ -149,7 +149,7 @@ export default function ExerciseDetailPage() {
                                                     e1RM: {session.e1RM}kg
                                                 </div>
                                             </div>
-                                            <div className="grid grid-cols-[3rem_1fr_1fr] gap-2 p-3 pb-2 text-[11px] font-bold text-muted-foreground text-center uppercase tracking-wider">
+                                            <div className="grid grid-cols-[3rem_1fr_1fr] gap-2 p-3 pb-2 text-xs font-bold text-muted-foreground text-center uppercase tracking-wider">
                                                 <div>Satz</div>
                                                 <div>kg</div>
                                                 <div>Wdh</div>

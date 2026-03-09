@@ -2,7 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, X } from 'lucide-react'
+import { DotsSixVertical as GripVertical, X } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 
 interface Props {

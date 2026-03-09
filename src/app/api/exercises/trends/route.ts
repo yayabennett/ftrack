@@ -5,6 +5,7 @@ import { getCurrentUserId } from '@/lib/auth'
 export async function GET() {
     try {
         const userId = await getCurrentUserId()
+        if (!userId) return new NextResponse('Unauthorized', { status: 401 })
 
         // Fetch all exercises the user has access to
         const exercises = await prisma.exercise.findMany({

@@ -22,5 +22,31 @@
             "type": "image/png",
             "sizes": "512x512"
         }
+    ],
+    "shortcuts": [
+        {
+            "name": "Start Workout",
+            "short_name": "Start",
+            "description": "Start a new free workout session",
+            "url": "/workout/start",
+            "icons": [
+                {
+                    "src": "/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "View History",
+            "short_name": "History",
+            "description": "View past workout sessions",
+            "url": "/history",
+            "icons": [
+                {
+                    "src": "/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
     ]
 }

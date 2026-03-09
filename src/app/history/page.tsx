@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Calendar, Clock, Barbell, Play } from '@phosphor-icons/react'
@@ -8,6 +10,8 @@ import type { HistorySessionDTO } from '@/lib/types'
 import Link from 'next/link'
 
 export default function HistoryPage() {
+    const [visibleCount, setVisibleCount] = useState(20)
+
     const { data: sessions = [], isLoading } = useQuery({
         queryKey: ['history-sessions'],
         queryFn: async () => {
@@ -17,8 +21,10 @@ export default function HistoryPage() {
         }
     })
 
+    const visibleSessions = sessions.slice(0, visibleCount)
+
     // Grouping by Month/Year
-    const grouped = sessions.reduce((acc, session) => {
+    const grouped = visibleSessions.reduce((acc, session) => {
         const d = new Date(session.startedAt)
         const monthYear = d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
         if (!acc[monthYear]) acc[monthYear] = []
@@ -73,7 +79,7 @@ export default function HistoryPage() {
                                             <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
                                                 <CardContent className="p-4 flex items-center gap-4">
                                                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex flex-col items-center justify-center shrink-0">
-                                                        <span className="text-[10px] font-bold text-primary uppercase leading-tight">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</span>
+                                                        <span className="text-xs font-bold text-primary uppercase leading-tight">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</span>
                                                         <span className="text-[16px] font-extrabold text-primary leading-tight">{d.getDate()}</span>
                                                     </div>
                                                     <div className="flex-1 min-w-0">
@@ -97,6 +103,14 @@ export default function HistoryPage() {
                             </div>
                         </div>
                     ))
+                )}
+
+                {!isLoading && sessions.length > visibleCount && (
+                    <div className="pt-4 pb-8 flex justify-center w-full">
+                        <Button variant="outline" onClick={() => setVisibleCount(c => c + 20)} className="rounded-full shadow-sm text-xs font-bold ring-1 ring-white/5 bg-transparent border-0 text-muted-foreground hover:bg-secondary/40 active:scale-95 transition-all w-full">
+                            Ältere Einheiten laden
+                        </Button>
+                    </div>
                 )}
             </div>
         </div>

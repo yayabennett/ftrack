@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Copy, Play, Trash2 } from 'lucide-react'
+import { Plus, Copy, Play, Trash as Trash2 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
@@ -135,7 +135,7 @@ export default function EinheitenPage() {
                                     </div>
 
                                     <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">
-                                        <span className="text-[11px] font-bold tracking-wider uppercase text-muted-foreground">
+                                        <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
                                             {template.exercises.length} Übungen
                                         </span>
                                         <Link href={`/workout/active?templateId=${template.id}`}>

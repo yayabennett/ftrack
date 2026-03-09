@@ -20,6 +20,27 @@ export const metadata: Metadata = {
   title: "Workout Tracker",
   description: "Ultra-fast workout tracking PWA",
   manifest: "/manifest.json",
+  openGraph: {
+    title: "Workout Tracker",
+    description: "Ultra-fast workout tracking PWA",
+    url: "https://ftrack.vercel.app", // Replace with real URL
+    siteName: "ftrack",
+    images: [
+      {
+        url: "/icon-512.png",
+        width: 512,
+        height: 512,
+      },
+    ],
+    locale: "de_DE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Workout Tracker",
+    description: "Ultra-fast workout tracking PWA",
+    images: ["/icon-512.png"],
+  },
 };
 
 export const viewport: Viewport = {

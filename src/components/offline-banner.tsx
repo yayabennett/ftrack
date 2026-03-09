@@ -1,7 +1,7 @@
 "use client"
 
 import { useSyncQueue } from '@/hooks/use-sync'
-import { WifiOff, RefreshCw } from 'lucide-react'
+import { WifiSlash as WifiOff, ArrowsClockwise as RefreshCw } from '@phosphor-icons/react'
 
 export function OfflineBanner() {
     const { queueCount, isOnline } = useSyncQueue()

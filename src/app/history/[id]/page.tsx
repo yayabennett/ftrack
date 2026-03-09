@@ -93,15 +93,15 @@ export default function SessionDetailPage() {
                         <div className="grid grid-cols-3 gap-3">
                             <div className="bg-background/40 p-3 rounded-2xl flex flex-col items-center justify-center text-center">
                                 <span className="text-2xl font-extrabold text-foreground">{volumeStr}</span>
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Volumen</span>
+                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Volumen</span>
                             </div>
                             <div className="bg-background/40 p-3 rounded-2xl flex flex-col items-center justify-center text-center">
                                 <span className="text-2xl font-extrabold text-foreground">{durationMins}</span>
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Minuten</span>
+                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Minuten</span>
                             </div>
                             <div className="bg-background/40 p-3 rounded-2xl flex flex-col items-center justify-center text-center">
                                 <span className="text-2xl font-extrabold text-foreground">{totalSets}</span>
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Sätze</span>
+                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Sätze</span>
                             </div>
                         </div>
 
@@ -124,7 +124,7 @@ export default function SessionDetailPage() {
                             <CardContent className="p-0">
                                 <div className="p-3 bg-secondary/30 border-b border-white/5 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center text-[11px] font-bold">
+                                        <div className="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
                                             {index + 1}
                                         </div>
                                         <Link href={`/exercises/${ex.exercise.id}`} className="font-semibold text-[15px] hover:text-primary transition-colors">
@@ -132,7 +132,7 @@ export default function SessionDetailPage() {
                                         </Link>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-[3rem_1fr_1fr] gap-2 p-3 pb-2 text-[11px] font-bold text-muted-foreground text-center uppercase tracking-wider">
+                                <div className="grid grid-cols-[3rem_1fr_1fr] gap-2 p-3 pb-2 text-xs font-bold text-muted-foreground text-center uppercase tracking-wider">
                                     <div>Satz</div>
                                     <div>kg</div>
                                     <div>Wdh</div>

@@ -46,7 +46,7 @@ export function WorkoutTimer({ startedAt, totalSets, completedSets }: WorkoutTim
                 {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
             </span>
             {estMin !== null && estMin > 0 && (
-                <span className="text-[11px] font-medium text-muted-foreground/70">
+                <span className="text-xs font-medium text-muted-foreground/70">
                     ~{estMin}min übrig
                 </span>
             )}

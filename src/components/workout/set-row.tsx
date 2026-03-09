@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { Check, Trash2 } from 'lucide-react'
+import { Check, Trash as Trash2 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { motion, useAnimation, useMotionValue } from 'framer-motion'
@@ -69,12 +69,10 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                 // ── PR Detection ─────────────────────────────────────────────
                 // Only check PR when online (GET can't be queued offline)
                 if (exerciseDbId && typeof window !== 'undefined' && navigator.onLine) {
-                    try {
-                        const prRes = await fetch(`/api/exercises/${exerciseDbId}/pr`)
-                        if (prRes.ok) {
-                            const pr: PRResult | null = await prRes.json()
+                    fetch(`/api/exercises/${exerciseDbId}/pr`)
+                        .then(res => res.ok ? res.json() : null)
+                        .then((pr: PRResult | null) => {
                             const newVolume = parsedWeight * parsedReps
-                            // It's a PR if there's no previous record, or the new set exceeds it
                             if (!pr || newVolume >= pr.volume) {
                                 toast.success(`🏆 Neuer PR: ${parsedWeight} kg × ${parsedReps} Wdh!`, {
                                     description: 'Richtig stark! Bleib dran.',
@@ -82,10 +80,10 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                                 })
                                 onPR?.(`🏆 Neuer PR: ${parsedWeight} kg × ${parsedReps} Wdh!`)
                             }
-                        }
-                    } catch {
-                        // PR check is best-effort — never block the main save
-                    }
+                        })
+                        .catch(() => {
+                            // PR check is best-effort — never block the main save
+                        })
                 }
             } else {
                 // Toggle off (uncomplete)

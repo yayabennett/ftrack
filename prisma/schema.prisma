@@ -21,36 +21,37 @@ model User {
   experienceLevel String?
   isOnboarded     Boolean  @default(false)
   createdAt       DateTime @default(now())
-  
-  exercises   Exercise[]
-  templates   Template[]
-  sessions    WorkoutSession[]
+
+  exercises Exercise[]
+  templates Template[]
+  sessions  WorkoutSession[]
 }
 
 model Exercise {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   muscleGroup String?
   equipment   String?
-  isCustom    Boolean  @default(false)
+  isCustom    Boolean @default(false)
   notes       String?
   userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  
+  user        User?   @relation(fields: [userId], references: [id])
+
   templateExercises TemplateExercise[]
   workoutExercises  WorkoutExercise[]
 
+  @@unique([name, userId])
   @@index([userId])
   @@index([muscleGroup])
 }
 
 model Template {
-  id        String   @id @default(uuid())
-  name      String
-  order     Int      @default(0)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
-  
+  id     String  @id @default(uuid())
+  name   String
+  order  Int     @default(0)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
   exercises TemplateExercise[]
   sessions  WorkoutSession[]
 
@@ -58,16 +59,16 @@ model Template {
 }
 
 model TemplateExercise {
-  id          String   @id @default(uuid())
-  templateId  String
-  exerciseId  String
-  order       Int
-  targetSets  Int?
-  repRange    String?  // e.g. "8-12"
-  notes       String?
-  
-  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  exercise    Exercise @relation(fields: [exerciseId], references: [id])
+  id         String  @id @default(uuid())
+  templateId String
+  exerciseId String
+  order      Int
+  targetSets Int?
+  repRange   String? // e.g. "8-12"
+  notes      String?
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
 
   @@unique([templateId, exerciseId])
   @@index([templateId])
@@ -83,8 +84,8 @@ model WorkoutSession {
   userId     String?
   user       User?     @relation(fields: [userId], references: [id])
   template   Template? @relation(fields: [templateId], references: [id])
-  
-  exercises  WorkoutExercise[]
+
+  exercises WorkoutExercise[]
 
   @@index([userId])
   @@index([templateId])
@@ -92,14 +93,14 @@ model WorkoutSession {
 }
 
 model WorkoutExercise {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
   sessionId  String
   exerciseId String
   order      Int
-  
-  session    WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  exercise   Exercise       @relation(fields: [exerciseId], references: [id])
-  sets       SetEntry[]
+
+  session  WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exercise Exercise       @relation(fields: [exerciseId], references: [id])
+  sets     SetEntry[]
 
   @@index([sessionId])
   @@index([exerciseId])
@@ -115,8 +116,8 @@ model SetEntry {
   isWarmup          Boolean  @default(false)
   note              String?
   createdAt         DateTime @default(now())
-  
-  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+
+  workoutExercise WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
 
   @@index([workoutExerciseId])
   @@index([createdAt])

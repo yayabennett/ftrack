@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { X, Search, Dumbbell } from 'lucide-react'
+import { X, MagnifyingGlass as Search, Barbell as Dumbbell } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { ExerciseDTO } from '@/lib/types'
@@ -105,7 +105,7 @@ export function ExercisePickerDialog({
                                 </div>
                                 <div>
                                     <p className="font-semibold text-[14px]">{ex.name}</p>
-                                    <p className="text-[11px] text-muted-foreground">{ex.muscleGroup || 'Allgemein'}{ex.equipment ? ` · ${ex.equipment}` : ''}</p>
+                                    <p className="text-xs text-muted-foreground">{ex.muscleGroup || 'Allgemein'}{ex.equipment ? ` · ${ex.equipment}` : ''}</p>
                                 </div>
                             </button>
                         ))

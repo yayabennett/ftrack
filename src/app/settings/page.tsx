@@ -3,6 +3,7 @@ import { User, DownloadSimple, Moon, Info, CaretRight, DeviceMobile, Ruler, Targ
 import prisma from '@/lib/prisma'
 import Link from 'next/link'
 import { getCurrentUserId } from '@/lib/auth'
+import { StatTile } from '@/components/ui/stat-tile'
 
 export const revalidate = 0
 
@@ -57,21 +58,21 @@ export default async function SettingsPage() {
                     <div className="space-y-2">
                         <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1 mb-3">Dein Profil</h3>
                         <div className="grid grid-cols-3 gap-2">
-                            <ProfileTile
+                            <StatTile
                                 icon={<Ruler className="w-4 h-4" />}
                                 label="Größe"
                                 value={user.height ? `${user.height} cm` : '–'}
                                 color="text-blue-400"
                                 bg="bg-blue-400/10"
                             />
-                            <ProfileTile
+                            <StatTile
                                 icon={<Barbell className="w-4 h-4" />}
                                 label="Gewicht"
                                 value={user.weight ? `${user.weight} kg` : '–'}
                                 color="text-emerald-400"
                                 bg="bg-emerald-400/10"
                             />
-                            <ProfileTile
+                            <StatTile
                                 icon={<User className="w-4 h-4" />}
                                 label="Alter"
                                 value={user.age ? `${user.age} J.` : '–'}
@@ -87,7 +88,7 @@ export default async function SettingsPage() {
                                         <Target className="w-4 h-4" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ziel</p>
+                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ziel</p>
                                         <p className="text-[13px] font-semibold text-foreground">{GOAL_LABELS[user.goal ?? ''] || '–'}</p>
                                     </div>
                                 </CardContent>
@@ -98,7 +99,7 @@ export default async function SettingsPage() {
                                         <Barbell className="w-4 h-4" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Level</p>
+                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Level</p>
                                         <p className="text-[13px] font-semibold text-foreground">{EXPERIENCE_LABELS[user.experienceLevel ?? ''] || '–'}</p>
                                     </div>
                                 </CardContent>
@@ -110,8 +111,7 @@ export default async function SettingsPage() {
                 {/* Settings List */}
                 <div className="space-y-2">
                     <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1 mb-3">Einstellungen</h3>
-                    <SettingsItem icon={Moon} label="Dark Mode" detail="Aktiv" />
-                    <SettingsItem icon={DeviceMobile} label="Streak-Erinnerungen" detail="Bald verfügbar" />
+                    <SettingsItem icon={Moon} label="Dark Mode" detail="System" />
                 </div>
 
                 {/* Actions */}
@@ -150,22 +150,6 @@ export default async function SettingsPage() {
                 </div>
             </div>
         </div>
-    )
-}
-
-function ProfileTile({ icon, label, value, color, bg }: {
-    icon: React.ReactNode; label: string; value: string; color: string; bg: string
-}) {
-    return (
-        <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0">
-            <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1">
-                <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center ${color}`}>
-                    {icon}
-                </div>
-                <span className="text-lg font-extrabold text-foreground">{value}</span>
-                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{label}</span>
-            </CardContent>
-        </Card>
     )
 }
 

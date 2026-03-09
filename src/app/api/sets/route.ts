@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getCurrentUserId } from '@/lib/auth'
 import { z } from 'zod'
 
 const SetEntrySchema = z.object({
@@ -31,6 +32,23 @@ export async function POST(request: Request) {
 
         if (!sets || !sets.length) {
             return NextResponse.json({ error: 'No sets provided' }, { status: 400 })
+        }
+
+        const userId = await getCurrentUserId()
+        if (!userId) {
+            return new NextResponse('Unauthorized', { status: 401 })
+        }
+
+        // Verify ownership (IDOR prevention): 
+        // We only check the first set's workoutExerciseId assuming batch sets belong to the same workoutExercise
+        const sampleWorkoutExerciseId = sets[0].workoutExerciseId
+        const workoutExercise = await prisma.workoutExercise.findUnique({
+            where: { id: sampleWorkoutExerciseId },
+            include: { session: { select: { userId: true } } }
+        })
+
+        if (!workoutExercise || workoutExercise.session.userId !== userId) {
+            return new NextResponse('Forbidden', { status: 403 })
         }
 
         const created = await prisma.setEntry.createMany({

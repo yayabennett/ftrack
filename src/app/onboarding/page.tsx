@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Dumbbell, ArrowRight, User, Ruler, Target, Zap, Sparkles, ChevronLeft } from 'lucide-react'
+import { Barbell as Dumbbell, ArrowRight, User, Ruler, Target, Lightning as Zap, Sparkle as Sparkles, CaretLeft as ChevronLeft } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -112,7 +112,7 @@ function PersonalStep({
 
             <div className="space-y-4">
                 <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">Name</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Name</label>
                     <Input
                         value={data.name}
                         onChange={e => onChange('name', e.target.value)}
@@ -123,7 +123,7 @@ function PersonalStep({
 
                 <div className="grid grid-cols-3 gap-3">
                     <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">Alter</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Alter</label>
                         <Input
                             type="number"
                             value={data.age}
@@ -133,7 +133,7 @@ function PersonalStep({
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">Gewicht <span className="normal-case text-[9px]">kg</span></label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Gewicht <span className="normal-case text-[9px]">kg</span></label>
                         <Input
                             type="number"
                             value={data.weight}
@@ -143,7 +143,7 @@ function PersonalStep({
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">Größe <span className="normal-case text-[9px]">cm</span></label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Größe <span className="normal-case text-[9px]">cm</span></label>
                         <Input
                             type="number"
                             value={data.height}
@@ -156,7 +156,7 @@ function PersonalStep({
 
                 {/* Gender Selection */}
                 <div className="space-y-2">
-                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">Geschlecht</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Geschlecht</label>
                     <div className="grid grid-cols-3 gap-2">
                         {GENDERS.map(g => (
                             <button
@@ -438,7 +438,7 @@ export default function OnboardingPage() {
 
             {/* Version footer on welcome */}
             {step === 0 && (
-                <p className="text-[10px] text-muted-foreground/40 text-center pb-6 font-medium tracking-wider">
+                <p className="text-xs text-muted-foreground/40 text-center pb-6 font-medium tracking-wider">
                     ftrack v0.3.0 · Dein Trainingsbegleiter
                 </p>
             )}

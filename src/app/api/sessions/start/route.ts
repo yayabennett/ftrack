@@ -21,6 +21,8 @@ export async function POST(request: Request) {
 
         const { templateId, startedAt, notes } = result.data
         const userId = await getCurrentUserId()
+        if (!userId) return new NextResponse('Unauthorized', { status: 401 })
+
         const sessionDate = startedAt ? new Date(startedAt) : new Date()
 
         let session; // Declare session here to be accessible outside if/else

@@ -151,7 +151,7 @@ export default function ExercisesPage() {
                 ) : (
                     grouped.map(([group, items]) => (
                         <section key={group}>
-                            <h2 className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase mb-2 px-1 flex items-center gap-1.5">
+                            <h2 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-2 px-1 flex items-center gap-1.5">
                                 <Sparkle className="w-3 h-3 text-primary/60" />
                                 {group}
                                 <span className="text-muted-foreground/40 ml-1">({items.length})</span>
@@ -177,10 +177,10 @@ export default function ExercisesPage() {
                                                 <p className="text-[14px] font-semibold truncate">{ex.name}</p>
                                                 <div className="flex items-center gap-1.5 mt-0.5">
                                                     {ex.equipment && (
-                                                        <span className="text-[10px] text-muted-foreground/80 font-medium truncate bg-secondary/50 px-1.5 py-0.5 rounded-md">{ex.equipment}</span>
+                                                        <span className="text-xs text-muted-foreground/80 font-medium truncate bg-secondary/50 px-1.5 py-0.5 rounded-md">{ex.equipment}</span>
                                                     )}
                                                     {ex.history && ex.history.length > 0 && (
-                                                        <span className="text-[10px] text-primary/70 font-bold tracking-wider">Lvl {Math.min(ex.history.length, 10)}</span>
+                                                        <span className="text-xs text-primary/70 font-bold tracking-wider">Lvl {Math.min(ex.history.length, 10)}</span>
                                                     )}
                                                 </div>
                                             </div>

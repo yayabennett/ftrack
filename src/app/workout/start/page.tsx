@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Play, Dumbbell, Calendar, Clock, Copy, Check } from 'lucide-react'
+import { ArrowLeft, Play, Barbell as Dumbbell, Calendar, Clock, Copy, Check } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { TemplateDTO } from '@/lib/types'
+import { useStartWorkout } from '@/hooks/use-start-workout'
 
 type Template = Pick<TemplateDTO, 'id' | 'name'> & { exercises: { id: string }[] }
 
@@ -47,20 +48,10 @@ export default function StartWorkoutConfig() {
         fetchTemplates()
     }, [])
 
+    const { startWorkout, isStarting } = useStartWorkout()
+
     const handleStart = () => {
-        try {
-            const startDateTime = new Date(`${date}T${time}:00`)
-
-            // Build URL manually
-            let url = `/workout/active?startedAt=${startDateTime.toISOString()}`
-            if (selectedTemplateId) {
-                url += `&templateId=${selectedTemplateId}`
-            }
-
-            router.push(url)
-        } catch (error) {
-            console.error("Failed to start workout", error)
-        }
+        startWorkout(selectedTemplateId, date, time)
     }
 
     return (
@@ -87,7 +78,7 @@ export default function StartWorkoutConfig() {
                                 <div className="flex flex-col gap-1 w-full">
                                     <div className="flex items-center gap-2 text-muted-foreground mb-1">
                                         <Calendar className="w-4 h-4" />
-                                        <span className="text-[10px] uppercase font-bold tracking-wider">Datum</span>
+                                        <span className="text-xs uppercase font-bold tracking-wider">Datum</span>
                                     </div>
                                     <input
                                         type="date"
@@ -103,7 +94,7 @@ export default function StartWorkoutConfig() {
                                 <div className="flex flex-col gap-1 w-full">
                                     <div className="flex items-center gap-2 text-muted-foreground mb-1">
                                         <Clock className="w-4 h-4" />
-                                        <span className="text-[10px] uppercase font-bold tracking-wider">Uhrzeit</span>
+                                        <span className="text-xs uppercase font-bold tracking-wider">Uhrzeit</span>
                                     </div>
                                     <input
                                         type="time"
@@ -169,8 +160,13 @@ export default function StartWorkoutConfig() {
 
             {/* Floating Start Button */}
             <div className="fixed bottom-24 left-0 right-0 px-4 z-40">
-                <Button onClick={handleStart} className="w-full h-14 text-[17px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] transition-transform active:scale-95 flex items-center justify-center gap-2">
-                    <Play className="w-5 h-5 fill-current" /> Los geht&apos;s
+                <Button onClick={handleStart} disabled={isStarting} className="w-full h-14 text-[17px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] transition-transform active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:active:scale-100">
+                    {isStarting ? (
+                        <div className="w-5 h-5 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
+                    ) : (
+                        <Play className="w-5 h-5 fill-current" />
+                    )}
+                    {isStarting ? 'Wird vorbereitet...' : "Los geht's"}
                 </Button>
             </div>
         </div>

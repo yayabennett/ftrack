@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getCurrentUserId } from '@/lib/auth'
 
 export async function GET(
     request: Request,
@@ -7,9 +8,14 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
+        const userId = await getCurrentUserId()
+        if (!userId) return new NextResponse('Unauthorized', { status: 401 })
 
         const history = await prisma.workoutExercise.findMany({
-            where: { exerciseId: id },
+            where: {
+                exerciseId: id,
+                session: { userId }
+            },
             include: {
                 session: {
                     select: { startedAt: true, endedAt: true }

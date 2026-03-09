@@ -16,8 +16,10 @@ const CreateTemplateSchema = z.object({
 export async function GET() {
     try {
         const userId = await getCurrentUserId()
+        if (!userId) return new NextResponse('Unauthorized', { status: 401 })
+
         const templates = await prisma.template.findMany({
-            where: userId ? { userId } : {},
+            where: { userId },
             include: {
                 exercises: {
                     include: {
@@ -73,6 +75,7 @@ export async function POST(request: Request) {
 
         const { name, exercises } = result.data
         const userId = await getCurrentUserId()
+        if (!userId) return new NextResponse('Unauthorized', { status: 401 })
 
         const template = await prisma.template.create({
             data: {

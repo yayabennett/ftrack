@@ -38,8 +38,8 @@ export function RestTimerPill({ endsAt, onDismiss }: { endsAt: number; onDismiss
             <span className="font-mono font-bold text-primary text-lg tracking-wider">
                 {mins}:{secs.toString().padStart(2, '0')}
             </span>
-            <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Pause</span>
-            <Button size="sm" variant="ghost" onClick={onDismiss} className="h-8 text-[11px] font-bold text-muted-foreground px-4">
+            <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Pause</span>
+            <Button size="sm" variant="ghost" onClick={onDismiss} className="h-8 text-xs font-bold text-muted-foreground px-4">
                 Skip
             </Button>
         </div>

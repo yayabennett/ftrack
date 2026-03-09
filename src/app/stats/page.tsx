@@ -7,59 +7,32 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Pulse, Flame, TrendUp, Barbell, Lightning } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    Cell,
-} from 'recharts'
+import { StatTile } from '@/components/ui/stat-tile'
+import dynamic from 'next/dynamic'
 import type { WeeklyStatsDTO } from '@/lib/types'
+
+const WeeklyChart = dynamic(() => import('@/components/stats/weekly-chart'), {
+    ssr: false,
+    loading: () => (
+        <div className="h-[176px] flex items-end justify-between px-2 gap-2 pb-6 pt-8">
+            <Skeleton className="w-8 h-12 rounded-t-sm bg-secondary" />
+            <Skeleton className="w-8 h-24 rounded-t-sm bg-secondary" />
+            <Skeleton className="w-8 h-16 rounded-t-sm bg-secondary" />
+            <Skeleton className="w-8 h-32 rounded-t-sm bg-primary/40" />
+            <Skeleton className="w-8 h-20 rounded-t-sm bg-secondary" />
+            <Skeleton className="w-8 h-8 rounded-t-sm bg-secondary" />
+        </div>
+    )
+})
 
 type WeeklyResponse = WeeklyStatsDTO & {
     weeklyStreak: number
     totalSessionsEver: number
 }
 
-function StatTile({ icon, value, label, color, bgColor }: {
-    icon: React.ReactNode; value: number; label: string; color: string; bgColor: string
-}) {
-    return (
-        <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 text-card-foreground card-hover">
-            <CardContent className="p-3 flex flex-col items-center justify-center text-center gap-1.5">
-                <div className={`w-9 h-9 rounded-xl ${bgColor} flex items-center justify-center ${color}`}>
-                    {icon}
-                </div>
-                <h3 className="text-2xl font-extrabold text-foreground tracking-tight">{value}</h3>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{label}</p>
-            </CardContent>
-        </Card>
-    )
-}
 
-// Custom tooltip for the bar chart
-function CustomTooltip({ active, payload, label }: {
-    active?: boolean
-    payload?: { value: number }[]
-    label?: string
-}) {
-    if (!active || !payload?.length) return null
-    const volume = payload[0].value
-    return (
-        <div className="bg-background/95 border border-white/10 rounded-xl px-3 py-2 text-xs shadow-lg">
-            <p className="font-bold text-foreground">{label}</p>
-            {volume > 0 ? (
-                <p className="text-primary font-semibold">
-                    {volume >= 1000 ? `${(volume / 1000).toFixed(1)}t` : `${volume} kg`}
-                </p>
-            ) : (
-                <p className="text-muted-foreground">Kein Training</p>
-            )}
-        </div>
-    )
-}
+
+
 
 export default function StatsPage() {
     const [range, setRange] = useState(7)
@@ -69,7 +42,7 @@ export default function StatsPage() {
         { label: '3 Monate', value: 90 },
     ]
 
-    const { data, isLoading } = useQuery({
+    const { data, isLoading } = useQuery<WeeklyResponse>({
         queryKey: ['weekly-stats', range],
         queryFn: async () => {
             const res = await fetch(`/api/stats/weekly?range=${range}`)
@@ -122,7 +95,7 @@ export default function StatsPage() {
                 {/* Hero Volume Card */}
                 <Card className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden glow-primary">
                     <CardContent className="p-6 text-center">
-                        <p className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase mb-2">Wochen-Volumen</p>
+                        <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-2">Wochen-Volumen</p>
                         {isLoading ? (
                             <div className="flex flex-col items-center justify-center gap-2 h-[88px]">
                                 <Skeleton className="h-12 w-32 rounded-lg bg-primary/20" />
@@ -142,9 +115,9 @@ export default function StatsPage() {
 
                 {/* Stat Tiles */}
                 <div className="grid grid-cols-3 gap-3">
-                    <StatTile icon={<Flame className="h-5 w-5" />} value={weeklyStreak} label="Streak" color="text-orange-400" bgColor="bg-orange-400/10" />
-                    <StatTile icon={<Pulse className="h-5 w-5" />} value={sessionsCount} label="Diese Woche" color="text-primary" bgColor="bg-primary/10" />
-                    <StatTile icon={<Barbell className="h-5 w-5" />} value={totalSessionsEver} label="Gesamt" color="text-emerald-400" bgColor="bg-emerald-400/10" />
+                    <StatTile icon={<Flame className="h-5 w-5" />} value={weeklyStreak} label="Streak" color="text-orange-400" bg="bg-orange-400/10" />
+                    <StatTile icon={<Pulse className="h-5 w-5" />} value={sessionsCount} label="Diese Woche" color="text-primary" bg="bg-primary/10" />
+                    <StatTile icon={<Barbell className="h-5 w-5" />} value={totalSessionsEver} label="Gesamt" color="text-emerald-400" bg="bg-emerald-400/10" />
                 </div>
 
                 {/* Real Recharts Bar Chart */}
@@ -166,41 +139,7 @@ export default function StatsPage() {
                                 <Skeleton className="w-8 h-8 rounded-t-sm bg-secondary" />
                             </div>
                         ) : (
-                            <ResponsiveContainer width="100%" height={176}>
-                                <BarChart
-                                    data={data?.days ?? []}
-                                    margin={{ top: 8, right: 0, left: -24, bottom: 0 }}
-                                    barCategoryGap="30%"
-                                >
-                                    <XAxis
-                                        dataKey="label"
-                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 700 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                    />
-                                    <YAxis
-                                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}t` : `${v}`}
-                                    />
-                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                                    <Bar dataKey="volume" radius={[6, 6, 0, 0]} maxBarSize={40}>
-                                        {(data?.days ?? []).map((entry) => (
-                                            <Cell
-                                                key={entry.date}
-                                                fill={
-                                                    entry.date === todayISO
-                                                        ? 'hsl(var(--primary))'
-                                                        : entry.volume > 0
-                                                            ? 'hsl(var(--primary) / 0.45)'
-                                                            : 'hsl(var(--secondary))'
-                                                }
-                                            />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
+                            <WeeklyChart data={data?.days ?? []} todayISO={todayISO} />
                         )}
                     </CardContent>
                 </Card>

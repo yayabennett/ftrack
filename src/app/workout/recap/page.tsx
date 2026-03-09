@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Trophy, Dumbbell, Clock, Flame, TrendingUp, Home, ChevronRight } from 'lucide-react'
+import { Trophy, Barbell as Dumbbell, Clock, Fire as Flame, TrendUp as TrendingUp, House as Home, CaretRight as ChevronRight } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { Suspense } from 'react'
 
@@ -105,9 +105,9 @@ function RecapContent() {
                     <CardContent className="p-4 flex flex-col items-center text-center gap-1">
                         <Dumbbell className="w-5 h-5 text-primary mb-1" />
                         <span className="text-2xl font-extrabold text-foreground">{volumeDisplay}</span>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Volumen</span>
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Volumen</span>
                         {volumeChange !== null && (
-                            <span className={`text-[11px] font-bold mt-1 ${volumeChange > 0 ? 'text-green-400' : volumeChange < 0 ? 'text-red-400' : 'text-muted-foreground'}`}>
+                            <span className={`text-xs font-bold mt-1 ${volumeChange > 0 ? 'text-green-400' : volumeChange < 0 ? 'text-red-400' : 'text-muted-foreground'}`}>
                                 {volumeChange > 0 ? '↑' : volumeChange < 0 ? '↓' : '→'} {Math.abs(volumeChange).toFixed(1)}%
                             </span>
                         )}
@@ -118,7 +118,7 @@ function RecapContent() {
                     <CardContent className="p-4 flex flex-col items-center text-center gap-1">
                         <Clock className="w-5 h-5 text-primary mb-1" />
                         <span className="text-2xl font-extrabold text-foreground">{data.duration}</span>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Minuten</span>
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Minuten</span>
                     </CardContent>
                 </Card>
 
@@ -126,7 +126,7 @@ function RecapContent() {
                     <CardContent className="p-4 flex flex-col items-center text-center gap-1">
                         <Flame className="w-5 h-5 text-orange-400 mb-1" />
                         <span className="text-2xl font-extrabold text-foreground">{data.totalSets}</span>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Sätze</span>
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Sätze</span>
                     </CardContent>
                 </Card>
 
@@ -134,7 +134,7 @@ function RecapContent() {
                     <CardContent className="p-4 flex flex-col items-center text-center gap-1">
                         <TrendingUp className="w-5 h-5 text-emerald-400 mb-1" />
                         <span className="text-2xl font-extrabold text-foreground">{data.exerciseCount}</span>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Übungen</span>
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Übungen</span>
                     </CardContent>
                 </Card>
             </div>
@@ -142,7 +142,7 @@ function RecapContent() {
             {/* PRs */}
             {data.prs.length > 0 && (
                 <div className="px-5 mb-6">
-                    <h3 className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase mb-3 px-1">
+                    <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-3 px-1">
                         🏆 Neue PRs
                     </h3>
                     <div className="space-y-2">
