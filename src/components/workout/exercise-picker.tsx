@@ -6,6 +6,7 @@ import type { ExerciseDTO } from '@/lib/types'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { getMuscleGroupStyle } from '@/lib/exercise-styles'
 
 export function ExercisePickerDialog({
     isOpen,
@@ -30,7 +31,7 @@ export function ExercisePickerDialog({
         enabled: isOpen
     })
 
-    // 2. Global Exercises (only when searching)
+    // 2. Global Exercises (all by default)
     const { data: globalExercises = [], isLoading: isLoadingGlobal } = useQuery({
         queryKey: ['global-exercises-picker', search],
         queryFn: async () => {
@@ -38,7 +39,7 @@ export function ExercisePickerDialog({
             if (!res.ok) throw new Error('Failed to fetch global')
             return res.json() as Promise<(ExerciseDTO & { isSaved: boolean })[]>
         },
-        enabled: isOpen && search.length > 0,
+        enabled: isOpen, // REMOVED search.length > 0 restriction
         staleTime: 60000,
     })
 
@@ -64,8 +65,13 @@ export function ExercisePickerDialog({
         return matchesSearch && matchesGroup
     })
 
-    // Filter global exercises (deduplicate against mine)
-    const filteredGlobal = search ? globalExercises.filter(g => !myExercises.some(m => m.id === g.id)).map(g => ({ ...g, isGlobal: true })) : []
+    // Filter global exercises (deduplicate against mine AND respect group/search filters)
+    const filteredGlobal = globalExercises.filter(g => {
+        if (myExercises.some(m => m.id === g.id)) return false
+        const matchesSearch = search ? (g.name.toLowerCase().includes(search.toLowerCase()) || (g.muscleGroup?.toLowerCase().includes(search.toLowerCase()))) : true
+        const matchesGroup = selectedGroup === 'Alle' || g.muscleGroup === selectedGroup
+        return matchesSearch && matchesGroup
+    }).map(g => ({ ...g, isGlobal: true }))
 
     const combined: (ExerciseDTO & { isGlobal?: boolean })[] = [...filteredMine, ...filteredGlobal]
 
@@ -131,7 +137,8 @@ export function ExercisePickerDialog({
                         </div>
                     ) : (
                         combined.map((ex, i) => {
-                            const showGlobalHeader = search && ex.isGlobal && (i === 0 || !combined[i - 1].isGlobal)
+                            const showGlobalHeader = ex.isGlobal && (i === 0 || !combined[i - 1].isGlobal)
+                            const mStyle = getMuscleGroupStyle(ex.muscleGroup)
 
                             return (
                                 <div key={`picker-${ex.id}`}>
@@ -144,17 +151,18 @@ export function ExercisePickerDialog({
                                     <button
                                         onClick={() => handleSelect(ex)}
                                         className={cn(
-                                            "w-full text-left p-3 rounded-2xl active:scale-[0.98] transition-all flex items-center gap-4 mb-2",
+                                            "w-full text-left p-3 rounded-2xl active:scale-[0.98] transition-all flex items-center gap-4 mb-2 border",
                                             ex.isGlobal
-                                                ? "bg-muted/30 border border-border/40 hover:bg-muted"
-                                                : "bg-secondary/40 hover:bg-secondary/80"
+                                                ? `bg-card hover:bg-muted ${mStyle.borderClass}`
+                                                : `bg-secondary/40 hover:bg-secondary/80 ${mStyle.borderClass}`
                                         )}
                                     >
                                         <div className={cn(
                                             "w-10 h-10 rounded-xl flex items-center justify-center shadow-sm shrink-0",
-                                            ex.isGlobal ? "bg-card text-muted-foreground" : "bg-primary/10 text-primary"
+                                            ex.isGlobal ? `bg-card ${mStyle.colorClass}` : mStyle.bgClass,
+                                            !ex.isGlobal && mStyle.colorClass
                                         )}>
-                                            <Dumbbell className="h-5 w-5" />
+                                            <div className="w-5 h-5">{mStyle.icon}</div>
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <p className="font-bold text-[15px] truncate text-foreground">{ex.name}</p>

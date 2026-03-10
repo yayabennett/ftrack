@@ -5,6 +5,7 @@ import { Barbell, CaretRight, TrendUp, TrendDown, Minus, Trophy, Cube, User, Har
 import { cn } from '@/lib/utils'
 import { MiniSparkline } from '@/components/ui/mini-sparkline'
 import type { ExerciseDTO } from '@/lib/types'
+import { getMuscleGroupStyle } from '@/lib/exercise-styles'
 
 interface ExerciseListItemProps {
     exercise: ExerciseDTO & {
@@ -17,15 +18,7 @@ export function ExerciseListItem({ exercise }: ExerciseListItemProps) {
     const level = exercise.history?.length || 0
     const hasTrend = exercise.history && exercise.history.length > 1
 
-    // Equipment icon mapper
-    const EquipmentIcon = (eq: string | null) => {
-        const lower = eq?.toLowerCase() || ""
-        if (lower.includes('hantel') || lower.includes('dumbbell')) return <Cube className="w-4 h-4" />
-        if (lower.includes('langhantel') || lower.includes('barbell')) return <Barbell className="w-4 h-4" />
-        if (lower.includes('kettlebell')) return <HardDrives className="w-4 h-4" /> // Or similar icon
-        if (lower.includes('bodyweight') || lower.includes('körpergewicht')) return <User className="w-4 h-4" />
-        return <Barbell className="w-4 h-4" />
-    }
+    const mStyle = getMuscleGroupStyle(exercise.muscleGroup)
 
     return (
         <Link
@@ -39,9 +32,9 @@ export function ExerciseListItem({ exercise }: ExerciseListItemProps) {
             )}
         >
             <div className="flex items-center gap-3 min-w-0 z-10">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 shadow-sm">
-                    <div className="text-primary opacity-80 group-hover:opacity-100 transition-opacity">
-                        {EquipmentIcon(exercise.equipment)}
+                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm", mStyle.bgClass)}>
+                    <div className={cn("opacity-80 group-hover:opacity-100 transition-opacity w-5 h-5", mStyle.colorClass)}>
+                        {mStyle.icon}
                     </div>
                 </div>
                 <div className="min-w-0">

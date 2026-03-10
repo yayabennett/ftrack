@@ -26,8 +26,8 @@ export async function GET(request: Request) {
                     where: { id: userId }
                 }
             },
-            orderBy: { name: 'asc' },
-            take: 50 // Limit to avoid massive payloads if search is empty
+            orderBy: { name: 'asc' }
+            // take: removed to allow the picker to display all 200+ exercises instantly
         })
 
         // Map to include a simple boolean
