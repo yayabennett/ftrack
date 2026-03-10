@@ -1,301 +1,365 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Barbell as Dumbbell, ArrowRight, User, Ruler, Target, Lightning as Zap, Sparkle as Sparkles, CaretLeft as ChevronLeft } from '@phosphor-icons/react'
+import { ArrowRight, CheckCircle, Barbell as Dumbbell, Target, Ruler, User, Sparkle as Sparkles, Lightning as Zap, CaretLeft as ChevronLeft } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signIn } from 'next-auth/react'
-import Link from 'next/link'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const GOALS = [
-    { id: 'muscle_gain', emoji: '💪', label: 'Muskelaufbau', desc: 'Masse und Definition aufbauen' },
-    { id: 'fat_loss', emoji: '🔥', label: 'Fettabbau', desc: 'Körperfett reduzieren, Muskeln erhalten' },
-    { id: 'strength', emoji: '🏋️', label: 'Kraft steigern', desc: 'Maximalkraft in Grundübungen' },
-    { id: 'general_fitness', emoji: '⚡', label: 'Allgemeine Fitness', desc: 'Gesund und fit bleiben' },
+    { id: 'muscle_gain', title: 'Muskeln aufbauen', desc: 'Sichtbar Masse & Kraft gewinnen', emoji: '💪', color: 'bg-blue-500/10 text-blue-500 ring-blue-500/30' },
+    { id: 'fat_loss', title: 'Fett abbauen', desc: 'Körperfett reduzieren, straffer werden', emoji: '🔥', color: 'bg-orange-500/10 text-orange-500 ring-orange-500/30' },
+    { id: 'strength', title: 'Stärker werden', desc: 'Gewichte bei Grundübungen steigern', emoji: '🏋️', color: 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/30' },
+    { id: 'general_fitness', title: 'Einfach fit werden', desc: 'Gesund bleiben und besser fühlen', emoji: '⚡', color: 'bg-violet-500/10 text-violet-500 ring-violet-500/30' },
 ] as const
 
 const EXPERIENCE_LEVELS = [
-    { id: 'beginner', emoji: '🌱', label: 'Anfänger', desc: 'Unter 6 Monate Trainingserfahrung' },
-    { id: 'intermediate', emoji: '💎', label: 'Fortgeschritten', desc: '6 Monate – 2 Jahre regelmäßiges Training' },
-    { id: 'advanced', emoji: '👑', label: 'Profi', desc: 'Über 2 Jahre konsequentes Training' },
+    { id: 'beginner', title: 'Anfänger', desc: 'Ich fange gerade erst an', emoji: '🌱' },
+    { id: 'intermediate', title: 'Fortgeschritten', desc: 'Ich trainiere schon einige Monate', emoji: '💎' },
+    { id: 'advanced', title: 'Profi', desc: 'Ich trainiere seit Jahren', emoji: '👑' },
 ] as const
 
 const GENDERS = [
-    { id: 'male', emoji: '♂️', label: 'Männlich' },
-    { id: 'female', emoji: '♀️', label: 'Weiblich' },
-    { id: 'other', emoji: '⚧️', label: 'Divers' },
+    { id: 'male', title: 'Männlich', emoji: '👨' },
+    { id: 'female', title: 'Weiblich', emoji: '👩' },
+    { id: 'other', title: 'Divers', emoji: '🌈' },
 ] as const
 
-const TOTAL_STEPS = 6 // Welcome, Demographics, Goal, Experience, Account, Success
+const TOTAL_STEPS = 8 // Welcome, Name, Gender, Goal, Experience, Metrics, Analyzing, Account
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface ProfileData {
     name: string
-    age: string
-    weight: string
-    height: string
     gender: string
     goal: string
     experienceLevel: string
+    age: string
+    weight: string
+    height: string
     email?: string
     password?: string
 }
 
-// ─── Step Components ─────────────────────────────────────────────────────────
+// ─── Shared Components ───────────────────────────────────────────────────────
 
-function StepIndicator({ current, total }: { current: number; total: number }) {
-    return (
-        <div className="flex gap-2 justify-center">
-            {Array.from({ length: total }, (_, i) => (
-                <div
-                    key={i}
-                    className={`h-1.5 rounded-full transition-all duration-500 ${i < current
-                        ? 'w-8 bg-primary'
-                        : i === current
-                            ? 'w-8 bg-primary/60'
-                            : 'w-4 bg-white/10'
-                        }`}
-                />
-            ))}
+const PageHeader = ({ title, subtitle }: { title: string, subtitle?: string }) => (
+    <div className="text-center space-y-3 mb-10 mt-6 px-4">
+        <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground"
+        >
+            {title}
+        </motion.h2>
+        {subtitle && (
+            <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-[15px] md:text-[17px] text-muted-foreground font-medium max-w-[280px] mx-auto leading-relaxed"
+            >
+                {subtitle}
+            </motion.p>
+        )}
+    </div>
+)
+
+const CardButton = ({
+    selected,
+    onClick,
+    emoji,
+    title,
+    desc
+}: {
+    selected: boolean,
+    onClick: () => void,
+    emoji: string,
+    title: string,
+    desc?: string
+}) => (
+    <motion.button
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={onClick}
+        className={`w-full text-left p-5 rounded-[24px] transition-all duration-300 flex items-center gap-5 border-2 ${selected
+            ? 'bg-primary/5 border-primary shadow-[0_8px_30px_rgb(6,182,212,0.15)] ring-4 ring-primary/10'
+            : 'bg-card border-transparent shadow-soft hover:shadow-md hover:bg-secondary/40'
+            }`}
+    >
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-300 ${selected ? 'scale-110 bg-primary/15' : 'bg-secondary/50'}`}>
+            {emoji}
         </div>
-    )
-}
+        <div>
+            <h3 className={`font-bold text-[17px] sm:text-lg tracking-tight ${selected ? 'text-primary' : 'text-foreground'}`}>{title}</h3>
+            {desc && <p className={`text-[13px] sm:text-sm mt-1 font-medium ${selected ? 'text-foreground/80' : 'text-muted-foreground'}`}>{desc}</p>}
+        </div>
+        <div className="ml-auto">
+            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
+                {selected && <CheckCircle className="w-4 h-4 text-white" weight="bold" />}
+            </div>
+        </div>
+    </motion.button>
+)
+
+const HugeInput = ({ value, onChange, placeholder, type = "text", postfix }: { value: string, onChange: (v: string) => void, placeholder: string, type?: string, postfix?: string }) => (
+    <div className="relative flex items-center justify-center w-full">
+        <input
+            type={type}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            className="w-full text-center bg-transparent border-b-2 border-border focus:border-primary focus:outline-none transition-colors text-4xl sm:text-5xl font-black py-4 placeholder:text-muted/40 pb-4 text-foreground"
+            autoFocus
+        />
+        {postfix && value && (
+            <span className="absolute right-8 bottom-6 text-xl text-muted-foreground font-bold">{postfix}</span>
+        )}
+    </div>
+)
+
+// ─── Step Components ─────────────────────────────────────────────────────────
 
 function WelcomeStep({ onNext }: { onNext: () => void }) {
     return (
-        <div className="flex flex-col items-center justify-center text-center h-full gap-8">
-            <div className="relative">
-                <div className="w-24 h-24 rounded-[28px] bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-[0_12px_40px_-8px_rgba(59,130,246,0.6)]">
-                    <Dumbbell className="w-12 h-12 text-white" />
+        <div className="flex flex-col items-center justify-center text-center h-full gap-10">
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
+                className="relative"
+            >
+                <div className="w-28 h-28 rounded-[32px] bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center shadow-[0_20px_40px_-10px_rgba(6,182,212,0.5)]">
+                    <Dumbbell className="w-14 h-14 text-white" weight="fill" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-sm shadow-lg">
-                    <Sparkles className="w-4 h-4 text-amber-900" />
-                </div>
-            </div>
+            </motion.div>
 
-            <div className="text-center space-y-4 mb-4">
-                <div className="inline-flex items-baseline justify-center text-5xl tracking-[-0.08em] mb-2">
+            <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="space-y-4"
+            >
+                <div className="inline-flex items-baseline justify-center text-6xl tracking-[-0.08em] mb-4">
                     <span className="font-extralight opacity-80">i</span>
                     <span className="font-black text-primary -ml-1">Track</span>
                 </div>
-                <h1 className="text-2xl font-bold tracking-tight">
-                    Premium Training.
+                <h1 className="text-[26px] font-extrabold tracking-tight leading-tight">
+                    Erreiche deine Ziele.<br />
+                    <span className="opacity-50">Wissenschaftlich fundiert.</span>
                 </h1>
-                <p className="text-muted-foreground text-[15px] leading-relaxed max-w-xs mx-auto">
-                    Dein intelligenter Trainingsbegleiter. Lass uns dein Profil einrichten, um dein Training optimal zu gestalten.
-                </p>
-            </div>
+            </motion.div>
 
-            <div className="w-full space-y-3">
+            <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="w-full mt-auto mb-8"
+            >
                 <Button
                     onClick={onNext}
-                    className="w-full h-14 rounded-2xl text-[16px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_30px_-6px_rgba(59,130,246,0.5)] transition-all active:scale-95 flex items-center justify-center gap-2"
+                    className="w-full h-[60px] rounded-[24px] text-[18px] font-bold btn-primary-gradient shadow-[0_12px_30px_-8px_rgba(6,182,212,0.6)] hover:shadow-[0_16px_40px_-8px_rgba(6,182,212,0.7)] transition-all active:scale-95 flex items-center justify-center gap-2 text-white"
                 >
-                    Los geht&apos;s
-                    <ArrowRight className="w-5 h-5" />
+                    Ich bin neu hier
+                    <ArrowRight className="w-5 h-5" weight="bold" />
                 </Button>
-                <Link href="/login" className="block w-full">
-                    <Button variant="ghost" className="w-full h-14 rounded-2xl text-[15px] font-semibold text-muted-foreground hover:text-foreground">
-                        Bereits Mitglied? Einloggen
-                    </Button>
-                </Link>
+                <div className="mt-6 flex justify-center">
+                    <button onClick={() => window.location.href = '/login'} className="text-[15px] font-bold text-muted-foreground hover:text-foreground transition-colors">
+                        Bereits Mitglied? <span className="text-primary">Einloggen</span>
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    )
+}
+
+function NameStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: string) => void }) {
+    return (
+        <div className="flex flex-col h-full items-center pt-8">
+            <PageHeader title="Wie dürfen wir dich nennen?" subtitle="Damit wir dich im Dashboard persönlich begrüßen können." />
+            <div className="w-full max-w-[300px] mt-10">
+                <HugeInput value={data.name} onChange={(v) => onChange('name', v)} placeholder="Dein Name" />
             </div>
         </div>
     )
 }
 
-function PersonalStep({ data, onChange }: { data: ProfileData; onChange: (field: keyof ProfileData, value: string) => void }) {
+function GenderStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: string) => void }) {
     return (
-        <div className="space-y-6">
-            <div className="text-center space-y-2">
-                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 mx-auto mb-4">
-                    <User className="w-7 h-7" />
-                </div>
-                <h2 className="text-2xl font-extrabold tracking-tight">Über dich</h2>
-                <p className="text-sm text-muted-foreground">Grundlagen für dein persönliches Training</p>
-            </div>
-
-            <div className="space-y-4">
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Name</label>
-                    <Input
-                        value={data.name}
-                        onChange={e => onChange('name', e.target.value)}
-                        placeholder="Dein Name"
-                        className="h-13 bg-secondary/50 border-0 rounded-xl text-[16px] font-semibold px-4 focus-visible:ring-primary"
+        <div className="flex flex-col h-full pt-8">
+            <PageHeader title="Was ist dein Geschlecht?" subtitle="Das hilft uns, deinen Kalorienbedarf und dein Volumen genauer zu berechnen." />
+            <div className="space-y-4 px-2 w-full max-w-sm mx-auto mt-4">
+                {GENDERS.map((g) => (
+                    <CardButton
+                        key={g.id}
+                        emoji={g.emoji}
+                        title={g.title}
+                        selected={data.gender === g.id}
+                        onClick={() => onChange('gender', g.id)}
                     />
-                </div>
+                ))}
+            </div>
+        </div>
+    )
+}
 
-                <div className="grid grid-cols-3 gap-3">
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Alter</label>
-                        <Input
-                            type="number"
-                            value={data.age}
-                            onChange={e => onChange('age', e.target.value)}
-                            placeholder="25"
-                            className="h-13 bg-secondary/50 border-0 rounded-xl text-[16px] font-semibold text-center focus-visible:ring-primary"
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Gewicht <span className="normal-case text-[9px]">kg</span></label>
-                        <Input
-                            type="number"
-                            value={data.weight}
-                            onChange={e => onChange('weight', e.target.value)}
-                            placeholder="80"
-                            className="h-13 bg-secondary/50 border-0 rounded-xl text-[16px] font-semibold text-center focus-visible:ring-primary"
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Größe <span className="normal-case text-[9px]">cm</span></label>
-                        <Input
-                            type="number"
-                            value={data.height}
-                            onChange={e => onChange('height', e.target.value)}
-                            placeholder="180"
-                            className="h-13 bg-secondary/50 border-0 rounded-xl text-[16px] font-semibold text-center focus-visible:ring-primary"
-                        />
-                    </div>
-                </div>
+function GoalStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: string) => void }) {
+    return (
+        <div className="flex flex-col h-full pt-8">
+            <PageHeader title="Was ist dein Hauptziel?" subtitle="Wir passen deinen Trainingsplan exakt auf dieses Ziel an." />
+            <div className="space-y-4 px-2 w-full max-w-sm mx-auto mt-2">
+                {GOALS.map((g) => (
+                    <CardButton
+                        key={g.id}
+                        emoji={g.emoji}
+                        title={g.title}
+                        desc={g.desc}
+                        selected={data.goal === g.id}
+                        onClick={() => onChange('goal', g.id)}
+                    />
+                ))}
+            </div>
+        </div>
+    )
+}
 
-                {/* Gender Selection */}
+function ExperienceStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: string) => void }) {
+    return (
+        <div className="flex flex-col h-full pt-8">
+            <PageHeader title="Dein Fitness-Level?" subtitle="Wir passen die Übungsauswahl an deine Erfahrung an." />
+            <div className="space-y-4 px-2 w-full max-w-sm mx-auto mt-4">
+                {EXPERIENCE_LEVELS.map((g) => (
+                    <CardButton
+                        key={g.id}
+                        emoji={g.emoji}
+                        title={g.title}
+                        desc={g.desc}
+                        selected={data.experienceLevel === g.id}
+                        onClick={() => onChange('experienceLevel', g.id)}
+                    />
+                ))}
+            </div>
+        </div>
+    )
+}
+
+function MetricsStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: string) => void }) {
+    return (
+        <div className="flex flex-col h-full pt-8">
+            <PageHeader title="Deine Körperdaten" subtitle="Lass uns deinen Startpunkt festhalten, um deine Fortschritte zu messen." />
+
+            <div className="space-y-10 mt-8 w-full max-w-sm mx-auto">
+                <div>
+                    <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Alter</p>
+                    <HugeInput type="number" value={data.age} onChange={(v) => onChange('age', v)} placeholder="25" postfix="Jahre" />
+                </div>
+                <div>
+                    <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Gewicht</p>
+                    <HugeInput type="number" value={data.weight} onChange={(v) => onChange('weight', v)} placeholder="80" postfix="kg" />
+                </div>
+                <div>
+                    <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Körpergröße</p>
+                    <HugeInput type="number" value={data.height} onChange={(v) => onChange('height', v)} placeholder="180" postfix="cm" />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function AnalyzingStep({ onComplete }: { onComplete: () => void }) {
+    const [progress, setProgress] = useState(0)
+    const [phase, setPhase] = useState(0)
+
+    const phases = [
+        "Analysiere Profil...",
+        "Berechne ideales Trainingsvolumen...",
+        "Optimiere Übungsauswahl...",
+        "Dein Plan ist bereit!"
+    ]
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                const next = prev + 1.2
+                if (next > 30 && phase === 0) setPhase(1)
+                if (next > 60 && phase === 1) setPhase(2)
+                if (next >= 100) {
+                    clearInterval(interval)
+                    setPhase(3)
+                    setTimeout(onComplete, 800)
+                    return 100
+                }
+                return next
+            })
+        }, 50)
+        return () => clearInterval(interval)
+    }, [phase, onComplete])
+
+    return (
+        <div className="flex flex-col items-center justify-center text-center h-full gap-10">
+            <div className="relative w-40 h-40 flex items-center justify-center">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" className="stroke-secondary/50 fill-none stroke-[6]" strokeLinecap="round" />
+                    <motion.circle
+                        cx="50" cy="50" r="45"
+                        className="stroke-primary fill-none stroke-[6]"
+                        strokeLinecap="round"
+                        initial={{ strokeDasharray: "0 283" }}
+                        animate={{ strokeDasharray: `${(progress / 100) * 283} 283` }}
+                        transition={{ ease: "linear" }}
+                    />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center text-4xl">
+                    {phase === 3 ? <Sparkles className="text-primary w-12 h-12" weight="fill" /> : <Dumbbell className="text-primary/50 w-10 h-10 animate-pulse" weight="fill" />}
+                </div>
+            </div>
+            <div>
+                <motion.h2
+                    key={phase}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-2xl font-extrabold tracking-tight"
+                >
+                    {phases[phase]}
+                </motion.h2>
+                <p className="text-muted-foreground font-medium mt-2">Wir stellen alles für dich ein...</p>
+            </div>
+        </div>
+    )
+}
+
+function AccountStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: string) => void }) {
+    return (
+        <div className="flex flex-col h-full pt-8">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary">
+                <Zap className="w-8 h-8" weight="fill" />
+            </div>
+            <PageHeader title="Sichere deinen Code" subtitle="Letzter Schritt! Lege einen Account an, um deinen personalisierten Plan für immer zu speichern." />
+
+            <div className="space-y-6 mt-6 px-2 w-full max-w-sm mx-auto">
                 <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Geschlecht</label>
-                    <div className="grid grid-cols-3 gap-2">
-                        {GENDERS.map(g => (
-                            <button
-                                key={g.id}
-                                type="button"
-                                onClick={() => onChange('gender', g.id)}
-                                className={`p-3 rounded-xl text-center transition-all duration-300 active:scale-95 ${data.gender === g.id
-                                    ? 'bg-primary border-primary text-primary-foreground shadow-md'
-                                    : 'bg-card border border-border text-muted-foreground hover:bg-secondary/40'
-                                    }`}
-                            >
-                                <span className="text-lg">{g.emoji}</span>
-                                <p className="text-[12px] font-bold mt-1">{g.label}</p>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-function GoalStep({ selected, onSelect }: { selected: string; onSelect: (id: string) => void }) {
-    return (
-        <div className="space-y-6">
-            <div className="text-center space-y-2">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mx-auto mb-4">
-                    <Target className="w-7 h-7" />
-                </div>
-                <h2 className="text-2xl font-extrabold tracking-tight">Dein Trainingsziel</h2>
-                <p className="text-sm text-muted-foreground">Was möchtest du erreichen?</p>
-            </div>
-
-            <div className="space-y-3">
-                {GOALS.map(goal => (
-                    <button
-                        key={goal.id}
-                        type="button"
-                        onClick={() => onSelect(goal.id)}
-                        className={`w-full p-4 rounded-2xl text-left transition-all duration-300 active:scale-[0.98] flex items-center gap-4 ${selected === goal.id
-                            ? 'bg-primary/10 border-primary ring-2 ring-primary shadow-soft text-foreground'
-                            : 'bg-card border border-border text-muted-foreground shadow-sm hover:shadow-md'
-                            }`}
-                    >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-colors duration-300 ${selected === goal.id ? 'bg-primary/20' : 'bg-secondary/60'
-                            }`}>
-                            {goal.emoji}
-                        </div>
-                        <div>
-                            <h3 className={`font-bold text-[15px] ${selected === goal.id ? 'text-foreground' : 'text-foreground/80'}`}>{goal.label}</h3>
-                            <p className="text-[12px] opacity-80">{goal.desc}</p>
-                        </div>
-                    </button>
-                ))}
-            </div>
-        </div>
-    )
-}
-
-function ExperienceStep({ selected, onSelect }: { selected: string; onSelect: (id: string) => void }) {
-    return (
-        <div className="space-y-6">
-            <div className="text-center space-y-2">
-                <div className="w-14 h-14 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-400 mx-auto mb-4">
-                    <Ruler className="w-7 h-7" />
-                </div>
-                <h2 className="text-2xl font-extrabold tracking-tight">Dein Level</h2>
-                <p className="text-sm text-muted-foreground">Wie erfahren bist du im Krafttraining?</p>
-            </div>
-
-            <div className="space-y-3">
-                {EXPERIENCE_LEVELS.map(level => (
-                    <button
-                        key={level.id}
-                        type="button"
-                        onClick={() => onSelect(level.id)}
-                        className={`w-full p-4 rounded-2xl text-left transition-all duration-300 active:scale-[0.98] flex items-center gap-4 ${selected === level.id
-                            ? 'bg-primary/10 border-primary ring-2 ring-primary shadow-soft text-foreground'
-                            : 'bg-card border border-border text-muted-foreground shadow-sm hover:shadow-md'
-                            }`}
-                    >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-colors duration-300 ${selected === level.id ? 'bg-primary/20' : 'bg-secondary/60'
-                            }`}>
-                            {level.emoji}
-                        </div>
-                        <div>
-                            <h3 className={`font-bold text-[15px] ${selected === level.id ? 'text-foreground' : 'text-foreground/80'}`}>{level.label}</h3>
-                            <p className="text-[12px] opacity-80">{level.desc}</p>
-                        </div>
-                    </button>
-                ))}
-            </div>
-        </div>
-    )
-}
-
-function AccountStep({ data, onChange }: { data: ProfileData; onChange: (field: keyof ProfileData, value: string) => void }) {
-    return (
-        <div className="space-y-6">
-            <div className="text-center space-y-2">
-                <div className="inline-flex items-baseline justify-center text-5xl tracking-[-0.08em] mb-4">
-                    <span className="font-extralight opacity-80">i</span>
-                    <span className="font-black text-primary -ml-1">Track</span>
-                </div>
-                <h2 className="text-2xl font-extrabold tracking-tight">Account erstellen</h2>
-                <p className="text-sm text-muted-foreground">Speichere deinen Fortschritt sicher in der Cloud ab.</p>
-            </div>
-
-            <div className="space-y-4">
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Email</label>
-                    <Input
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Adresse</label>
+                    <input
                         type="email"
                         value={data.email || ''}
-                        onChange={e => onChange('email', e.target.value)}
+                        onChange={(e) => onChange('email', e.target.value)}
                         placeholder="name@beispiel.de"
-                        className="h-13 bg-secondary/50 border-0 rounded-xl text-[16px] font-semibold px-4 focus-visible:ring-primary"
-                        required
+                        className="w-full h-[60px] bg-secondary/40 border-2 border-transparent rounded-[20px] text-[16px] font-bold px-5 focus:border-primary focus:bg-card focus:shadow-[0_8px_30px_rgb(6,182,212,0.1)] outline-none transition-all placeholder:text-muted-foreground/40 placeholder:font-medium"
                     />
                 </div>
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">Passwort</label>
-                    <Input
+                <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Passwort <span className="text-[10px] ml-1 opacity-50">(min. 6 Zeichen)</span></label>
+                    <input
                         type="password"
                         value={data.password || ''}
-                        onChange={e => onChange('password', e.target.value)}
+                        onChange={(e) => onChange('password', e.target.value)}
                         placeholder="••••••••"
-                        className="h-13 bg-secondary/50 border-0 rounded-xl text-[16px] font-semibold px-4 focus-visible:ring-primary"
-                        required
+                        className="w-full h-[60px] bg-secondary/40 border-2 border-transparent rounded-[20px] text-[16px] font-bold px-5 focus:border-primary focus:bg-card focus:shadow-[0_8px_30px_rgb(6,182,212,0.1)] outline-none transition-all placeholder:text-muted-foreground/40 placeholder:font-medium"
                     />
                 </div>
             </div>
@@ -303,33 +367,7 @@ function AccountStep({ data, onChange }: { data: ProfileData; onChange: (field: 
     )
 }
 
-function SuccessStep({ name }: { name: string }) {
-    return (
-        <div className="flex flex-col items-center justify-center text-center h-full gap-6">
-            <div className="relative">
-                <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", bounce: 0.5 }}
-                    className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-[0_12px_40px_-8px_rgba(16,185,129,0.6)]"
-                >
-                    <Zap className="w-12 h-12 text-white" />
-                </motion.div>
-            </div>
-
-            <div className="space-y-3">
-                <h2 className="text-3xl font-extrabold tracking-tight text-foreground">
-                    Bereit, {name || 'Champ'}! 🎉
-                </h2>
-                <p className="text-muted-foreground text-[15px] leading-relaxed max-w-xs mx-auto">
-                    Dein Profil ist eingerichtet. iTrack ist jetzt auf dein Training zugeschnitten. Zeit, Fortschritte zu machen!
-                </p>
-            </div>
-        </div>
-    )
-}
-
-// ─── Main Wizard ─────────────────────────────────────────────────────────────
+// ─── Main Wizard Layout ──────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
     const router = useRouter()
@@ -337,67 +375,44 @@ export default function OnboardingPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    // Animation variants for Framer Motion
-    const slideVariants = {
-        enter: (direction: number) => ({
-            x: direction > 0 ? 50 : -50,
-            opacity: 0
-        }),
-        center: {
-            zIndex: 1,
-            x: 0,
-            opacity: 1
-        },
-        exit: (direction: number) => ({
-            zIndex: 0,
-            x: direction < 0 ? 50 : -50,
-            opacity: 0
-        })
-    }
-    const [[page, direction], setPage] = useState([0, 0])
-
-    const navigateTo = (newStep: number) => {
-        setPage([newStep, newStep > step ? 1 : -1])
-        setStep(newStep)
-    }
-
+    // Data Store
     const [data, setData] = useState<ProfileData>({
-        name: '',
-        age: '',
-        weight: '',
-        height: '',
-        gender: '',
-        goal: '',
-        experienceLevel: '',
-        email: '',
-        password: ''
+        name: '', gender: '', goal: '', experienceLevel: '',
+        age: '', weight: '', height: '', email: '', password: ''
     })
 
     const updateField = (field: keyof ProfileData, value: string) => {
         setData(prev => ({ ...prev, [field]: value }))
+        setError(null)
     }
 
     const canProceed = (): boolean => {
         switch (step) {
             case 0: return true // Welcome
-            case 1: return !!(data.name && data.age && data.weight && data.height && data.gender)
-            case 2: return !!data.goal
-            case 3: return !!data.experienceLevel
-            case 4: return !!(data.email && data.password && data.password.length >= 6)
+            case 1: return data.name.length >= 2
+            case 2: return !!data.gender
+            case 3: return !!data.goal
+            case 4: return !!data.experienceLevel
+            case 5: return !!(data.age && data.weight && data.height)
+            case 6: return false // Auto-advances
+            case 7: return !!(data.email && data.password && data.password.length >= 6)
             default: return true
         }
     }
 
-    const handleNext = () => {
-        if (step < TOTAL_STEPS - 1) {
-            navigateTo(step + 1)
-        } else {
-            router.replace('/')
+    const handleNext = async () => {
+        if (step === 7) {
+            await handleSubmit()
+            return
         }
-    }
 
-    const handleBack = () => {
-        if (step > 0) navigateTo(step - 1)
+        // Auto fake loading
+        if (step === 5) {
+            setStep(6)
+            return
+        }
+
+        if (step < TOTAL_STEPS - 1) setStep(s => s + 1)
     }
 
     const handleSubmit = async () => {
@@ -405,7 +420,6 @@ export default function OnboardingPage() {
         setError(null)
 
         try {
-            // Register & Create Full Profile via single API endpoint
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -414,122 +428,113 @@ export default function OnboardingPage() {
 
             if (!res.ok) {
                 const errorText = await res.text()
-                throw new Error(errorText || 'Failed to create account')
+                throw new Error(errorText || 'Fehler beim Erstellen des Accounts')
             }
 
-            // Immediately Auto-Login
             const signInRes = await signIn("credentials", {
                 email: data.email,
                 password: data.password,
                 redirect: false,
             })
 
-            if (signInRes?.error) {
-                throw new Error('Account created but login failed.')
-            }
+            if (signInRes?.error) throw new Error('Account erstellt, Login fehlgeschlagen.')
 
-            // Move to Success step
-            navigateTo(TOTAL_STEPS - 1)
+            router.replace('/') // Success redirect
         } catch (err: any) {
             setError(err.message || 'Etwas ist schiefgelaufen.')
-        } finally {
             setIsSubmitting(false)
         }
     }
 
-    const handleNextOrSubmit = async () => {
-        if (step === 4) {
-            // Account step — sumbit all data
-            await handleSubmit()
-        } else {
-            handleNext()
-        }
+    // Animation Config
+    const variants: import("framer-motion").Variants = {
+        initial: { opacity: 0, x: 20, scale: 0.98 },
+        animate: { opacity: 1, x: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 25 } },
+        exit: { opacity: 0, x: -20, scale: 0.98, transition: { duration: 0.2 } }
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
-            {/* Header with back button + step indicator */}
-            {step > 0 && step < TOTAL_STEPS - 1 && (
-                <div className="px-4 pt-safe-top mt-4 flex items-center justify-between z-10 relative">
+        <div className="min-h-screen bg-background flex flex-col font-sans">
+            {/* Top Progress Bar - Yazio Style (Hidden on Welcome and Analyzing) */}
+            {step > 0 && step !== 6 && (
+                <div className="pt-safe-top bg-background/80 backdrop-blur-xl z-50 sticky top-0 px-4 py-4 flex items-center gap-4">
                     <button
-                        onClick={handleBack}
-                        className="w-10 h-10 rounded-full bg-secondary/80 backdrop-blur-md flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors active:scale-95 shadow-sm"
+                        onClick={() => setStep(s => s - 1)}
+                        className="w-10 h-10 rounded-full bg-secondary/60 flex items-center justify-center text-foreground hover:bg-secondary transition-colors"
                     >
-                        <ChevronLeft className="w-5 h-5" />
+                        <ChevronLeft className="w-5 h-5" weight="bold" />
                     </button>
-                    <StepIndicator current={step - 1} total={TOTAL_STEPS - 2} />
-                    <div className="w-10" /> {/* Spacer */}
+                    <div className="flex-1 h-3 bg-secondary/50 rounded-full overflow-hidden">
+                        <motion.div
+                            className="h-full bg-primary rounded-full relative overflow-hidden"
+                            initial={{ width: `${((step) / (TOTAL_STEPS - 2)) * 100}%` }}
+                            animate={{ width: `${((step) / (TOTAL_STEPS - 2)) * 100}%` }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        >
+                            <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)', backgroundSize: '1rem 1rem' }} />
+                        </motion.div>
+                    </div>
+                    <span className="text-[13px] font-bold text-muted-foreground w-8 text-right">{Math.min(step, 7)}/7</span>
                 </div>
             )}
 
-            {/* Content Area with Framer Motion AnimatePresence */}
-            <div className="flex-1 flex flex-col justify-center px-6 py-8 relative">
-                <AnimatePresence initial={false} custom={direction} mode="wait">
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col px-4 sm:px-6 relative overflow-x-hidden">
+                <AnimatePresence mode="wait">
                     <motion.div
-                        key={page}
-                        custom={direction}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
+                        key={step}
+                        variants={variants}
+                        initial="initial"
+                        animate="animate"
                         exit="exit"
-                        transition={{
-                            x: { type: "spring", stiffness: 300, damping: 30 },
-                            opacity: { duration: 0.2 }
-                        }}
-                        className="w-full absolute left-0 right-0 px-6"
-                        style={{ top: '50%', y: '-50%' }}
+                        className="w-full max-w-md mx-auto h-full flex flex-col pt-4"
                     >
                         {step === 0 && <WelcomeStep onNext={handleNext} />}
-                        {step === 1 && <PersonalStep data={data} onChange={updateField} />}
-                        {step === 2 && <GoalStep selected={data.goal} onSelect={v => updateField('goal', v)} />}
-                        {step === 3 && <ExperienceStep selected={data.experienceLevel} onSelect={v => updateField('experienceLevel', v)} />}
-                        {step === 4 && <AccountStep data={data} onChange={updateField} />}
-                        {step === 5 && <SuccessStep name={data.name} />}
+                        {step === 1 && <NameStep data={data} onChange={updateField} />}
+                        {step === 2 && <GenderStep data={data} onChange={updateField} />}
+                        {step === 3 && <GoalStep data={data} onChange={updateField} />}
+                        {step === 4 && <ExperienceStep data={data} onChange={updateField} />}
+                        {step === 5 && <MetricsStep data={data} onChange={updateField} />}
+                        {step === 6 && <AnalyzingStep onComplete={() => setStep(7)} />}
+                        {step === 7 && <AccountStep data={data} onChange={updateField} />}
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            {/* Error message */}
+            {/* Floating Error Toast */}
             <AnimatePresence>
                 {error && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="px-6 pb-2 z-10 relative"
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="fixed bottom-32 left-4 right-4 z-50 pointer-events-none"
                     >
-                        <p className="text-sm text-destructive text-center font-bold bg-destructive/10 p-3 rounded-xl ring-1 ring-destructive/20 shadow-sm">{error}</p>
+                        <div className="max-w-sm mx-auto bg-destructive/95 text-destructive-foreground text-[14px] font-bold py-3 px-5 rounded-2xl shadow-xl text-center backdrop-blur-md">
+                            {error}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Bottom CTA */}
-            {step > 0 && (
-                <div className="px-6 pb-safe-bottom mb-6 pt-2 z-10 relative">
-                    <Button
-                        onClick={step === TOTAL_STEPS - 1 ? handleNext : handleNextOrSubmit}
-                        disabled={(step < TOTAL_STEPS - 1 && !canProceed()) || isSubmitting}
-                        className="w-full h-14 rounded-2xl text-[16px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_30px_-6px_rgba(59,130,246,0.5)] transition-all active:scale-95 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2"
-                    >
-                        {isSubmitting ? (
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                        ) : step === TOTAL_STEPS - 1 ? (
-                            <>
-                                <Dumbbell className="w-5 h-5" />
-                                Training starten
-                            </>
-                        ) : step === 4 ? (
-                            <>
-                                <Sparkles className="w-5 h-5" />
-                                Profil erstellen
-                            </>
-                        ) : (
-                            <>
-                                Weiter
-                                <ArrowRight className="w-5 h-5" />
-                            </>
-                        )}
-                    </Button>
+            {/* Bottom Sticky Action Bar */}
+            {step > 0 && step !== 6 && (
+                <div className="p-4 sm:p-6 pb-8 bg-gradient-to-t from-background via-background to-transparent sticky bottom-0 z-40 mt-auto">
+                    <div className="max-w-md mx-auto">
+                        <Button
+                            onClick={handleNext}
+                            disabled={!canProceed() || isSubmitting}
+                            className="w-full h-[64px] rounded-[24px] text-[18px] font-extrabold bg-foreground text-background hover:bg-foreground/90 transition-all active:scale-[0.98] disabled:opacity-30 flex items-center justify-center gap-3 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] dark:shadow-none"
+                        >
+                            {isSubmitting ? (
+                                <div className="w-6 h-6 border-3 border-background/20 border-t-background rounded-full animate-spin" />
+                            ) : step === 7 ? (
+                                <>Fortschritt sichern <Sparkles className="w-5 h-5" weight="fill" /></>
+                            ) : (
+                                <>Weiter <ArrowRight className="w-5 h-5" weight="bold" /></>
+                            )}
+                        </Button>
+                    </div>
                 </div>
             )}
         </div>
