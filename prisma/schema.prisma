@@ -66,6 +66,7 @@ model User {
   exercises Exercise[]
   templates Template[]
   sessions  WorkoutSession[]
+  savedExercises Exercise[] @relation("UserSavedExercises")
 }
 
 model Exercise {
@@ -80,6 +81,7 @@ model Exercise {
 
   templateExercises TemplateExercise[]
   workoutExercises  WorkoutExercise[]
+  savedByUsers      User[] @relation("UserSavedExercises")
 
   @@unique([name, userId])
   @@index([userId])

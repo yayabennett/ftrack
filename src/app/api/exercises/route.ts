@@ -15,11 +15,15 @@ const CreateExerciseSchema = z.object({
 export async function GET() {
     try {
         const userId = await getCurrentUserId()
+        if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
         const exercises = await prisma.exercise.findMany({
             where: {
                 OR: [
-                    { isCustom: false },
-                    { userId },
+                    { isCustom: true, userId }, // Created by the user
+                    { savedByUsers: { some: { id: userId } } }, // Explicitly saved by user
+                    { workoutExercises: { some: { session: { userId } } } }, // Used in a past workout
+                    { templateExercises: { some: { template: { userId } } } }, // Used in a template
                 ]
             },
             orderBy: { name: 'asc' },
