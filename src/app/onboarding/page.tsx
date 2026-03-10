@@ -500,7 +500,7 @@ export default function OnboardingPage() {
         <div className="min-h-screen bg-background flex flex-col font-sans">
             {/* Top Progress Bar - Yazio Style (Hidden on Welcome and Analyzing) */}
             {step > 0 && step !== 6 && (
-                <div className="pt-safe-top bg-background/80 backdrop-blur-xl z-50 sticky top-0 px-4 py-4 flex items-center gap-4">
+                <div className="bg-background/80 backdrop-blur-xl z-50 sticky top-0 px-4 py-4 flex items-center gap-4">
                     <button
                         onClick={() => setStep(s => s - 1)}
                         className="w-10 h-10 rounded-[14px] bg-secondary/60 flex items-center justify-center text-foreground hover:bg-secondary transition-colors shrink-0"

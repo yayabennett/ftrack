@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   title: "iTrack — Workout Tracker",
   description: "Die premium Fitness-App für dein Training",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "iTrack",
+  },
   openGraph: {
     title: "iTrack — Workout Tracker",
     description: "Die premium Fitness-App für dein Training",
@@ -55,21 +60,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de">
+    <html lang="de" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground safe-bottom pb-20 md:pb-0 transition-colors duration-300`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300 h-full overflow-x-hidden`}
       >
         <AuthProvider>
           <Providers>
             <SplashScreen />
-            <OfflineBanner />
-            <main className="pb-20 min-h-screen">
-              {children}
-            </main>
-            <BottomNav />
+            <div className="min-h-screen bg-background flex flex-col">
+              <div className="pt-safe-top flex-1 flex flex-col relative">
+                <OfflineBanner />
+                <main className="flex-1 pb-20 md:pb-0">
+                  {children}
+                </main>
+                <BottomNav />
+              </div>
+            </div>
+            <Toaster theme="dark" position="bottom-center" />
           </Providers>
         </AuthProvider>
-        <Toaster theme="dark" position="bottom-center" />
       </body>
     </html>
   );

@@ -223,6 +223,15 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
+  .pt-safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .pt-safe-top-dynamic {
+    padding-top: calc(env(safe-area-inset-top) + 1rem);
+    /* Use for extra breathing room if needed */
+  }
+
   .h-safe {
     height: env(safe-area-inset-bottom, 0px);
   }
@@ -263,6 +272,10 @@
 
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    margin: 0;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    background-color: var(--background);
   }
 
   :where(button, a, input, textarea, select, [role="button"], [tabindex]):focus-visible {
