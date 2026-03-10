@@ -1,63 +1,38 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import prisma from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
+import { UserService } from '@/lib/services/user.service'
+import { RegisterSchema } from '@/lib/validations/auth'
 
 export async function POST(req: Request) {
     try {
-        const { email, password, name, age, weight, height, gender, goal, experienceLevel, migrateUserId } = await req.json()
+        const json = await req.json()
+        const result = RegisterSchema.safeParse(json)
 
-        if (!email || !password) {
-            return new NextResponse('Missing email or password', { status: 400 })
+        if (!result.success) {
+            return NextResponse.json({ error: 'Ungültige Eingaben', details: result.error.format() }, { status: 400 })
         }
 
-        const lowerEmail = email.toLowerCase()
+        const data = result.data
 
-        const existing = await prisma.user.findUnique({ where: { email: lowerEmail } })
-        if (existing) {
-            return new NextResponse('Email already in use', { status: 400 })
+        if (await UserService.isEmailTaken(data.email)) {
+            return NextResponse.json({ error: 'E-Mail bereits vergeben' }, { status: 400 })
         }
-
-        const hashedPassword = await bcrypt.hash(password, 10)
 
         const cookieStore = await cookies()
-        const cookieMigrateUserId = cookieStore.get('iTrack-user-id')?.value
-        const actualMigrateUserId = migrateUserId || cookieMigrateUserId
+        const migrateUserId = cookieStore.get('iTrack-user-id')?.value
 
-        if (actualMigrateUserId) {
-            // Attempt to migrate existing local-only user (the initial "Bennett" or generated cookie users)
-            const localUser = await prisma.user.findUnique({ where: { id: actualMigrateUserId } })
-            if (localUser && !localUser.email) {
-                const updated = await prisma.user.update({
-                    where: { id: actualMigrateUserId },
-                    data: {
-                        email: lowerEmail,
-                        password: hashedPassword,
-                        name: name || localUser.name
-                    }
-                })
-                return NextResponse.json(updated)
-            }
-        }
+        const user = await UserService.registerAndOnboard(data, migrateUserId)
 
-        // Create brand new user
-        const newUser = await prisma.user.create({
-            data: {
-                email: lowerEmail,
-                name,
-                password: hashedPassword,
-                isOnboarded: true,
-                age: age ? parseInt(age) : null,
-                weight: weight ? parseFloat(weight) : null,
-                height: height ? parseFloat(height) : null,
-                gender: gender || null,
-                goal: goal || null,
-                experienceLevel: experienceLevel || null,
+        return NextResponse.json({
+            success: true,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name
             }
         })
-        return NextResponse.json(newUser)
     } catch (error) {
         console.error('Registration Error:', error)
-        return new NextResponse('Internal Error', { status: 500 })
+        return NextResponse.json({ error: 'Interner Serverfehler' }, { status: 500 })
     }
 }

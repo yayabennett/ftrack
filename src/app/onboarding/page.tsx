@@ -7,42 +7,35 @@ import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signIn } from 'next-auth/react'
 
+import { Gender, Goal, ExperienceLevel } from '@prisma/client'
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const GOALS = [
-    { id: 'muscle_gain', title: 'Muskeln aufbauen', desc: 'Sichtbar Masse & Kraft gewinnen', emoji: '💪', color: 'bg-blue-500/10 text-blue-500 ring-blue-500/30' },
-    { id: 'fat_loss', title: 'Fett abbauen', desc: 'Körperfett reduzieren, straffer werden', emoji: '🔥', color: 'bg-orange-500/10 text-orange-500 ring-orange-500/30' },
-    { id: 'strength', title: 'Stärker werden', desc: 'Gewichte bei Grundübungen steigern', emoji: '🏋️', color: 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/30' },
-    { id: 'general_fitness', title: 'Einfach fit werden', desc: 'Gesund bleiben und besser fühlen', emoji: '⚡', color: 'bg-violet-500/10 text-violet-500 ring-violet-500/30' },
+    { id: Goal.MUSCLE_GAIN, title: 'Muskeln aufbauen', desc: 'Sichtbar Masse & Kraft gewinnen', emoji: '💪', color: 'bg-blue-500/10 text-blue-500 ring-blue-500/30' },
+    { id: Goal.FAT_LOSS, title: 'Fett abbauen', desc: 'Körperfett reduzieren, straffer werden', emoji: '🔥', color: 'bg-orange-500/10 text-orange-500 ring-orange-500/30' },
+    { id: Goal.STRENGTH, title: 'Stärker werden', desc: 'Gewichte bei Grundübungen steigern', emoji: '🏋️', color: 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/30' },
+    { id: Goal.GENERAL_FITNESS, title: 'Einfach fit werden', desc: 'Gesund bleiben und besser fühlen', emoji: '⚡', color: 'bg-violet-500/10 text-violet-500 ring-violet-500/30' },
 ] as const
 
 const EXPERIENCE_LEVELS = [
-    { id: 'beginner', title: 'Anfänger', desc: 'Ich fange gerade erst an', emoji: '🌱' },
-    { id: 'intermediate', title: 'Fortgeschritten', desc: 'Ich trainiere schon einige Monate', emoji: '💎' },
-    { id: 'advanced', title: 'Profi', desc: 'Ich trainiere seit Jahren', emoji: '👑' },
+    { id: ExperienceLevel.BEGINNER, title: 'Anfänger', desc: 'Ich fange gerade erst an', emoji: '🌱' },
+    { id: ExperienceLevel.INTERMEDIATE, title: 'Fortgeschritten', desc: 'Ich trainiere schon einige Monate', emoji: '💎' },
+    { id: ExperienceLevel.ADVANCED, title: 'Profi', desc: 'Ich trainiere seit Jahren', emoji: '👑' },
 ] as const
 
 const GENDERS = [
-    { id: 'male', title: 'Männlich', emoji: '👨' },
-    { id: 'female', title: 'Weiblich', emoji: '👩' },
-    { id: 'other', title: 'Divers', emoji: '🌈' },
+    { id: Gender.MALE, title: 'Männlich', emoji: '👨' },
+    { id: Gender.FEMALE, title: 'Weiblich', emoji: '👩' },
+    { id: Gender.OTHER, title: 'Divers', emoji: '🌈' },
 ] as const
 
 const TOTAL_STEPS = 8 // Welcome, Name, Gender, Goal, Experience, Metrics, Analyzing, Account
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface ProfileData {
-    name: string
-    gender: string
-    goal: string
-    experienceLevel: string
-    age: string
-    weight: string
-    height: string
-    email?: string
-    password?: string
-}
+import { RegisterInput } from '@/lib/validations/auth'
+type ProfileData = RegisterInput
 
 // ─── Shared Components ───────────────────────────────────────────────────────
 
@@ -255,15 +248,15 @@ function MetricsStep({ data, onChange }: { data: ProfileData; onChange: (f: keyo
             <div className="space-y-10 mt-8 w-full max-w-sm mx-auto">
                 <div>
                     <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Alter</p>
-                    <HugeInput type="number" value={data.age} onChange={(v) => onChange('age', v)} placeholder="25" postfix="Jahre" />
+                    <HugeInput type="number" value={data.age?.toString() || ""} onChange={(v) => onChange('age', v)} placeholder="25" postfix="Jahre" />
                 </div>
                 <div>
                     <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Gewicht</p>
-                    <HugeInput type="number" value={data.weight} onChange={(v) => onChange('weight', v)} placeholder="80" postfix="kg" />
+                    <HugeInput type="number" value={data.weight?.toString() || ""} onChange={(v) => onChange('weight', v)} placeholder="80" postfix="kg" />
                 </div>
                 <div>
                     <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Körpergröße</p>
-                    <HugeInput type="number" value={data.height} onChange={(v) => onChange('height', v)} placeholder="180" postfix="cm" />
+                    <HugeInput type="number" value={data.height?.toString() || ""} onChange={(v) => onChange('height', v)} placeholder="180" postfix="cm" />
                 </div>
             </div>
         </div>
@@ -377,11 +370,18 @@ export default function OnboardingPage() {
 
     // Data Store
     const [data, setData] = useState<ProfileData>({
-        name: '', gender: '', goal: '', experienceLevel: '',
-        age: '', weight: '', height: '', email: '', password: ''
+        name: '',
+        gender: Gender.MALE, // Default to satisfy non-null
+        goal: Goal.MUSCLE_GAIN, // Default to satisfy non-null
+        experienceLevel: ExperienceLevel.BEGINNER, // Default to satisfy non-null
+        age: "" as unknown as number,
+        weight: "" as unknown as number,
+        height: "" as unknown as number,
+        email: '',
+        password: ''
     })
 
-    const updateField = (field: keyof ProfileData, value: string) => {
+    const updateField = (field: keyof ProfileData, value: any) => {
         setData(prev => ({ ...prev, [field]: value }))
         setError(null)
     }

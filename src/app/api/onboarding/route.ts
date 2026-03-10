@@ -1,18 +1,7 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { z } from 'zod'
-
-import { Gender, Goal, ExperienceLevel } from '@prisma/client'
-
-const OnboardingSchema = z.object({
-    name: z.string().min(1),
-    age: z.number().int().min(10).max(99),
-    weight: z.number().min(20).max(300),
-    height: z.number().min(100).max(250),
-    gender: z.nativeEnum(Gender),
-    goal: z.nativeEnum(Goal),
-    experienceLevel: z.nativeEnum(ExperienceLevel),
-})
+import { UserService } from '@/lib/services/user.service'
+import { OnboardingSchema } from '@/lib/validations/auth'
+import { getCurrentUserId } from '@/lib/auth'
 
 export async function POST(request: Request) {
     try {
@@ -20,38 +9,26 @@ export async function POST(request: Request) {
         const result = OnboardingSchema.safeParse(json)
 
         if (!result.success) {
-            return NextResponse.json({ error: result.error.format() }, { status: 400 })
+            return NextResponse.json({ error: 'Ungültige Eingaben', details: result.error.format() }, { status: 400 })
         }
 
         const data = result.data
+        const currentUserId = await getCurrentUserId()
 
-        const user = await prisma.user.create({
-            data: {
-                name: data.name,
-                age: data.age,
-                weight: data.weight,
-                height: data.height,
-                gender: data.gender,
-                goal: data.goal,
-                experienceLevel: data.experienceLevel,
-                isOnboarded: true,
-            },
-        })
+        let user;
+        if (currentUserId) {
+            // Update existing user (logged in or local-only)
+            user = await UserService.updateOnboarding(currentUserId, data)
+        } else {
+            // Fallback: This shouldn't happen much in the new Onboarding-First flow, 
+            // but we keep it for robustness as a "guest-to-local" creation if needed.
+            // Note: In the new flow, Account Creation (Register) is the primary path.
+            return NextResponse.json({ error: 'Nicht authentifiziert' }, { status: 401 })
+        }
 
-        const response = NextResponse.json({ success: true, userId: user.id })
-
-        // Set a long-lived httpOnly cookie with the userId
-        response.cookies.set('iTrack-user-id', user.id, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            maxAge: 60 * 60 * 24 * 365 * 2, // 2 years
-        })
-
-        return response
+        return NextResponse.json({ success: true, userId: user.id })
     } catch (error) {
         console.error('Onboarding error:', error)
-        return NextResponse.json({ error: 'Failed to complete onboarding' }, { status: 500 })
+        return NextResponse.json({ error: 'Interner Serverfehler' }, { status: 500 })
     }
 }

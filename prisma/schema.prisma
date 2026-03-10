@@ -15,16 +15,16 @@ enum Gender {
 }
 
 enum Goal {
-  MUSCLE_GAIN @map("muscle_gain")
-  WEIGHT_LOSS @map("weight_loss")
-  MAINTENANCE @map("maintenance")
-  STRENGTH @map("strength")
+  MUSCLE_GAIN      @map("muscle_gain")
+  FAT_LOSS         @map("fat_loss")
+  STRENGTH         @map("strength")
+  GENERAL_FITNESS  @map("general_fitness")
 }
 
 enum ExperienceLevel {
-  BEGINNER @map("beginner")
+  BEGINNER     @map("beginner")
   INTERMEDIATE @map("intermediate")
-  ADVANCED @map("advanced")
+  ADVANCED     @map("advanced")
 }
 
 enum Equipment {
