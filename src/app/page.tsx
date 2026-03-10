@@ -33,10 +33,12 @@ export default async function Home() {
       {/* Header / Brand */}
       <header className="px-5 pt-8 pb-4 flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase opacity-60 mb-1">{greeting}</p>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Hi, {userName}
+          <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1">
+            Heute
           </h1>
+          <p className="text-sm font-semibold text-muted-foreground">
+            Hi {userName}, {greeting}
+          </p>
         </div>
         <div className="w-10 h-10 rounded-full bg-secondary ring-1 ring-white/5 flex items-center justify-center overflow-hidden">
           <UserIcon />

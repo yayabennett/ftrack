@@ -54,9 +54,9 @@ export async function LastSessionRecap({ userId }: { userId: string }) {
         <>
             {/* Hub: Last Session Recap */}
             <section className="px-5 space-y-4">
-                <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase px-1">Letzte Einheit</h2>
+                <h2 className="text-xl font-bold tracking-tight text-foreground">Letzte Einheit</h2>
                 {lastSession ? (
-                    <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
+                    <Card className="bg-card border border-border/40 shadow-sm rounded-[1.25rem] overflow-hidden text-card-foreground">
                         <CardContent className="p-4 flex gap-4 items-center">
                             <div className="p-3 bg-primary/10 rounded-2xl text-primary">
                                 <Barbell className="w-6 h-6" />

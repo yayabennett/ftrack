@@ -12,12 +12,9 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
 
     return (
         <section className="space-y-4">
-            <div className="px-5 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <CopySimple className="w-4 h-4 text-primary" />
-                    <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase">Einheiten</h2>
-                </div>
-                <Link href="/templates" className="text-xs font-bold text-primary hover:underline underline-offset-4">ALLE ANSEHEN</Link>
+            <div className="px-5 pb-2 flex items-center justify-between">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">Einheiten</h2>
+                <Link href="/templates" className="text-sm font-bold text-primary hover:underline underline-offset-4">Mehr</Link>
             </div>
 
             <div className="flex gap-4 overflow-x-auto px-5 pb-2 no-scrollbar scroll-smooth">
@@ -28,7 +25,7 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
                     </Card>
                 ) : templates.map((template) => (
                     <Link key={template.id} href={`/workout/active?templateId=${template.id}`} className="min-w-[170px] active:scale-95 transition-transform">
-                        <Card className="bg-card ring-1 ring-white/5 shadow-sm border-0 rounded-2xl overflow-hidden h-full">
+                        <Card className="bg-card border border-border/40 shadow-sm rounded-2xl overflow-hidden h-full">
                             <CardContent className="p-4 flex flex-col justify-between h-full">
                                 <div>
                                     <h3 className="font-bold text-[15px] mb-1 truncate">{template.name}</h3>

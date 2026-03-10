@@ -30,19 +30,19 @@ export async function WeeklyConsistency({ userId }: { userId: string }) {
 
     return (
         <section className="px-5">
-            <div className="bg-card/40 ring-1 ring-white/5 rounded-3xl p-5 shadow-sm">
+            <div className="bg-card border border-border/40 rounded-[1.25rem] p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-[13px] font-bold tracking-widest text-muted-foreground uppercase">Wochen-Aktivität</h2>
-                    <span className="text-xs font-semibold text-primary px-2 py-0.5 bg-primary/10 rounded-full">
-                        Streak: {weekSessions.length} Einheiten
+                    <h2 className="text-xl font-bold tracking-tight text-foreground">Aktivität</h2>
+                    <span className="text-xs font-semibold text-primary px-2 py-1 bg-primary/10 rounded-full">
+                        Streak: {weekSessions.length}
                     </span>
                 </div>
                 <div className="flex justify-between items-end gap-1 px-1">
                     {weekActivity.map((d, i) => (
-                        <div key={i} className="flex flex-col items-center gap-3">
+                        <div key={i} className="flex flex-col items-center gap-2">
                             <div className={cn(
-                                "w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300",
-                                d.hasWorkout ? "bg-primary text-primary-foreground shadow-sm" : "bg-secondary/50 text-muted-foreground",
+                                "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300",
+                                d.hasWorkout ? "bg-primary text-primary-foreground shadow-sm" : "bg-secondary text-muted-foreground",
                                 d.isToday && !d.hasWorkout && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background"
                             )}>
                                 {d.hasWorkout ? <Lightning className="w-4 h-4 fill-current" /> : <div className="w-1.5 h-1.5 rounded-full bg-current opacity-40" />}
