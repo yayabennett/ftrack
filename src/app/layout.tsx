@@ -6,6 +6,7 @@ import { OfflineBanner } from "@/components/offline-banner";
 import Providers from "@/components/providers";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { SplashScreen } from "@/components/splash-screen";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,6 +61,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Providers>
+            <SplashScreen />
             <OfflineBanner />
             <main className="pb-20 min-h-screen">
               {children}
