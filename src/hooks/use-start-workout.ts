@@ -49,9 +49,19 @@ export function useStartWorkout() {
                 for (const ex of mappedExercises) {
                     try {
                         let hasTemplateTarget = (ex._templateProps.targetWeight != null || (ex._templateProps.targetSets > 0 && ex._templateProps.targetSets !== 3 && ex._templateProps.repRange !== '8-12'))
+                        const isOverload = session.isProgressiveOverload === true
 
-                        if (hasTemplateTarget) {
-                            // Seed from template definition
+                        // Optimization: Always fetch history because progressive overload needs it even if template targets exist.
+                        // If Overload is ON, we ideally bump the history numbers. If template targets exist, we override defaults but overload history.
+                        const lastSetsRes = await fetch(`/api/exercises/${ex.exerciseId}/last-sets`)
+                        let lastSets: any[] = []
+                        if (lastSetsRes.ok) {
+                            const data = await lastSetsRes.json()
+                            lastSets = data.sets || []
+                        }
+
+                        if (hasTemplateTarget && (!isOverload || lastSets.length === 0)) {
+                            // Seed from template definition (No Overload, or no history to overload from)
                             const targetRepsMatch = ex._templateProps.repRange.match(/\d+/)
                             const targetReps = targetRepsMatch ? parseInt(targetRepsMatch[0]) : 10
 
@@ -69,28 +79,36 @@ export function useStartWorkout() {
                                     })
                                 })
                             }
-                        } else {
-                            // Seed from history
-                            const lastSetsRes = await fetch(`/api/exercises/${ex.exerciseId}/last-sets`)
-                            if (lastSetsRes.ok) {
-                                const { sets: lastSets } = await lastSetsRes.json()
-                                if (lastSets && lastSets.length > 0) {
-                                    for (const lastSet of lastSets) {
-                                        useWorkoutStore.getState().addSet(ex.id)
-                                    }
+                        } else if (lastSets.length > 0) {
+                            // Seed from history (With optional Overload)
+                            for (const lastSet of lastSets) {
+                                useWorkoutStore.getState().addSet(ex.id)
+                            }
 
-                                    const store = useWorkoutStore.getState()
-                                    const currentEx = store.exercises.find(e => e.id === ex.id)
-                                    if (currentEx) {
-                                        for (let i = 0; i < Math.min(currentEx.sets.length, lastSets.length); i++) {
-                                            useWorkoutStore.getState().updateSet(ex.id, currentEx.sets[i].id, {
-                                                previousWeight: lastSets[i].weight,
-                                                previousReps: lastSets[i].reps
-                                            })
+                            const store = useWorkoutStore.getState()
+                            const currentEx = store.exercises.find(e => e.id === ex.id)
+                            if (currentEx) {
+                                for (let i = 0; i < Math.min(currentEx.sets.length, lastSets.length); i++) {
+                                    let pWeight = lastSets[i].weight
+                                    let pReps = lastSets[i].reps
+
+                                    if (isOverload) {
+                                        if (pWeight > 0) {
+                                            pWeight += 2.5 // Generic 2.5kg increase
+                                        } else {
+                                            pReps += 1 // Bodyweight increase rep
                                         }
                                     }
+
+                                    useWorkoutStore.getState().updateSet(ex.id, currentEx.sets[i].id, {
+                                        previousWeight: pWeight,
+                                        previousReps: pReps
+                                    })
                                 }
                             }
+                        } else {
+                            // Fallback: No history, no template target. Just add one empty set.
+                            useWorkoutStore.getState().addSet(ex.id)
                         }
                     } catch {
                         // Non-critical

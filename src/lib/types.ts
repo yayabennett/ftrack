@@ -23,11 +23,11 @@ export interface TemplateExerciseDTO {
   exercise: Pick<ExerciseDTO, 'id' | 'name' | 'muscleGroup'>
 }
 
-export interface TemplateDTO {
+export type TemplateDTO = {
   id: string
   name: string
   order: number
-  userId: string | null
+  isProgressiveOverload: boolean
   exercises: TemplateExerciseDTO[]
 }
 

@@ -13,7 +13,7 @@ export function BottomNav() {
 
     const mainNavItems = [
         { name: 'Home', href: '/', icon: House },
-        { name: 'Übungen', href: '/exercises', icon: Barbell },
+        { name: 'Einheiten', href: '/templates', icon: Barbell },
         { name: 'Verlauf', href: '/history', icon: ClockCounterClockwise },
         { name: 'Statistiken', href: '/stats', icon: ChartBar },
         { name: 'Profil', href: '/settings', icon: UserCircle }

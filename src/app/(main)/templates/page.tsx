@@ -1,15 +1,17 @@
 "use client"
 
-import { Plus, Copy, Play, Trash as Trash2 } from '@phosphor-icons/react'
+import { useState, useMemo } from 'react'
+import { Plus, Copy, Play, Trash as Trash2, MagnifyingGlass, Sparkle } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import type { TemplateDTO } from '@/lib/types'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+import { motion } from 'framer-motion'
 
 interface TemplateExercise {
     id: string
@@ -20,6 +22,8 @@ interface Template {
     id: string
     name: string
     exercises: TemplateExercise[]
+    usageCount?: number
+    lastUsed?: string | null
 }
 
 export default function EinheitenPage() {
@@ -27,6 +31,8 @@ export default function EinheitenPage() {
     const queryClient = useQueryClient()
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [duplicatingId, setDuplicatingId] = useState<string | null>(null)
+    const [search, setSearch] = useState('')
+    const [filter, setFilter] = useState<'all' | 'frequent' | 'recent'>('all')
 
     const { data: templates = [], isLoading } = useQuery({
         queryKey: ['templates'],
@@ -60,6 +66,7 @@ export default function EinheitenPage() {
 
     const handleDuplicate = async (id: string, e: React.MouseEvent) => {
         e.preventDefault()
+        e.stopPropagation()
         setDuplicatingId(id)
         try {
             const res = await fetch(`/api/templates/${id}/duplicate`, { method: 'POST' })
@@ -77,35 +84,138 @@ export default function EinheitenPage() {
         }
     }
 
+    // Filter Logic
+    const filteredTemplates = useMemo(() => {
+        let result = templates.filter(t =>
+            t.name.toLowerCase().includes(search.toLowerCase()) ||
+            t.exercises.some(ex => ex.exercise.name.toLowerCase().includes(search.toLowerCase()))
+        )
+
+        if (filter === 'frequent') {
+            // Sort by usage count descending
+            result = [...result].sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
+        } else if (filter === 'recent') {
+            // Sort by last used date descending
+            result = [...result].sort((a, b) => {
+                const dateA = a.lastUsed ? new Date(a.lastUsed).getTime() : 0
+                const dateB = b.lastUsed ? new Date(b.lastUsed).getTime() : 0
+                return dateB - dateA
+            })
+        }
+
+        return result
+    }, [templates, search, filter])
+
+    const recentlyTrained = useMemo(() => {
+        return [...templates]
+            .filter(t => t.lastUsed != null)
+            .sort((a, b) => new Date(b.lastUsed!).getTime() - new Date(a.lastUsed!).getTime())
+            .slice(0, 2)
+    }, [templates])
+
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background pb-24">
-                <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center justify-between border-b border-white/5">
-                    <div className="flex items-center gap-2">
-                        <Copy className="h-5 w-5 text-primary" />
-                        <h1 className="text-[22px] font-bold tracking-tight text-foreground">Einheiten</h1>
-                    </div>
-                    <Skeleton className="h-9 w-9 rounded-full bg-secondary" />
+                <header className="px-5 pt-8 pb-2 border-b border-white/5">
+                    <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1">
+                        Einheiten
+                    </h1>
                 </header>
                 <div className="container mx-auto p-4 space-y-4 mt-2">
-                    <Skeleton className="h-[120px] w-full rounded-2xl bg-card border border-white/5" />
-                    <Skeleton className="h-[120px] w-full rounded-2xl bg-card border border-white/5" />
-                    <Skeleton className="h-[60px] w-full rounded-2xl bg-card border border-dashed border-white/5" />
+                    <Skeleton className="h-12 w-full rounded-2xl bg-card border border-white/5" />
+                    <Skeleton className="h-[140px] w-full rounded-2xl bg-card border border-white/5 mt-8" />
+                    <Skeleton className="h-[140px] w-full rounded-2xl bg-card border border-white/5" />
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-background pb-24">
-            <header className="sticky top-0 z-40 h-14 bg-background/60 backdrop-blur-[32px] px-4 flex items-center justify-between border-b border-white/5">
-                <div className="flex items-center gap-2">
-                    <Copy className="h-5 w-5 text-primary" />
-                    <h1 className="text-[22px] font-bold tracking-tight text-foreground">Einheiten</h1>
-                </div>
+        <div className="min-h-screen bg-background pb-32">
+            <header className="px-5 pt-8 pb-2">
+                <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1">
+                    Einheiten
+                </h1>
             </header>
 
-            <div className="container mx-auto p-4 space-y-4 animate-in fade-in duration-300 mt-2">
+            {!search && filter === 'all' && recentlyTrained.length > 0 && (
+                <div className="px-5 py-4 space-y-3">
+                    <h3 className="text-[10px] font-black tracking-widest text-primary uppercase flex items-center gap-2">
+                        <Sparkle weight="fill" className="w-3 h-3" />
+                        Zuletzt trainiert
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3">
+                        {recentlyTrained.map(template => (
+                            <Card
+                                key={`recent-${template.id}`}
+                                onClick={() => router.push(`/templates/${template.id}`)}
+                                className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground cursor-pointer transition-all active:scale-[0.98] hover:bg-secondary/20 block"
+                            >
+                                <CardContent className="p-0">
+                                    <div className="p-4 flex flex-col gap-3">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
+                                                <p className="text-[13px] text-muted-foreground leading-snug truncate">
+                                                    {template.exercises.map(e => e.exercise.name).join(', ')}
+                                                </p>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                className="h-9 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex gap-1.5 px-4 shadow-sm shadow-primary/20 shrink-0 ml-3"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(`/workout/active?templateId=${template.id}`);
+                                                }}
+                                            >
+                                                <Play className="w-4 h-4 fill-current" /> Starten
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="px-5 py-3 space-y-3 sticky top-safe z-40 bg-background/80 backdrop-blur-md outline outline-8 outline-background/80 mt-2">
+                <div className="relative">
+                    <MagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <input
+                        type="text"
+                        placeholder="Einheiten suchen..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full h-12 pl-12 pr-4 rounded-2xl bg-card border border-border/40 text-[15px] font-medium text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all shadow-sm"
+                    />
+                </div>
+
+                {!search && (
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                        {[
+                            { id: 'all', label: 'Alle' },
+                            { id: 'recent', label: 'Kürzlich' },
+                            { id: 'frequent', label: 'Häufig' }
+                        ].map(f => (
+                            <button
+                                key={f.id}
+                                onClick={() => setFilter(f.id as typeof filter)}
+                                className={cn(
+                                    "whitespace-nowrap px-4 py-1.5 rounded-full text-[13px] font-bold transition-all shrink-0 border",
+                                    filter === f.id
+                                        ? "bg-primary text-primary-foreground border-transparent shadow-sm glow-primary"
+                                        : "bg-card border-border/40 text-muted-foreground hover:text-foreground hover:border-border"
+                                )}
+                            >
+                                {f.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="px-5 space-y-4 mt-6 animate-in slide-in-from-bottom-4 fade-in duration-500">
                 {templates.length === 0 ? (
                     <div className="text-center mt-12 mb-12 space-y-4 p-8 glass-panel rounded-3xl mx-2 shadow-soft">
                         <div className="w-20 h-20 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 inner-highlight shadow-sm shadow-primary/20">
@@ -124,9 +234,13 @@ export default function EinheitenPage() {
                             </Link>
                         </div>
                     </div>
+                ) : filteredTemplates.length === 0 ? (
+                    <div className="py-12 text-center text-muted-foreground font-medium">
+                        Keine Ergebnisse für "{search}" gefunden.
+                    </div>
                 ) : (
-                    <>
-                        {templates.map(template => (
+                    <div className="space-y-4">
+                        {filteredTemplates.map(template => (
                             <div
                                 key={template.id}
                                 onClick={() => router.push(`/templates/${template.id}`)}
@@ -136,7 +250,7 @@ export default function EinheitenPage() {
                                     <CardContent className="p-0">
                                         <div className="p-4 flex flex-col gap-3">
                                             <div className="flex justify-between items-start">
-                                                <div className="flex-1 min-w-0">
+                                                <div className="flex-1 min-w-0 pr-2">
                                                     <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
                                                     <p className="text-[13px] text-muted-foreground leading-snug truncate">
                                                         {template.exercises.map(e => e.exercise.name).join(', ')}
@@ -147,10 +261,7 @@ export default function EinheitenPage() {
                                                         variant="ghost"
                                                         size="icon"
                                                         className="h-9 w-9 text-muted-foreground hover:bg-secondary/80 hover:text-foreground rounded-lg transition-colors"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDuplicate(template.id, e);
-                                                        }}
+                                                        onClick={(e) => handleDuplicate(template.id, e)}
                                                         disabled={duplicatingId === template.id || deletingId === template.id}
                                                     >
                                                         {duplicatingId === template.id ? (
@@ -163,10 +274,7 @@ export default function EinheitenPage() {
                                                         variant="ghost"
                                                         size="icon"
                                                         className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDelete(template.id, template.name, e);
-                                                        }}
+                                                        onClick={(e) => handleDelete(template.id, template.name, e)}
                                                         disabled={deletingId === template.id || duplicatingId === template.id}
                                                     >
                                                         {deletingId === template.id ? (
@@ -198,15 +306,17 @@ export default function EinheitenPage() {
                                 </Card>
                             </div>
                         ))}
+                    </div>
+                )}
 
-                        <div className="fixed bottom-24 right-6 z-40">
-                            <Link href="/templates/create">
-                                <Button className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 flex items-center justify-center action-press">
-                                    <Plus className="h-7 w-7 stroke-[3px]" />
-                                </Button>
-                            </Link>
-                        </div>
-                    </>
+                {templates.length > 0 && (
+                    <div className="fixed bottom-24 right-6 z-40">
+                        <Link href="/templates/create">
+                            <Button className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 flex items-center justify-center active:scale-95 transition-transform hover:bg-primary/90">
+                                <Plus className="h-7 w-7 stroke-[3px]" />
+                            </Button>
+                        </Link>
+                    </div>
                 )}
             </div>
         </div>

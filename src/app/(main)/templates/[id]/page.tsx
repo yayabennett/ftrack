@@ -43,6 +43,7 @@ export default function EditTemplatePage() {
 
     // UI State
     const [name, setName] = useState('')
+    const [isProgressiveOverload, setIsProgressiveOverload] = useState(false)
     const [selectedExercises, setSelectedExercises] = useState<{ id: string, targets: { targetSets: number, repRange: string, targetWeight?: number } }[]>([])
     const [searchQuery, setSearchQuery] = useState('')
     const [activeTab, setActiveTab] = useState('Alle')
@@ -83,6 +84,7 @@ export default function EditTemplatePage() {
     useEffect(() => {
         if (template) {
             setName(template.name)
+            setIsProgressiveOverload(template.isProgressiveOverload)
             setSelectedExercises(template.exercises.map(e => ({
                 id: e.exerciseId,
                 targets: {
@@ -123,6 +125,7 @@ export default function EditTemplatePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name,
+                    isProgressiveOverload,
                     exercises: selectedExercises.map(ex => ({
                         exerciseId: ex.id,
                         targetSets: ex.targets.targetSets,
@@ -199,13 +202,27 @@ export default function EditTemplatePage() {
             </header>
 
             <div className="container mx-auto p-4 pt-6 space-y-6 animate-in fade-in duration-300">
-                <div className="space-y-2">
-                    <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">Name</label>
-                    <Input
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        className="h-14 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-2xl text-[16px] px-4 font-semibold"
-                    />
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">Name</label>
+                        <Input
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            className="h-14 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-2xl text-[16px] px-4 font-semibold"
+                        />
+                    </div>
+
+                    <Card className={`relative bg-card ring-2 transition-all shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer active:scale-[0.98] ${isProgressiveOverload ? 'ring-primary bg-primary/5' : 'ring-white/5'}`} onClick={() => setIsProgressiveOverload(!isProgressiveOverload)}>
+                        <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex-1 pr-4">
+                                <h4 className="font-bold text-[15px] text-foreground">Progressive Overload</h4>
+                                <p className="text-[13px] text-muted-foreground font-medium mt-0.5 leading-snug">Gewichte werden basierend auf dem letzten Training automatisch leicht erhöht vorgeschlagen.</p>
+                            </div>
+                            <div className={`shrink-0 w-12 h-7 rounded-full transition-colors relative flex items-center px-1 ${isProgressiveOverload ? 'bg-primary' : 'bg-muted/50'}`}>
+                                <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${isProgressiveOverload ? 'translate-x-[20px]' : 'translate-x-0'}`} />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 <div className="space-y-4">
@@ -236,53 +253,84 @@ export default function EditTemplatePage() {
                         </div>
                     )}
 
-                    <div className="space-y-3">
-                        <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">Übungen hinzufügen</label>
-                        <div className="flex overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4">
-                            {['Alle', 'Push', 'Pull', 'Beine', 'Core'].map(tab => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all active:scale-95 ${activeTab === tab ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card text-muted-foreground ring-1 ring-white/5'}`}
-                                >
-                                    {tab}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Übung suchen..."
-                                value={searchQuery}
-                                onChange={e => setSearchQuery(e.target.value)}
-                                className="h-12 pl-10 bg-card ring-1 ring-white/5 border-0 rounded-xl text-[15px] font-semibold"
-                            />
-                        </div>
-                        <div className="space-y-2 mt-2">
-                            {filteredExercises.slice(0, 20).map(ex => {
-                                const isSelected = selectedExercises.some(sx => sx.id === ex.id)
-                                return (
-                                    <Card
-                                        key={ex.id}
-                                        onClick={() => toggleSelection(ex.id)}
-                                        className={`bg-card ring-1 shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer transition-all active:scale-[0.98] ${isSelected ? 'ring-primary bg-primary/5' : 'ring-white/5'}`}
+
+
+                    <div className="space-y-4">
+                        {selectedExercises.length > 0 && (
+                            <div className="space-y-3 mb-8 bg-secondary/10 p-4 -mx-4 rounded-3xl border border-white/5">
+                                <label className="text-xs font-bold tracking-widest text-primary uppercase px-1">Reihenfolge</label>
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                                    <SortableContext items={selectedExercises.map(ex => ex.id)} strategy={verticalListSortingStrategy}>
+                                        <div className="space-y-2">
+                                            {selectedExercises.map(({ id, targets }) => {
+                                                const ex = exercises.find(e => e.id === id) || template?.exercises.find((te: any) => te.exerciseId === id)?.exercise
+                                                if (!ex) return null
+                                                return (
+                                                    <SortableExerciseItem
+                                                        key={id}
+                                                        id={id}
+                                                        name={ex.name}
+                                                        muscleGroup={ex.muscleGroup}
+                                                        targets={targets}
+                                                        onUpdate={(updates) => updateTargets(id, updates)}
+                                                        onRemove={() => toggleSelection(id)}
+                                                    />
+                                                )
+                                            })}
+                                        </div>
+                                    </SortableContext>
+                                </DndContext>
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">Übungen hinzufügen</label>
+                            <div className="flex overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4">
+                                {['Alle', 'Push', 'Pull', 'Beine', 'Core'].map(tab => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all active:scale-95 ${activeTab === tab ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card text-muted-foreground ring-1 ring-white/5'}`}
                                     >
-                                        <CardContent className="p-4 flex items-center justify-between">
-                                            <div>
-                                                <h4 className="font-semibold text-[15px]">{ex.name}</h4>
-                                                <p className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">{ex.muscleGroup}</p>
-                                            </div>
-                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'}`}>
-                                                <Check className={`w-3.5 h-3.5 ${isSelected ? 'opacity-100' : 'opacity-0'}`} weight="bold" />
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                )
-                            })}
+                                        {tab}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="relative">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Übung suchen..."
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    className="h-12 pl-10 bg-card ring-1 ring-white/5 border-0 rounded-xl text-[15px] font-semibold"
+                                />
+                            </div>
+                            <div className="space-y-2 mt-2">
+                                {filteredExercises.slice(0, 20).map(ex => {
+                                    const isSelected = selectedExercises.some(sx => sx.id === ex.id)
+                                    return (
+                                        <Card
+                                            key={ex.id}
+                                            onClick={() => toggleSelection(ex.id)}
+                                            className={`bg-card ring-1 shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer transition-all active:scale-[0.98] ${isSelected ? 'ring-primary bg-primary/5' : 'ring-white/5'}`}
+                                        >
+                                            <CardContent className="p-4 flex items-center justify-between">
+                                                <div>
+                                                    <h4 className="font-semibold text-[15px]">{ex.name}</h4>
+                                                    <p className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">{ex.muscleGroup}</p>
+                                                </div>
+                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'}`}>
+                                                    <Check className={`w-3.5 h-3.5 ${isSelected ? 'opacity-100' : 'opacity-0'}`} weight="bold" />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div >
+            </div >
 
             <div className="fixed bottom-24 left-0 right-0 px-4 z-40">
                 <Button
@@ -293,6 +341,6 @@ export default function EditTemplatePage() {
                     {isPending ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <><Check className="w-5 h-5 weight-bold" /> Speichern</>}
                 </Button>
             </div>
-        </div>
+        </div >
     )
 }

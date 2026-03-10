@@ -63,9 +63,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className="dark h-full">
+    <html lang="de" className="dark min-h-screen">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300 h-full overflow-x-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300 min-h-screen overflow-x-hidden`}
       >
         <AuthProvider>
           <Providers>

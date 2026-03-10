@@ -50,6 +50,7 @@ export async function POST(request: Request) {
                     }
                 },
                 include: {
+                    template: true,
                     exercises: {
                         include: {
                             exercise: true
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
             // Inject template data back into the session response for the client
             const sessionWithTargets = {
                 ...session,
+                isProgressiveOverload: session.template?.isProgressiveOverload || false,
                 exercises: session.exercises.map((ex) => {
                     const te = templateExercises.find((t: any) => t.exerciseId === ex.exerciseId) as any
                     return {
