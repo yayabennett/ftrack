@@ -6,11 +6,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { WorkoutTimer } from '@/components/workout/workout-timer'
 import { SetRow } from '@/components/workout/set-row'
+import { motion } from 'framer-motion'
+import Confetti from 'react-confetti'
+import { useWindowSize } from 'react-use'
 import { useWorkoutStore } from '@/store/use-workout-store'
 import type { WorkoutExercise } from '@/store/use-workout-store'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ExercisePickerDialog } from '@/components/workout/exercise-picker'
 import { RestTimerPill } from '@/components/workout/rest-timer'
+import { SwipeToFinish } from '@/components/workout/swipe-to-finish'
+import { useHaptics } from '@/hooks/use-haptics'
 import {
     DndContext,
     closestCenter,
@@ -39,6 +44,8 @@ function WorkoutContent() {
     const [showPicker, setShowPicker] = useState(false)
     const [restTimerEnd, setRestTimerEnd] = useState<number | null>(null)
     const [prAlert, setPrAlert] = useState<string | null>(null)
+    const { vibrate } = useHaptics()
+    const { width, height } = useWindowSize()
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -54,6 +61,34 @@ function WorkoutContent() {
         }
     }
 
+    // WakeLock to keep screen alive during workout
+    useEffect(() => {
+        let wakeLock: any = null
+        const requestWakeLock = async () => {
+            if (isActive && 'wakeLock' in navigator) {
+                try {
+                    wakeLock = await (navigator as any).wakeLock.request('screen')
+                } catch (err) {
+                    console.error('WakeLock failed:', err)
+                }
+            }
+        }
+
+        requestWakeLock()
+
+        const handleVisibilityChange = () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                requestWakeLock()
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+
+        return () => {
+            if (wakeLock !== null) wakeLock.release()
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
+        }
+    }, [isActive])
+
     const handlePR = useCallback((message: string) => {
         setPrAlert(message)
         setTimeout(() => setPrAlert(null), 4000)
@@ -68,6 +103,7 @@ function WorkoutContent() {
     }, [isActive, router])
 
     const handleEndWorkout = async () => {
+        vibrate('success')
         const currentSessionId = sessionId
         if (currentSessionId) {
             try {
@@ -81,7 +117,7 @@ function WorkoutContent() {
         router.push(currentSessionId ? `/workout/recap?sessionId=${currentSessionId}` : '/')
     }
 
-    const handleAddExercise = async (picked: { id: string; exerciseId: string; name: string }) => {
+    const handleAddExercise = async (picked: { id: string; exerciseId: string; name: string; muscleGroup?: string }) => {
         const order = exercises.length
         // Add to backend session
         if (sessionId) {
@@ -97,6 +133,7 @@ function WorkoutContent() {
                         id: workoutExercise.id,
                         exerciseId: picked.exerciseId,
                         name: picked.name,
+                        muscleGroup: picked.muscleGroup,
                         order,
                         sets: []
                     })
@@ -125,31 +162,50 @@ function WorkoutContent() {
 
     const totalSets = exercises.reduce((sum, ex) => sum + (ex.sets?.length || 0), 0)
     const completedSets = exercises.reduce((sum, ex) => sum + (ex.sets?.filter(s => s.isCompleted).length || 0), 0)
+    const progressPercent = totalSets > 0 ? (completedSets / totalSets) * 100 : 0
 
     return (
         <div className="min-h-screen bg-background pb-32">
-            <div className="sticky top-0 z-40 bg-background/60 backdrop-blur-[32px] border-b border-white/5 h-14 px-4 flex items-center justify-between">
+            <div className="sticky top-safe z-40 bg-background/60 backdrop-blur-[32px] border-b border-white/5 h-14 px-4 flex items-center justify-between">
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-transparent">
+                    <motion.div
+                        className="h-[2px] bg-primary shadow-[0_0_12px_rgba(43,111,255,1)]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progressPercent}%` }}
+                        transition={{ ease: "easeInOut", duration: 0.4 }}
+                    />
+                </div>
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     <WorkoutTimer startedAt={startedAt} totalSets={totalSets} completedSets={completedSets} />
                 </div>
-                <Button onClick={handleEndWorkout} variant="default" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-4 h-8 rounded-full shadow-sm">
-                    Beenden
-                </Button>
             </div>
 
             {/* Rest Timer */}
             {restTimerEnd && (
-                <div className="sticky top-14 z-30 bg-background/90 backdrop-blur-md border-b border-white/5">
+                <div className="sticky top-[calc(env(safe-area-inset-top,0px)+3.5rem)] z-30 bg-background/90 backdrop-blur-md border-b border-white/5">
                     <RestTimerPill endsAt={restTimerEnd} onDismiss={() => setRestTimerEnd(null)} />
                 </div>
             )}
 
             {/* PR Alert */}
             {prAlert && (
-                <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-primary text-primary-foreground px-6 py-3 rounded-2xl shadow-lg animate-in zoom-in duration-300 font-bold flex items-center gap-2">
-                    🎉 {prAlert}
-                </div>
+                <>
+                    <div className="fixed inset-0 z-[100] pointer-events-none">
+                        <Confetti
+                            width={width}
+                            height={height}
+                            recycle={false}
+                            numberOfPieces={300}
+                            gravity={0.3}
+                            initialVelocityY={20}
+                            colors={['#2b6fff', '#00E2AA', '#ffffff']}
+                        />
+                    </div>
+                    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[101] bg-primary text-primary-foreground px-6 py-3 rounded-2xl shadow-[0_0_30px_rgba(43,111,255,0.4)] animate-in zoom-in duration-300 font-bold flex items-center gap-2">
+                        🎉 {prAlert}
+                    </div>
+                </>
             )}
 
             <div className="container mx-auto p-4 space-y-6 animate-in slide-in-from-bottom-8 duration-300">
@@ -177,6 +233,15 @@ function WorkoutContent() {
                     <Plus className="mr-2 h-5 w-5" />
                     Übung hinzufügen
                 </Button>
+
+                <div className="h-16" /> {/* Spacer for fixed lower CTA */}
+            </div>
+
+            {/* Slide to Finish CTA */}
+            <div className="fixed bottom-0 left-0 right-0 p-6 pb-8 bg-gradient-to-t from-background via-background/90 to-transparent z-40 pointer-events-none">
+                <div className="pointer-events-auto">
+                    <SwipeToFinish onFinish={handleEndWorkout} />
+                </div>
             </div>
 
             <ExercisePickerDialog

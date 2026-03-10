@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWorkoutStore } from '@/store/use-workout-store'
+import { useHaptics } from '@/hooks/use-haptics'
 
 export function useStartWorkout() {
     const router = useRouter()
     const [isStarting, setIsStarting] = useState(false)
+    const { vibrate } = useHaptics()
 
     const startWorkout = async (templateId?: string | null, dateStr?: string, timeStr?: string) => {
         setIsStarting(true)
@@ -30,6 +32,7 @@ export function useStartWorkout() {
                         id: ex.id,
                         exerciseId: ex.exerciseId,
                         name: ex.exercise?.name || 'Unbekannte Übung',
+                        muscleGroup: ex.exercise?.muscleGroup,
                         order: ex.order,
                         sets: []
                     })) : []
@@ -52,8 +55,8 @@ export function useStartWorkout() {
                                 if (currentEx) {
                                     for (let i = 0; i < Math.min(currentEx.sets.length, lastSets.length); i++) {
                                         useWorkoutStore.getState().updateSet(ex.id, currentEx.sets[i].id, {
-                                            weight: lastSets[i].weight,
-                                            reps: lastSets[i].reps
+                                            previousWeight: lastSets[i].weight,
+                                            previousReps: lastSets[i].reps
                                         })
                                     }
                                 }
@@ -64,6 +67,7 @@ export function useStartWorkout() {
                     }
                 }
 
+                vibrate('heavy')
                 router.push('/workout/active')
             }
         } catch (error) {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { House, UserCircle, ClockCounterClockwise, Barbell } from '@phosphor-icons/react'
+import { House, UserCircle, ClockCounterClockwise, Barbell, ChartBar } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
@@ -15,6 +15,7 @@ export function BottomNav() {
         { name: 'Home', href: '/', icon: House },
         { name: 'Übungen', href: '/exercises', icon: Barbell },
         { name: 'Verlauf', href: '/history', icon: ClockCounterClockwise },
+        { name: 'Statistiken', href: '/stats', icon: ChartBar },
         { name: 'Profil', href: '/settings', icon: UserCircle }
     ]
 
@@ -23,7 +24,7 @@ export function BottomNav() {
             {/* Glassmorphism Background */}
             <div className="absolute inset-0 bg-background/85 backdrop-blur-xl border-t border-white/[0.05]" />
 
-            <div className="relative flex h-[84px] items-center justify-around px-4 max-w-md mx-auto">
+            <div className="relative flex h-[84px] items-center justify-between px-2 max-w-md mx-auto">
                 {mainNavItems.map((item) => {
                     // Check if active (handle exact match for Home, loose for others)
                     const isActive = item.href === '/'
@@ -34,7 +35,7 @@ export function BottomNav() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className="relative flex flex-col items-center justify-center w-[72px] h-full transition-all duration-300 active:scale-95 touch-manipulation group"
+                            className="relative flex flex-1 flex-col items-center justify-center h-full transition-all duration-300 active:scale-95 touch-manipulation group"
                             style={{ WebkitTapHighlightColor: 'transparent' }}
                         >
                             {/* Active Dot Indicator */}

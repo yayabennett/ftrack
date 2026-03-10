@@ -70,8 +70,12 @@ export default function RootLayout({
         <AuthProvider>
           <Providers>
             <SplashScreen />
-            <div className="min-h-screen bg-background flex flex-col">
-              <div className="pt-safe-top flex-1 flex flex-col relative">
+
+            {/* Global Dynamic Island / Notch safe area blur */}
+            <div className="fixed top-0 inset-x-0 h-safe-top bg-background/60 backdrop-blur-[32px] z-[100] pointer-events-none" />
+
+            <div className="min-h-screen bg-background flex flex-col pt-safe-top">
+              <div className="flex-1 flex flex-col relative">
                 <OfflineBanner />
                 <main className="flex-1 flex flex-col">
                   {children}

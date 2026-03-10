@@ -15,10 +15,10 @@ export function SplashScreen() {
             setIsVisible(true)
             sessionStorage.setItem("itrack-splash-seen", "true")
 
-            // Auto hide after 2.5 seconds giving enough time for the animation to play
+            // Auto hide after 1.2 seconds giving enough time for the animation to play
             const timer = setTimeout(() => {
                 setIsVisible(false)
-            }, 2500)
+            }, 1200)
 
             return () => clearTimeout(timer)
         }

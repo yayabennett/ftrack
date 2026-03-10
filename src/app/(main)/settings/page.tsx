@@ -6,6 +6,7 @@ import { getCurrentUserId } from '@/lib/auth'
 import { StatTile } from '@/components/ui/stat-tile'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { AvatarSelector } from '@/components/ui/avatar-selector'
+import { SettingsToggle } from './settings-toggle'
 
 export const revalidate = 0
 
@@ -120,7 +121,8 @@ export default async function SettingsPage() {
                 {/* Settings List */}
                 <div className="space-y-2">
                     <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1 mb-3">Einstellungen</h3>
-                    <SettingsItem icon={Moon} label="Dark Mode" detail="System" />
+                    <SettingsToggle icon={Moon} label="Dark Mode erzwingen" defaultOn={true} />
+                    <SettingsToggle icon={DeviceMobile} label="Haptisches Feedback" defaultOn={true} />
                 </div>
 
                 {/* Actions */}
@@ -162,18 +164,5 @@ export default async function SettingsPage() {
     )
 }
 
-function SettingsItem({ icon: Icon, label, detail }: { icon: React.ComponentType<{ className?: string }>; label: string; detail: string }) {
-    return (
-        <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden">
-            <CardContent className="p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground">
-                    <Icon className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                    <p className="font-semibold text-[15px] text-foreground">{label}</p>
-                </div>
-                <span className="text-[12px] text-muted-foreground font-medium">{detail}</span>
-            </CardContent>
-        </Card>
-    )
-}
+"use client"
+

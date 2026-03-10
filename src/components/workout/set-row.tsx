@@ -11,6 +11,7 @@ import { useWorkoutStore } from '@/store/use-workout-store'
 import type { SetEntry } from '@/store/use-workout-store'
 import type { PRResult } from '@/lib/types'
 import { toast } from 'sonner'
+import { useHaptics } from '@/hooks/use-haptics'
 
 interface SetRowProps {
     exerciseId: string      // The Zustand workout-exercise ID (client UUID)
@@ -25,6 +26,7 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
     const [weight, setWeight] = useState(setEntry.weight ? setEntry.weight.toString() : "")
     const [reps, setReps] = useState(setEntry.reps ? setEntry.reps.toString() : "")
     const [isLoading, setIsLoading] = useState(false)
+    const { vibrate } = useHaptics()
 
     // Swipe to delete setup
     const x = useMotionValue(0)
@@ -32,6 +34,7 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
 
     const handleDragEnd = (_event: unknown, info: { offset: { x: number } }) => {
         if (info.offset.x < -60) {
+            vibrate('heavy')
             removeSet(exerciseId, setEntry.id)
             toast('Satz gelöscht')
             // Optionally delete from backend here if needed
@@ -41,15 +44,16 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
     }
 
     const handleSave = async () => {
-        if (!weight || !reps || isLoading) return
-        setIsLoading(true)
+        let parsedWeight = weight ? parseFloat(weight) : (setEntry.previousWeight ?? NaN)
+        let parsedReps = reps ? parseInt(reps, 10) : (setEntry.previousReps ?? NaN)
 
-        const parsedWeight = parseFloat(weight)
-        const parsedReps = parseInt(reps, 10)
+        if (isNaN(parsedWeight) || isNaN(parsedReps) || isLoading) return
+        setIsLoading(true)
 
         try {
             if (!setEntry.isCompleted) {
                 // Optimistic UI update
+                vibrate('success')
                 updateSet(exerciseId, setEntry.id, { weight: parsedWeight, reps: parsedReps })
                 toggleSetComplete(exerciseId, setEntry.id)
                 onComplete?.()
@@ -87,6 +91,7 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                 }
             } else {
                 // Toggle off (uncomplete)
+                vibrate('medium')
                 toggleSetComplete(exerciseId, setEntry.id)
             }
         } catch (e) {
@@ -132,10 +137,10 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                     pattern="[0-9]*"
                     value={weight}
                     onChange={e => setWeight(e.target.value)}
-                    placeholder="0"
+                    placeholder={setEntry.previousWeight ? setEntry.previousWeight.toString() : "0"}
                     disabled={isCompleted}
                     className={cn(
-                        "h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none",
+                        "h-11 tabular-nums text-[16px] text-center font-semibold border-0 transition-all focus:scale-105 focus:ring-2 focus:ring-primary focus:bg-primary/10 shadow-none placeholder:text-muted-foreground/30",
                         isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
                     )}
                 />
@@ -145,22 +150,22 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                     pattern="[0-9]*"
                     value={reps}
                     onChange={e => setReps(e.target.value)}
-                    placeholder="0"
+                    placeholder={setEntry.previousReps ? setEntry.previousReps.toString() : "0"}
                     disabled={isCompleted}
                     className={cn(
-                        "h-11 text-[16px] text-center font-semibold border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none",
+                        "h-11 tabular-nums text-[16px] text-center font-semibold border-0 transition-all focus:scale-105 focus:ring-2 focus:ring-primary focus:bg-primary/10 shadow-none placeholder:text-muted-foreground/30",
                         isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
                     )}
                 />
                 <div className="flex justify-end pr-1">
                     <Button
                         onClick={handleSave}
-                        disabled={isLoading || !weight || !reps}
+                        disabled={isLoading || (!weight && !setEntry.previousWeight) || (!reps && !setEntry.previousReps)}
                         size="icon"
                         variant={isCompleted ? "default" : "outline"}
                         aria-label={isCompleted ? "Satz bearbeiten" : "Satz abspeichern"}
                         className={cn(
-                            "h-10 w-10 text-[16px] rounded-[10px] active:scale-95 transition-transform",
+                            "h-11 w-11 text-[16px] rounded-[10px] active:scale-95 transition-transform",
                             isCompleted ? "bg-primary text-primary-foreground border-0" : "bg-secondary/80 text-muted-foreground border-white/10"
                         )}
                     >

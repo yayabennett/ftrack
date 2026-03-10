@@ -5,8 +5,10 @@ export type SetEntry = {
     id: string; // client-generated UUID for offline sync
     workoutExerciseId: string;
     setIndex: number;
-    weight: number;
-    reps: number;
+    weight?: number;
+    reps?: number;
+    previousWeight?: number;
+    previousReps?: number;
     rpe?: number | null;
     isWarmup?: boolean;
     isCompleted: boolean;
@@ -16,6 +18,7 @@ export type WorkoutExercise = {
     id: string; // client-generated UUID
     exerciseId: string;
     name: string;
+    muscleGroup?: string;
     order: number;
     sets: SetEntry[];
 }
@@ -82,8 +85,10 @@ export const useWorkoutStore = create<WorkoutState>()(
                                 id: generateId(),
                                 workoutExerciseId: ex.id,
                                 setIndex: ex.sets.length + 1,
-                                weight: lastSet ? lastSet.weight : 0,
-                                reps: lastSet ? lastSet.reps : 0,
+                                weight: lastSet ? lastSet.weight : undefined,
+                                reps: lastSet ? lastSet.reps : undefined,
+                                previousWeight: lastSet ? lastSet.previousWeight : undefined,
+                                previousReps: lastSet ? lastSet.previousReps : undefined,
                                 isCompleted: false
                             };
                             return { ...ex, sets: [...ex.sets, newSet] };

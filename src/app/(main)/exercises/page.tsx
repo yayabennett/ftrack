@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import type { ExerciseDTO } from '@/lib/types'
 import { ExerciseListItem } from '@/components/exercises/exercise-list-item'
 import { MuscleGroupSection } from '@/components/exercises/muscle-group-section'
+import { motion } from 'framer-motion'
 
 type ExerciseWithTrend = ExerciseDTO & {
     trend?: 'up' | 'down' | 'flat' | null
@@ -140,7 +141,7 @@ export default function ExercisesPage() {
                 </div>
             )}
 
-            <div className="px-5 py-3 space-y-3 sticky top-0 z-40 bg-background/80 backdrop-blur-md">
+            <div className="px-5 py-3 space-y-3 sticky top-safe z-40 bg-background/80 backdrop-blur-md outline outline-8 outline-background/80">
                 <div className="relative">
                     <MagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <input
@@ -178,11 +179,26 @@ export default function ExercisesPage() {
 
             <div className="px-5 space-y-8 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {(isLoadingMine || !mounted) ? (
-                    <div className="space-y-4">
+                    <motion.div
+                        className="space-y-4"
+                        initial="hidden"
+                        animate="show"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+                        }}
+                    >
                         {[...Array(6)].map((_, i) => (
-                            <div key={i} className="h-16 rounded-2xl bg-card border border-border/40 animate-pulse" />
+                            <motion.div
+                                key={i}
+                                variants={{
+                                    hidden: { opacity: 0, scale: 0.95 },
+                                    show: { opacity: 1, scale: 1 }
+                                }}
+                                className="h-16 rounded-2xl bg-secondary/40 animate-pulse"
+                            />
                         ))}
-                    </div>
+                    </motion.div>
                 ) : (
                     <>
                         {/* MY EXERCISES */}

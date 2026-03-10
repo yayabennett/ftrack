@@ -166,6 +166,13 @@
     appearance: textfield;
   }
 
+  /* Extreme OLED Legibility for inputs */
+  input,
+  textarea,
+  select {
+    background-color: #000000 !important;
+  }
+
   /* Friendly Primary CTA */
   .btn-primary-gradient {
     background: var(--primary);
@@ -195,6 +202,14 @@
     height: env(safe-area-inset-bottom, 0px);
   }
 
+  .h-safe-top {
+    height: env(safe-area-inset-top, 0px);
+  }
+
+  .top-safe {
+    top: env(safe-area-inset-top, 0px);
+  }
+
   /* Premium Custom Slider */
   .premium-slider {
     @apply w-full h-16 bg-transparent appearance-none outline-none relative z-20 cursor-grab active:cursor-grabbing;
@@ -216,6 +231,10 @@
 
   .premium-slider::-moz-range-thumb:active {
     @apply scale-110;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
 

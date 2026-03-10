@@ -9,13 +9,19 @@ export function OfflineBanner() {
     if (isOnline && queueCount === 0) return null
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-[#0A0B10]/95 backdrop-blur-md border-b border-orange-500/20 px-4 py-2 flex items-center justify-center text-xs font-medium text-orange-500 transition-transform">
-            <div className="flex items-center gap-2">
-                {!isOnline ? <WifiOff className="w-3.5 h-3.5" /> : <RefreshCw className="w-3.5 h-3.5 animate-spin opacity-50" />}
-                <span>
-                    {!isOnline ? "Offline Modus aktiv. " : "Synchronisiere... "}
-                    {queueCount > 0 ? `${queueCount} Aktion(en) warten.` : ""}
-                </span>
+        <div className="fixed top-safe left-1/2 -translate-x-1/2 z-50 mt-2 pointer-events-none">
+            <div className="bg-background/80 backdrop-blur-xl border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)] px-4 py-2.5 rounded-full flex items-center justify-center text-[13px] font-bold text-foreground transition-all duration-300 animate-in slide-in-from-top-4 fade-in">
+                <div className="flex items-center gap-2">
+                    {!isOnline ? (
+                        <WifiOff className="w-4 h-4 text-orange-500" />
+                    ) : (
+                        <RefreshCw className="w-4 h-4 text-primary animate-spin" />
+                    )}
+                    <span>
+                        {!isOnline ? "Offline Modus " : "Synchronisiere... "}
+                        {queueCount > 0 && <span className="opacity-60 ml-1">({queueCount})</span>}
+                    </span>
+                </div>
             </div>
         </div>
     )

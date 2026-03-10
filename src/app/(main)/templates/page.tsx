@@ -26,6 +26,7 @@ export default function EinheitenPage() {
     const router = useRouter()
     const queryClient = useQueryClient()
     const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [duplicatingId, setDuplicatingId] = useState<string | null>(null)
 
     const { data: templates = [], isLoading } = useQuery({
         queryKey: ['templates'],
@@ -52,6 +53,25 @@ export default function EinheitenPage() {
             toast.error('Fehler beim Löschen')
         } finally {
             setDeletingId(null)
+        }
+    }
+
+    const handleDuplicate = async (id: string, e: React.MouseEvent) => {
+        e.preventDefault()
+        setDuplicatingId(id)
+        try {
+            const res = await fetch(`/api/templates/${id}/duplicate`, { method: 'POST' })
+            if (res.ok) {
+                toast.success('Einheit dupliziert')
+                queryClient.invalidateQueries({ queryKey: ['templates'] })
+            } else {
+                toast.error('Fehler beim Duplizieren')
+            }
+        } catch (e) {
+            console.error('Failed to duplicate template:', e)
+            toast.error('Fehler beim Duplizieren')
+        } finally {
+            setDuplicatingId(null)
         }
     }
 
@@ -115,19 +135,34 @@ export default function EinheitenPage() {
                                                     {template.exercises.map(e => e.exercise.name).join(', ')}
                                                 </p>
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-10 w-10 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl shrink-0 transition-colors"
-                                                onClick={() => handleDelete(template.id, template.name)}
-                                                disabled={deletingId === template.id}
-                                            >
-                                                {deletingId === template.id ? (
-                                                    <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
-                                                ) : (
-                                                    <Trash2 className="h-5 w-5" />
-                                                )}
-                                            </Button>
+                                            <div className="flex flex-col gap-1 shrink-0">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-9 w-9 text-muted-foreground hover:bg-secondary/80 hover:text-foreground rounded-lg transition-colors"
+                                                    onClick={(e) => handleDuplicate(template.id, e)}
+                                                    disabled={duplicatingId === template.id || deletingId === template.id}
+                                                >
+                                                    {duplicatingId === template.id ? (
+                                                        <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                                    ) : (
+                                                        <Copy className="h-4 w-4" />
+                                                    )}
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
+                                                    onClick={() => handleDelete(template.id, template.name)}
+                                                    disabled={deletingId === template.id || duplicatingId === template.id}
+                                                >
+                                                    {deletingId === template.id ? (
+                                                        <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="h-4 w-4" />
+                                                    )}
+                                                </Button>
+                                            </div>
                                         </div>
 
                                         <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">

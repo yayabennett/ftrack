@@ -19,10 +19,17 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
 
             <div className="flex gap-4 overflow-x-auto px-5 pb-2 no-scrollbar scroll-smooth">
                 {templates.length === 0 ? (
-                    <Card className="min-w-[240px] bg-secondary/20 rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2 border-0">
-                        <Plus className="w-6 h-6 text-muted-foreground" />
-                        <p className="text-xs text-muted-foreground font-medium">Noch keine Einheiten</p>
-                    </Card>
+                    <Link href="/templates" className="min-w-[240px] flex active:scale-[0.98] transition-transform group">
+                        <Card className="w-full bg-secondary/10 hover:bg-primary/5 transition-colors border-2 border-dashed border-border/50 hover:border-primary/50 rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Plus className="w-5 h-5 text-primary" weight="bold" />
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-sm font-bold text-foreground">Neue Einheit</p>
+                                <p className="text-xs text-muted-foreground">Erstelle dein erstes Workout</p>
+                            </div>
+                        </Card>
+                    </Link>
                 ) : templates.map((template) => (
                     <Link key={template.id} href={`/workout/active?templateId=${template.id}`} className="min-w-[170px] active:scale-95 transition-transform">
                         <Card className="bg-card border border-border/40 shadow-sm rounded-2xl overflow-hidden h-full">

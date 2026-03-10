@@ -71,16 +71,27 @@ export default function HistoryPage() {
                             <div className="space-y-2">
                                 {monthSessions.map(session => {
                                     const d = new Date(session.startedAt)
-                                    const dateStr = d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })
+                                    const now = new Date()
+                                    now.setHours(0, 0, 0, 0)
+                                    const sessionDateOnly = new Date(d)
+                                    sessionDateOnly.setHours(0, 0, 0, 0)
+
+                                    const diffDays = Math.round((now.getTime() - sessionDateOnly.getTime()) / (1000 * 60 * 60 * 24))
+
+                                    let relativeLabel = d.toLocaleDateString('de-DE', { weekday: 'short' })
+                                    let isHighlight = false
+                                    if (diffDays === 0) { relativeLabel = 'Heute'; isHighlight = true }
+                                    else if (diffDays === 1) { relativeLabel = 'Gestern'; isHighlight = true }
+
                                     const volumeStr = session.volume > 1000 ? `${(session.volume / 1000).toFixed(1)}t` : `${session.volume}kg`
 
                                     return (
                                         <Link key={session.id} href={`/history/${session.id}`} className="block active:scale-[0.98] transition-transform">
                                             <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
                                                 <CardContent className="p-4 flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex flex-col items-center justify-center shrink-0">
-                                                        <span className="text-xs font-bold text-primary uppercase leading-tight">{d.toLocaleDateString('de-DE', { weekday: 'short' })}</span>
-                                                        <span className="text-[16px] font-extrabold text-primary leading-tight">{d.getDate()}</span>
+                                                    <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 ${isHighlight ? 'bg-primary/20 text-primary ring-1 ring-primary/30' : 'bg-secondary/50 text-muted-foreground'}`}>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">{relativeLabel}</span>
+                                                        <span className={`text-[18px] font-black leading-none mt-0.5 ${isHighlight ? 'text-primary' : 'text-foreground'}`}>{d.getDate()}</span>
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <h4 className="font-bold text-[15px] truncate">

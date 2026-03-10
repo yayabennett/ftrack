@@ -9,6 +9,7 @@ import { useWorkoutStore } from '@/store/use-workout-store'
 import type { WorkoutExercise } from '@/store/use-workout-store'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { getMuscleGroupStyle } from '@/lib/exercise-styles'
 
 export interface SortableExerciseCardProps {
     exercise: WorkoutExercise
@@ -20,6 +21,8 @@ export function SortableExerciseCard({ exercise, onCompleteSet, onPR }: Sortable
     const { removeExercise, addSet } = useWorkoutStore()
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: exercise.id })
 
+    const mStyle = getMuscleGroupStyle(exercise.muscleGroup || 'Allgemein')
+
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
@@ -29,12 +32,17 @@ export function SortableExerciseCard({ exercise, onCompleteSet, onPR }: Sortable
     } as React.CSSProperties
 
     return (
-        <Card ref={setNodeRef} style={style} className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground ${isDragging ? 'shadow-lg ring-primary/50 ring-2' : ''}`}>
-            <CardHeader className="bg-secondary/50 p-3 flex flex-row items-center justify-between border-b border-white/5">
+        <Card ref={setNodeRef} style={style} className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 text-card-foreground ${isDragging ? 'shadow-lg ring-primary/50 ring-2' : ''}`}>
+            <CardHeader className="sticky top-14 z-20 bg-secondary/80 backdrop-blur-md p-3 flex flex-row items-center justify-between border-b border-white/5 rounded-t-[15px]">
                 <div className="flex items-center gap-2 flex-1">
                     <div {...attributes} {...listeners} className="p-1 -ml-1 text-muted-foreground/50 hover:text-foreground cursor-grab active:cursor-grabbing touch-none focus:outline-none">
                         <GripVertical className="h-5 w-5" />
                     </div>
+                    {exercise.muscleGroup && (
+                        <div className={`w-7 h-7 flex items-center justify-center shrink-0 rounded-lg ${mStyle.bgClass} ${mStyle.colorClass}`}>
+                            <div className="w-4 h-4">{mStyle.icon}</div>
+                        </div>
+                    )}
                     <CardTitle className="text-[15px] font-semibold text-foreground">{exercise.name}</CardTitle>
                 </div>
                 <Button

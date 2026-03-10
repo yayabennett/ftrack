@@ -1,4 +1,25 @@
+"use client"
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const LOADING_MESSAGES = [
+    "Wärme Gewichte auf...",
+    "Lade Muskelversagen...",
+    "Suche nach Gains...",
+    "Mische Pre-Workout...",
+    "Verhandle mit der Schwerkraft..."
+]
+
 export default function Loading() {
+    const [messageIndex, setMessageIndex] = useState(0)
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setMessageIndex(i => (i + 1) % LOADING_MESSAGES.length)
+        }, 2000)
+        return () => clearInterval(interval)
+    }, [])
+
     return (
         <div className="min-h-screen bg-background pb-24">
             {/* Header skeleton */}
@@ -44,6 +65,23 @@ export default function Loading() {
                             </div>
                         ))}
                     </div>
+                </div>
+            </div>
+
+            <div className="fixed bottom-32 left-0 right-0 flex justify-center pointer-events-none">
+                <div className="bg-secondary/80 backdrop-blur-md px-6 py-3 rounded-full border border-white/5 flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                    <AnimatePresence mode="wait">
+                        <motion.span
+                            key={messageIndex}
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                            className="text-sm font-bold text-foreground tracking-wide"
+                        >
+                            {LOADING_MESSAGES[messageIndex]}
+                        </motion.span>
+                    </AnimatePresence>
                 </div>
             </div>
         </div>

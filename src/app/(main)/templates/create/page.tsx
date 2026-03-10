@@ -174,10 +174,11 @@ export default function CreateTemplatePage() {
                         Name der Einheit
                     </label>
                     <Input
+                        autoFocus
                         id="name"
                         value={name}
                         onChange={e => setName(e.target.value)}
-                        placeholder="z.B. Push Day, Full Body A..."
+                        placeholder="Wie heißt deine Foltermethode heute?"
                         className="h-14 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-2xl text-[16px] px-4 font-semibold"
                         required
                     />
@@ -266,7 +267,13 @@ export default function CreateTemplatePage() {
                                 <Skeleton className="h-[72px] w-full rounded-2xl bg-secondary/50" />
                             </>
                         ) : filteredExercises.length === 0 ? (
-                            <div className="text-center py-12 px-4 rounded-3xl glass-panel mt-8 shadow-sm">Keine Übungen gefunden.</div>
+                            <div className="flex flex-col items-center justify-center py-16 px-4 rounded-3xl bg-secondary/20 border border-white/5 mt-8 shadow-sm text-center animate-in fade-in zoom-in-95 duration-500">
+                                <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mb-4">
+                                    <Search className="w-8 h-8 text-muted-foreground/50" />
+                                </div>
+                                <h3 className="text-lg font-bold text-foreground">Nichts gefunden</h3>
+                                <p className="text-[14px] text-muted-foreground mt-1 max-w-[200px]">Wir konnten keine Übung mit diesem Namen finden.</p>
+                            </div>
                         ) : (
                             filteredExercises.map(ex => {
                                 const isSelected = selectedIds.includes(ex.id)
