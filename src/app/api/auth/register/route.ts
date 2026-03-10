@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs'
 
 export async function POST(req: Request) {
     try {
-        const { email, password, name, migrateUserId } = await req.json()
+        const { email, password, name, age, weight, height, gender, goal, experienceLevel, migrateUserId } = await req.json()
 
         if (!email || !password) {
             return new NextResponse('Missing email or password', { status: 400 })
@@ -46,7 +46,13 @@ export async function POST(req: Request) {
                 email: lowerEmail,
                 name,
                 password: hashedPassword,
-                isOnboarded: true
+                isOnboarded: true,
+                age: age ? parseInt(age) : null,
+                weight: weight ? parseFloat(weight) : null,
+                height: height ? parseFloat(height) : null,
+                gender: gender || null,
+                goal: goal || null,
+                experienceLevel: experienceLevel || null,
             }
         })
         return NextResponse.json(newUser)

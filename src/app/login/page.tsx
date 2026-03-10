@@ -6,18 +6,12 @@ import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Barbell, UserPlus, SignIn } from "@phosphor-icons/react"
-import { toast } from "sonner"
+import { SignIn } from "@phosphor-icons/react"
 import { motion, AnimatePresence } from "framer-motion"
-
-type Tab = "login" | "register"
+import Link from "next/link"
 
 export default function AuthPage() {
     const router = useRouter()
-    const [tab, setTab] = useState<Tab>("login")
-
-    // Form state
-    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
@@ -28,55 +22,18 @@ export default function AuthPage() {
         setLoading(true)
         setError("")
 
-        if (tab === "register") {
-            try {
-                const res = await fetch("/api/auth/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name, email, password }),
-                })
+        const res = await signIn("credentials", {
+            email,
+            password,
+            redirect: false
+        })
 
-                if (!res.ok) {
-                    const errorText = await res.text()
-                    setError(errorText || "Registrierung fehlgeschlagen")
-                    setLoading(false)
-                    return
-                }
-
-                // Auto sign-in
-                const signInRes = await signIn("credentials", {
-                    email,
-                    password,
-                    redirect: false,
-                })
-
-                if (signInRes?.error) {
-                    setError("Account erstellt, Login fehlgeschlagen.")
-                    setLoading(false)
-                } else {
-                    toast.success("Account erfolgreich erstellt!")
-                    router.push("/")
-                    router.refresh()
-                }
-            } catch (err) {
-                setError("Ein unerwarteter Fehler ist aufgetreten.")
-                setLoading(false)
-            }
+        if (res?.error) {
+            setError("Ungültige E-Mail oder Passwort.")
+            setLoading(false)
         } else {
-            // Login
-            const res = await signIn("credentials", {
-                email,
-                password,
-                redirect: false
-            })
-
-            if (res?.error) {
-                setError("Ungültige E-Mail oder Passwort.")
-                setLoading(false)
-            } else {
-                router.push("/")
-                router.refresh()
-            }
+            router.push("/")
+            router.refresh()
         }
     }
 
@@ -89,70 +46,26 @@ export default function AuthPage() {
             <div className="w-full max-w-sm z-10 animate-in fade-in zoom-in-95 duration-500">
                 <div className="flex flex-col items-center gap-2 mb-8">
                     <div className="text-center">
-                        <h1 className="text-6xl tracking-[-0.08em] text-foreground flex items-baseline justify-center">
-                            <span className="font-extralight opacity-80">i</span>
-                            <span className="font-black text-primary -ml-1">Track</span>
-                        </h1>
+                        <Link href="/onboarding">
+                            <h1 className="text-6xl tracking-[-0.08em] text-foreground flex items-baseline justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 duration-300">
+                                <span className="font-extralight opacity-80">i</span>
+                                <span className="font-black text-primary -ml-1">Track</span>
+                            </h1>
+                        </Link>
                         <p className="text-xs text-muted-foreground font-bold mt-2 opacity-60 uppercase tracking-[0.3em]">Premium Training</p>
                     </div>
                 </div>
 
                 <Card className="p-6 bg-card border-border shadow-soft rounded-[32px] overflow-hidden relative">
-                    {/* Segmented Control */}
-                    <div className="flex p-1 bg-secondary/60 rounded-xl mb-6 ring-1 ring-white/5 relative z-10">
-                        <button
-                            type="button"
-                            onClick={() => { setTab("login"); setError(""); }}
-                            className={`flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all z-10 ${tab === "login" ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
-                        >
-                            Anmelden
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => { setTab("register"); setError(""); }}
-                            className={`flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all z-10 ${tab === "register" ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
-                        >
-                            Registrieren
-                        </button>
-                        <motion.div
-                            className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-card rounded-lg shadow-sm ring-1 ring-white/10"
-                            animate={{ left: tab === "login" ? "4px" : "calc(50%)" }}
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
-                    </div>
-
-                    {error && (
-                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-destructive/10 text-destructive text-sm font-semibold p-3 rounded-xl text-center mb-6 ring-1 ring-destructive/20 relative z-10">
-                            {error}
-                        </motion.div>
-                    )}
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-destructive/10 text-destructive text-sm font-semibold p-3 rounded-xl text-center mb-6 ring-1 ring-destructive/20 relative z-10">
+                                {error}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
-                        <AnimatePresence mode="popLayout" initial={false}>
-                            {tab === "register" && (
-                                <motion.div
-                                    key="name-field"
-                                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                                    animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
-                                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                                    className="space-y-1.5 overflow-hidden"
-                                >
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">
-                                        Name
-                                    </label>
-                                    <Input
-                                        type="text"
-                                        placeholder="Dein Name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        required={tab === "register"}
-                                        className="h-12 bg-secondary/30 border-0 rounded-xl text-[15px] font-medium px-4 focus-visible:ring-primary focus-visible:bg-secondary/50 transition-all placeholder:text-muted-foreground/50"
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
                         <div className="space-y-1.5">
                             <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">
                                 Email
@@ -188,20 +101,23 @@ export default function AuthPage() {
                         >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                            ) : tab === "login" ? (
+                            ) : (
                                 <>
                                     <SignIn className="w-5 h-5" />
                                     Einloggen
-                                </>
-                            ) : (
-                                <>
-                                    <UserPlus className="w-5 h-5" />
-                                    Account erstellen
                                 </>
                             )}
                         </Button>
                     </form>
                 </Card>
+
+                <div className="mt-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+                    <Link href="/onboarding">
+                        <Button variant="ghost" className="h-auto py-2 px-4 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground">
+                            Noch keinen Account? Jetzt starten
+                        </Button>
+                    </Link>
+                </div>
             </div>
         </div>
     )
