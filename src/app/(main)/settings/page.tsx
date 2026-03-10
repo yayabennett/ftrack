@@ -163,6 +163,3 @@ export default async function SettingsPage() {
         </div>
     )
 }
-
-"use client"
-
