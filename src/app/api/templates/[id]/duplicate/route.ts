@@ -4,14 +4,15 @@ import { getCurrentUserId } from '@/lib/auth'
 
 export async function POST(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const userId = await getCurrentUserId()
         if (!userId) return new NextResponse('Unauthorized', { status: 401 })
 
         const sourceTemplate = await prisma.template.findUnique({
-            where: { id: params.id, userId },
+            where: { id, userId },
             include: { exercises: true }
         })
 
