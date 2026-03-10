@@ -89,11 +89,11 @@ export default function AuthPage() {
             <div className="w-full max-w-sm z-10 animate-in fade-in zoom-in-95 duration-500">
                 <div className="flex flex-col items-center gap-2 mb-8">
                     <div className="text-center">
-                        <h1 className="text-5xl tracking-tighter text-foreground flex items-baseline justify-center">
-                            <span className="font-light opacity-60">i</span>
-                            <span className="font-black text-primary">Track</span>
+                        <h1 className="text-6xl tracking-[-0.08em] text-foreground flex items-baseline justify-center">
+                            <span className="font-extralight opacity-80">i</span>
+                            <span className="font-black text-primary -ml-1">Track</span>
                         </h1>
-                        <p className="text-sm text-muted-foreground font-semibold mt-1 opacity-80 uppercase tracking-[0.2em]">Dein Leben. Dein Training.</p>
+                        <p className="text-xs text-muted-foreground font-bold mt-2 opacity-60 uppercase tracking-[0.3em]">Premium Training</p>
                     </div>
                 </div>
 

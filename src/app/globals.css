@@ -65,8 +65,8 @@
   /* Extreme rounding for friendly organic feel */
   --radius: 1.5rem;
 
-  /* Surfaces: Darker slate background, pure white cards */
-  --background: #F1F5F9;
+  /* Surfaces: Richer slate background (distinctly not white) */
+  --background: #E2E8F0;
   --foreground: #0F172A;
 
   --card: #FFFFFF;
@@ -80,10 +80,10 @@
   --primary-foreground: #FFFFFF;
 
   /* Supporting surfaces - friendly neutral */
-  --secondary: #E2E8F0;
+  --secondary: #CBD5E1;
   --secondary-foreground: #334155;
 
-  --muted: #E2E8F0;
+  --muted: #CBD5E1;
   --muted-foreground: #64748B;
 
   --accent: #E0E7FF;

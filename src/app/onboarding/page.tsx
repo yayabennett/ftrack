@@ -74,9 +74,9 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
             </div>
 
             <div className="text-center space-y-4 mb-4">
-                <div className="inline-flex items-baseline justify-center text-4xl tracking-tighter mb-2">
-                    <span className="font-light opacity-60">i</span>
-                    <span className="font-black text-primary">Track</span>
+                <div className="inline-flex items-baseline justify-center text-5xl tracking-[-0.08em] mb-2">
+                    <span className="font-extralight opacity-80">i</span>
+                    <span className="font-black text-primary -ml-1">Track</span>
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight">
                     Willkommen bei <span className="text-primary">iTrack</span>
