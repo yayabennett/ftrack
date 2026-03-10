@@ -39,32 +39,57 @@ export async function POST(request: Request) {
             return new NextResponse('Unauthorized', { status: 401 })
         }
 
-        // Verify ownership (IDOR prevention): 
-        // We only check the first set's workoutExerciseId assuming batch sets belong to the same workoutExercise
-        const sampleWorkoutExerciseId = sets[0].workoutExerciseId
-        const workoutExercise = await prisma.workoutExercise.findUnique({
-            where: { id: sampleWorkoutExerciseId },
-            include: { session: { select: { userId: true } } }
+        // Extract all unique workoutExerciseIds from the incoming payload
+        const wExIds = [...new Set(sets.map((s: any) => s.workoutExerciseId))]
+
+        // IDOR PREVENTION: 
+        // We MUST verify that *every single* workoutExerciseId requested belongs to an active session
+        // owned by the currently authenticated user.
+        const validExercises = await prisma.workoutExercise.findMany({
+            where: {
+                id: { in: wExIds },
+                session: { userId }
+            },
+            select: { id: true }
         })
 
-        if (!workoutExercise || workoutExercise.session.userId !== userId) {
-            return new NextResponse('Forbidden', { status: 403 })
+        if (validExercises.length !== wExIds.length) {
+            return new NextResponse('Forbidden: One or more exercises do not belong to you.', { status: 403 })
         }
 
-        const created = await prisma.setEntry.createMany({
-            data: sets.map((s) => ({
-                id: s.id, // optional uuid from client for offline sync matching
-                workoutExerciseId: s.workoutExerciseId,
-                setIndex: s.setIndex,
-                weight: s.weight,
-                reps: s.reps,
-                rpe: s.rpe,
-                isWarmup: s.isWarmup || false,
-                note: s.note
-            }))
+        // OFFLINE IDEMPOTENCY:
+        // Use an upsert loop based on the client-provided ID so retries don't duplicate sets.
+        // Fallback to random UUID if the client doesn't provide one (unlikely but safe).
+        const crypto = require('crypto')
+
+        const upsertPromises = sets.map((s: any) => {
+            const setId = s.id || crypto.randomUUID()
+            return prisma.setEntry.upsert({
+                where: { id: setId },
+                update: {
+                    setIndex: s.setIndex,
+                    weight: s.weight,
+                    reps: s.reps,
+                    rpe: s.rpe,
+                    isWarmup: s.isWarmup || false,
+                    note: s.note
+                },
+                create: {
+                    id: setId,
+                    workoutExerciseId: s.workoutExerciseId,
+                    setIndex: s.setIndex,
+                    weight: s.weight,
+                    reps: s.reps,
+                    rpe: s.rpe,
+                    isWarmup: s.isWarmup || false,
+                    note: s.note
+                }
+            })
         })
 
-        return NextResponse.json({ success: true, count: created.count })
+        await Promise.all(upsertPromises)
+
+        return NextResponse.json({ success: true, count: sets.length })
     } catch (error) {
         console.error(error)
         return NextResponse.json({ error: 'Failed to save sets' }, { status: 500 })

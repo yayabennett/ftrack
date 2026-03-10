@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getCurrentUserId } from '@/lib/auth'
+import { WorkoutService } from '@/lib/services/workout.service'
 
 export async function GET() {
     try {
         const userId = await getCurrentUserId()
         if (!userId) return new NextResponse('Unauthorized', { status: 401 })
 
+        // No need to include exercises; WorkoutService calculates volume natively.
         const sessions = await prisma.workoutSession.findMany({
             where: {
                 userId,
@@ -14,23 +16,13 @@ export async function GET() {
             },
             orderBy: { startedAt: 'desc' },
             include: {
-                template: { select: { name: true } },
-                exercises: {
-                    include: { sets: true }
-                }
+                template: { select: { name: true } }
             }
         })
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mapped = sessions.map((session: any) => {
-            let volume = 0
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            session.exercises.forEach((ex: any) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ex.sets.forEach((set: any) => {
-                    volume += set.weight * set.reps
-                })
-            })
+        const mapped = await Promise.all(sessions.map(async (session) => {
+            // Get volume efficiently via SQL rather than bringing thousands of rows into JS
+            const volume = await WorkoutService.getSessionVolume(session.id)
 
             const durationMinutes = session.endedAt
                 ? Math.round((session.endedAt.getTime() - session.startedAt.getTime()) / 60000)
@@ -44,7 +36,7 @@ export async function GET() {
                 volume,
                 durationMinutes
             }
-        })
+        }))
 
         return NextResponse.json(mapped)
     } catch (e) {

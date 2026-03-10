@@ -2,14 +2,16 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { z } from 'zod'
 
+import { Gender, Goal, ExperienceLevel } from '@prisma/client'
+
 const OnboardingSchema = z.object({
     name: z.string().min(1),
     age: z.number().int().min(10).max(99),
     weight: z.number().min(20).max(300),
     height: z.number().min(100).max(250),
-    gender: z.enum(['male', 'female', 'other']),
-    goal: z.enum(['muscle_gain', 'fat_loss', 'strength', 'general_fitness']),
-    experienceLevel: z.enum(['beginner', 'intermediate', 'advanced']),
+    gender: z.nativeEnum(Gender),
+    goal: z.nativeEnum(Goal),
+    experienceLevel: z.nativeEnum(ExperienceLevel),
 })
 
 export async function POST(request: Request) {

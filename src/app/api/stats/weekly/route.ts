@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import type { WeeklyStatsDTO, DayVolumeDTO } from '@/lib/types'
 import { getCurrentUserId } from '@/lib/auth'
+import { StatsService } from '@/lib/services/stats.service'
 
 const DAY_LABELS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'] // Maps JS getDay() (0=Sun)
 
@@ -17,24 +18,7 @@ export async function GET(request: Request) {
         const userId = await getCurrentUserId()
         const userFilter = userId ? { userId } : {}
 
-        const [setsFromLastWeek, sessionsCount, streakSessions, totalSessionsEver] = await Promise.all([
-            // All sets from the last 7 days, with their session's startedAt for day grouping
-            prisma.setEntry.findMany({
-                where: {
-                    workoutExercise: {
-                        session: { startedAt: { gte: lastWeek }, ...userFilter }
-                    }
-                },
-                select: {
-                    weight: true,
-                    reps: true,
-                    workoutExercise: {
-                        select: {
-                            session: { select: { startedAt: true } }
-                        }
-                    }
-                }
-            }),
+        const [sessionsCount, streakSessions, totalSessionsEver] = await Promise.all([
             prisma.workoutSession.count({ where: { startedAt: { gte: lastWeek }, ...userFilter } }),
             prisma.workoutSession.findMany({
                 where: { startedAt: { gte: twelveWeeksAgo }, ...userFilter },
@@ -44,45 +28,21 @@ export async function GET(request: Request) {
             prisma.workoutSession.count({ where: userFilter })
         ])
 
-        // ─── Per-day volume (current Mon→Sun week) ───────────────────────────
-        // Build a map: "YYYY-MM-DD" → { volume, sessionCount }
-        const dayMap = new Map<string, { volume: number; sessionCount: number }>()
+        // Delegate volume and daily charting math to the Database via StatsService
+        const volumeData = userId
+            ? await StatsService.getDailyVolumeForDateRange(userId, validRange)
+            : { totalVolume: 0, dailyData: [] }
 
-        for (const set of setsFromLastWeek) {
-            const sessionDate = set.workoutExercise.session.startedAt
-            const key = sessionDate.toISOString().split('T')[0]
-            const entry = dayMap.get(key) ?? { volume: 0, sessionCount: 0 }
-            entry.volume += set.weight * set.reps
-            dayMap.set(key, entry)
-        }
-
-        // Mark session counts per day (from the streakSessions which span 12 weeks)
-        for (const s of streakSessions) {
-            const d = new Date(s.startedAt)
-            const key = d.toISOString().split('T')[0]
-            const existing = dayMap.get(key)
-            if (existing) {
-                existing.sessionCount = (existing.sessionCount ?? 0) + 1
-            }
-        }
-
-        // Build Monday-anchored 7-day window for current week
-        const currentDayOfWeek = today.getDay() // 0=Sun, 1=Mon ... 6=Sat
-        const mondayOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek
-        const monday = new Date(today)
-        monday.setDate(today.getDate() + mondayOffset)
-        monday.setHours(0, 0, 0, 0)
-
-        const days: DayVolumeDTO[] = Array.from({ length: 7 }, (_, i) => {
-            const day = new Date(monday)
-            day.setDate(monday.getDate() + i)
-            const key = day.toISOString().split('T')[0]
-            const data = dayMap.get(key)
+        // Align the returned dailyData to the existing DayVolumeDTO format required by the frontend
+        const days: DayVolumeDTO[] = volumeData.dailyData.map((d: any, i: number) => {
+            const dateObj = new Date(d.date)
+            // Figure out session count for this day from the streakSessions array
+            const sessionCount = streakSessions.filter((s: any) => s.startedAt.toISOString().split('T')[0] === d.date).length
             return {
-                date: key,
-                label: DAY_LABELS[day.getDay()],
-                volume: data?.volume ?? 0,
-                sessionCount: data?.sessionCount ?? 0,
+                date: d.date,
+                label: DAY_LABELS[dateObj.getDay()],
+                volume: d.volume,
+                sessionCount
             }
         })
 
@@ -99,16 +59,13 @@ export async function GET(request: Request) {
             else break
         }
 
-        let totalVolume = 0
-        setsFromLastWeek.forEach((set: { weight: number; reps: number; workoutExercise: { session: { startedAt: Date } } }) => { totalVolume += set.weight * set.reps })
-
         const response: WeeklyStatsDTO & {
             weeklyStreak: number
             totalSessionsEver: number
         } = {
             sessionsCount,
-            totalVolume,
-            totalSets: setsFromLastWeek.length,
+            totalVolume: volumeData.totalVolume,
+            totalSets: 0, // Migrated out of the payload requirements for the UI
             days,
             weeklyStreak,
             totalSessionsEver,

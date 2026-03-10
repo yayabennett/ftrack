@@ -8,6 +8,47 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Gender {
+  MALE @map("male")
+  FEMALE @map("female")
+  OTHER @map("other")
+}
+
+enum Goal {
+  MUSCLE_GAIN @map("muscle_gain")
+  WEIGHT_LOSS @map("weight_loss")
+  MAINTENANCE @map("maintenance")
+  STRENGTH @map("strength")
+}
+
+enum ExperienceLevel {
+  BEGINNER @map("beginner")
+  INTERMEDIATE @map("intermediate")
+  ADVANCED @map("advanced")
+}
+
+enum Equipment {
+  BARBELL @map("Barbell")
+  DUMBBELL @map("Dumbbell")
+  MACHINE @map("Machine")
+  CABLE @map("Cable")
+  BODYWEIGHT @map("Bodyweight")
+}
+
+enum MuscleGroup {
+  CHEST @map("Brust")
+  BACK @map("Rücken")
+  QUADS @map("Beine (Quads)")
+  HAMS @map("Beine (Hams)")
+  SHOULDERS @map("Schultern")
+  BICEPS @map("Bizeps")
+  TRICEPS @map("Trizeps")
+  ABS @map("Bauch")
+  CALVES @map("Waden")
+  GLUTES @map("Po / Glutes")
+  FULL_BODY @map("Ganzkörper")
+}
+
 model User {
   id              String   @id @default(uuid())
   email           String?  @unique
@@ -16,9 +57,9 @@ model User {
   age             Int?
   weight          Float?
   height          Float?
-  gender          String?
-  goal            String?
-  experienceLevel String?
+  gender          Gender?
+  goal            Goal?
+  experienceLevel ExperienceLevel?
   isOnboarded     Boolean  @default(false)
   createdAt       DateTime @default(now())
 
@@ -28,10 +69,10 @@ model User {
 }
 
 model Exercise {
-  id          String  @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
-  muscleGroup String?
-  equipment   String?
+  muscleGroup MuscleGroup?
+  equipment   Equipment?
   isCustom    Boolean @default(false)
   notes       String?
   userId      String?

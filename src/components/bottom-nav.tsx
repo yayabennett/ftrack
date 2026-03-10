@@ -9,8 +9,13 @@ import { motion } from 'framer-motion'
 export function BottomNav() {
     const pathname = usePathname()
 
-    // Don't show bottom nav inside an active workout
-    if (pathname.startsWith('/workout/')) return null
+    // Don't show bottom nav inside an active workout or auth pages
+    if (
+        pathname.startsWith('/workout/') ||
+        pathname === '/login' ||
+        pathname === '/register' ||
+        pathname === '/onboarding'
+    ) return null
 
     const mainNavItems = [
         { name: 'Home', href: '/', icon: House },

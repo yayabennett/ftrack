@@ -4,6 +4,7 @@ import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
 import { OfflineBanner } from "@/components/offline-banner";
 import Providers from "@/components/providers";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -55,16 +56,18 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground safe-bottom pb-20 md:pb-0`}
       >
-        <Providers>
-          <OfflineBanner />
-          <main className="pb-20 min-h-screen">
-            {children}
-          </main>
-          <BottomNav />
-          <Toaster theme="dark" position="bottom-center" />
-        </Providers>
+        <AuthProvider>
+          <Providers>
+            <OfflineBanner />
+            <main className="pb-20 min-h-screen">
+              {children}
+            </main>
+            <BottomNav />
+          </Providers>
+        </AuthProvider>
+        <Toaster theme="dark" position="bottom-center" />
       </body>
     </html>
   );

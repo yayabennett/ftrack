@@ -3,10 +3,12 @@ import prisma from '@/lib/prisma'
 import { z } from 'zod'
 import { getCurrentUserId } from '@/lib/auth'
 
+import { MuscleGroup, Equipment } from '@prisma/client'
+
 const CreateExerciseSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    muscleGroup: z.string().optional(),
-    equipment: z.string().optional(),
+    muscleGroup: z.nativeEnum(MuscleGroup).optional(),
+    equipment: z.nativeEnum(Equipment).optional(),
     notes: z.string().optional()
 })
 
