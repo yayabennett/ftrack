@@ -150,7 +150,8 @@
 
 @layer utilities {
   .action-press {
-    @apply transition-transform duration-[250ms] active:scale-[0.96] ease-[cubic-bezier(0.34, 1.56, 0.64, 1)];
+    @apply transition-transform duration-[250ms] active:scale-[0.96];
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .hairline {
