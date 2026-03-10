@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ArrowLeft, Play, Barbell as Dumbbell, Calendar, Clock, Copy, Check } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { TemplateDTO } from '@/lib/types'
 import { useStartWorkout } from '@/hooks/use-start-workout'
 
@@ -13,8 +13,12 @@ type Template = Pick<TemplateDTO, 'id' | 'name'> & { exercises: { id: string }[]
 
 export default function StartWorkoutConfig() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const urlTemplateId = searchParams.get('templateId')
+
     const [templates, setTemplates] = useState<Template[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const hasAutoStarted = useRef(false)
 
     // State for configuration
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
@@ -49,6 +53,13 @@ export default function StartWorkoutConfig() {
     }, [])
 
     const { startWorkout, isStarting } = useStartWorkout()
+
+    useEffect(() => {
+        if (urlTemplateId && templates.length > 0 && !hasAutoStarted.current) {
+            hasAutoStarted.current = true
+            startWorkout(urlTemplateId, date, time)
+        }
+    }, [urlTemplateId, templates, date, time, startWorkout])
 
     const handleStart = () => {
         startWorkout(selectedTemplateId, date, time)
@@ -115,17 +126,17 @@ export default function StartWorkoutConfig() {
                     <div className="space-y-3">
                         {/* Empty Workout / Free Training */}
                         <div onClick={() => setSelectedTemplateId(null)} className="cursor-pointer">
-                            <Card className={`relative bg - card ring - 2 transition - all shadow - sm rounded - 2xl border - 0 overflow - hidden active: scale - [0.98] ${selectedTemplateId === null ? 'ring-primary bg-primary/5' : 'ring-white/5'} `}>
+                            <Card className={`relative bg-card ring-2 transition-all shadow-sm rounded-2xl border-0 overflow-hidden active:scale-[0.98] ${selectedTemplateId === null ? 'ring-primary bg-primary/5' : 'ring-white/5'}`}>
                                 <CardContent className="p-4 flex items-center gap-4">
-                                    <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - colors ${selectedTemplateId === null ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'} `}>
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${selectedTemplateId === null ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
                                         <Dumbbell className="w-6 h-6" />
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-bold text-[16px] text-foreground">Freies Training</h3>
                                         <p className="text-[13px] text-muted-foreground font-medium">Leere Einheit starten</p>
                                     </div>
-                                    <div className={`w - 6 h - 6 rounded - full border - 2 flex items - center justify - center transition - all ${selectedTemplateId === null ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'} `}>
-                                        <Check className={`w - 3.5 h - 3.5 transition - opacity ${selectedTemplateId === null ? 'opacity-100' : 'opacity-0'} `} strokeWidth={3} />
+                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedTemplateId === null ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'}`}>
+                                        <Check className={`w-3.5 h-3.5 transition-opacity ${selectedTemplateId === null ? 'opacity-100' : 'opacity-0'}`} strokeWidth={3} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -137,17 +148,17 @@ export default function StartWorkoutConfig() {
                         ) : (
                             templates.map(template => (
                                 <div key={template.id} onClick={() => setSelectedTemplateId(template.id)} className="cursor-pointer">
-                                    <Card className={`relative bg - card ring - 2 transition - all shadow - sm rounded - 2xl border - 0 overflow - hidden active: scale - [0.98] ${selectedTemplateId === template.id ? 'ring-primary bg-primary/5' : 'ring-white/5'} `}>
+                                    <Card className={`relative bg-card ring-2 transition-all shadow-sm rounded-2xl border-0 overflow-hidden active:scale-[0.98] ${selectedTemplateId === template.id ? 'ring-primary bg-primary/5' : 'ring-white/5'}`}>
                                         <CardContent className="p-4 flex items-center gap-4">
-                                            <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - colors ${selectedTemplateId === template.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'} `}>
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${selectedTemplateId === template.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
                                                 <Copy className="w-6 h-6" />
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="font-bold text-[16px] text-foreground">{template.name}</h3>
                                                 <p className="text-[12px] uppercase tracking-wider text-muted-foreground font-bold">{template.exercises?.length || 0} Übungen</p>
                                             </div>
-                                            <div className={`w - 6 h - 6 rounded - full border - 2 flex items - center justify - center transition - all ${selectedTemplateId === template.id ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'} `}>
-                                                <Check className={`w - 3.5 h - 3.5 transition - opacity ${selectedTemplateId === template.id ? 'opacity-100' : 'opacity-0'} `} strokeWidth={3} />
+                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedTemplateId === template.id ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30'}`}>
+                                                <Check className={`w-3.5 h-3.5 transition-opacity ${selectedTemplateId === template.id ? 'opacity-100' : 'opacity-0'}`} strokeWidth={3} />
                                             </div>
                                         </CardContent>
                                     </Card>

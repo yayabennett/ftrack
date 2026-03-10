@@ -44,7 +44,8 @@ export async function POST(request: Request) {
                     exercises: {
                         create: templateExercises.map((te: { exerciseId: string; order: number }) => ({
                             exerciseId: te.exerciseId,
-                            order: te.order
+                            order: te.order,
+                            // we pass these through for the client to parse, even if they aren't saved on WorkoutExercise schema
                         }))
                     }
                 },
@@ -57,7 +58,21 @@ export async function POST(request: Request) {
                 }
             })
 
-            return NextResponse.json(session)
+            // Inject template data back into the session response for the client
+            const sessionWithTargets = {
+                ...session,
+                exercises: session.exercises.map((ex) => {
+                    const te = templateExercises.find((t: any) => t.exerciseId === ex.exerciseId) as any
+                    return {
+                        ...ex,
+                        targetSets: te?.targetSets,
+                        repRange: te?.repRange,
+                        targetWeight: te?.targetWeight,
+                    }
+                })
+            }
+
+            return NextResponse.json(sessionWithTargets)
         }
 
         // Without template, just create an empty session

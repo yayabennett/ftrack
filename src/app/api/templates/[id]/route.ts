@@ -54,6 +54,7 @@ export async function PATCH(
                             order: idx,
                             targetSets: ex.targetSets || 3,
                             repRange: ex.repRange || '8-12',
+                            targetWeight: ex.targetWeight ? parseFloat(ex.targetWeight) : null,
                             notes: ex.notes || ''
                         }))
                     }

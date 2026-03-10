@@ -18,6 +18,7 @@ export interface TemplateExerciseDTO {
   order: number
   targetSets: number | null
   repRange: string | null
+  targetWeight: number | null
   notes: string | null
   exercise: Pick<ExerciseDTO, 'id' | 'name' | 'muscleGroup'>
 }

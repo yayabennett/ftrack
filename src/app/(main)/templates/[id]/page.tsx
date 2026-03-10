@@ -43,7 +43,7 @@ export default function EditTemplatePage() {
 
     // UI State
     const [name, setName] = useState('')
-    const [selectedIds, setSelectedIds] = useState<string[]>([])
+    const [selectedExercises, setSelectedExercises] = useState<{ id: string, targets: { targetSets: number, repRange: string, targetWeight?: number } }[]>([])
     const [searchQuery, setSearchQuery] = useState('')
     const [activeTab, setActiveTab] = useState('Alle')
 
@@ -53,7 +53,7 @@ export default function EditTemplatePage() {
         queryFn: async () => {
             const res = await fetch(`/api/templates/${id}`)
             if (!res.ok) throw new Error('Failed to fetch template')
-            return res.json() as Promise<TemplateDTO & { exercises: { exerciseId: string }[] }>
+            return res.json() as Promise<TemplateDTO>
         }
     })
 
@@ -83,7 +83,14 @@ export default function EditTemplatePage() {
     useEffect(() => {
         if (template) {
             setName(template.name)
-            setSelectedIds(template.exercises.map(e => e.exerciseId))
+            setSelectedExercises(template.exercises.map(e => ({
+                id: e.exerciseId,
+                targets: {
+                    targetSets: e.targetSets || 3,
+                    repRange: e.repRange || '8-12',
+                    targetWeight: e.targetWeight || undefined
+                }
+            })))
         }
     }, [template])
 
@@ -99,16 +106,16 @@ export default function EditTemplatePage() {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event
         if (over && active.id !== over.id) {
-            setSelectedIds((items) => {
-                const oldIndex = items.indexOf(active.id as string)
-                const newIndex = items.indexOf(over.id as string)
+            setSelectedExercises((items) => {
+                const oldIndex = items.findIndex(x => x.id === active.id)
+                const newIndex = items.findIndex(x => x.id === over.id)
                 return arrayMove(items, oldIndex, newIndex)
             })
         }
     }
 
     const handleSave = async () => {
-        if (!name.trim() || selectedIds.length === 0) return
+        if (!name.trim() || selectedExercises.length === 0) return
 
         startTransition(async () => {
             const res = await fetch(`/api/templates/${id}`, {
@@ -116,7 +123,12 @@ export default function EditTemplatePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name,
-                    exercises: selectedIds.map(exerciseId => ({ exerciseId }))
+                    exercises: selectedExercises.map(ex => ({
+                        exerciseId: ex.id,
+                        targetSets: ex.targets.targetSets,
+                        repRange: ex.targets.repRange,
+                        targetWeight: ex.targets.targetWeight
+                    }))
                 })
             })
 
@@ -132,9 +144,17 @@ export default function EditTemplatePage() {
     }
 
     const toggleSelection = (id: string) => {
-        setSelectedIds(prev =>
-            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        setSelectedExercises(prev =>
+            prev.some(x => x.id === id)
+                ? prev.filter(x => x.id !== id)
+                : [...prev, { id, targets: { targetSets: 3, repRange: '8-12' } }]
         )
+    }
+
+    const updateTargets = (id: string, updates: Partial<{ targetSets: number, repRange: string, targetWeight: number }>) => {
+        setSelectedExercises(prev => prev.map(ex =>
+            ex.id === id ? { ...ex, targets: { ...ex.targets, ...updates } } : ex
+        ))
     }
 
     const filteredExercises = exercises.filter(ex => {
@@ -189,13 +209,13 @@ export default function EditTemplatePage() {
                 </div>
 
                 <div className="space-y-4">
-                    {selectedIds.length > 0 && (
+                    {selectedExercises.length > 0 && (
                         <div className="space-y-3 mb-8 bg-secondary/10 p-4 -mx-4 rounded-3xl border border-white/5">
                             <label className="text-xs font-bold tracking-widest text-primary uppercase px-1">Reihenfolge</label>
                             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                                <SortableContext items={selectedIds} strategy={verticalListSortingStrategy}>
+                                <SortableContext items={selectedExercises.map(ex => ex.id)} strategy={verticalListSortingStrategy}>
                                     <div className="space-y-2">
-                                        {selectedIds.map(id => {
+                                        {selectedExercises.map(({ id, targets }) => {
                                             const ex = exercises.find(e => e.id === id) || template?.exercises.find((te: any) => te.exerciseId === id)?.exercise
                                             if (!ex) return null
                                             return (
@@ -204,6 +224,8 @@ export default function EditTemplatePage() {
                                                     id={id}
                                                     name={ex.name}
                                                     muscleGroup={ex.muscleGroup}
+                                                    targets={targets}
+                                                    onUpdate={(updates) => updateTargets(id, updates)}
                                                     onRemove={() => toggleSelection(id)}
                                                 />
                                             )
@@ -238,7 +260,7 @@ export default function EditTemplatePage() {
                         </div>
                         <div className="space-y-2 mt-2">
                             {filteredExercises.slice(0, 20).map(ex => {
-                                const isSelected = selectedIds.includes(ex.id)
+                                const isSelected = selectedExercises.some(sx => sx.id === ex.id)
                                 return (
                                     <Card
                                         key={ex.id}
@@ -265,7 +287,7 @@ export default function EditTemplatePage() {
             <div className="fixed bottom-24 left-0 right-0 px-4 z-40">
                 <Button
                     onClick={handleSave}
-                    disabled={isPending || selectedIds.length === 0 || !name.trim()}
+                    disabled={isPending || selectedExercises.length === 0 || !name.trim()}
                     className="w-full h-14 text-[16px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-transform active:scale-95 flex items-center justify-center gap-2"
                 >
                     {isPending ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <><Check className="w-5 h-5 weight-bold" /> Speichern</>}
