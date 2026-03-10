@@ -7,10 +7,11 @@ import { TemplateCarousel } from '@/components/dashboard/template-carousel'
 import { LastSessionRecap } from '@/components/dashboard/last-session-card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { redirect } from 'next/navigation'
+import { UserAvatar } from '@/components/ui/user-avatar'
 
 export default async function Home() {
   const userId = await getCurrentUserId()
-  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { name: true, isOnboarded: true } }) : null
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true, isOnboarded: true, image: true } }) : null
   const userName = user?.name || 'Viper' // Cool default placeholder for athletes
 
   if (userId && user && !user.isOnboarded) {
@@ -41,9 +42,11 @@ export default async function Home() {
             Hi {userName}, {greeting}
           </p>
         </div>
-        <div className="w-10 h-10 rounded-full bg-secondary ring-1 ring-white/5 flex items-center justify-center overflow-hidden">
-          <UserIcon />
-        </div>
+        <Link href="/settings" className="shrink-0">
+          <div className="w-10 h-10 rounded-full bg-secondary ring-1 ring-white/10 flex items-center justify-center overflow-hidden active:scale-95 transition-transform cursor-pointer shadow-sm">
+            <UserAvatar seed={user?.id || 'default'} style={(user?.image as any) || 'initials'} className="w-10 h-10" />
+          </div>
+        </Link>
       </header>
 
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-2">
@@ -83,11 +86,3 @@ function DashboardSkeleton({ height = "h-40" }: { height?: string }) {
   )
 }
 
-function UserIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-  )
-}

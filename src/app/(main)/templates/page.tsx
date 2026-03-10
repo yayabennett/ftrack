@@ -164,7 +164,7 @@ export default function EinheitenPage() {
                                             <Button
                                                 size="sm"
                                                 className="h-9 rounded-xl font-bold text-white hover:brightness-110 flex gap-1.5 px-4 shadow-sm shrink-0 ml-3"
-                                                style={{ backgroundColor: template.color || 'hsl(var(--primary))' }}
+                                                style={{ backgroundColor: template.color === 'primary' ? 'hsl(var(--primary))' : (template.color || 'hsl(var(--primary))') }}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     router.push(`/workout/active?templateId=${template.id}`);
@@ -267,7 +267,7 @@ export default function EinheitenPage() {
                                                         disabled={duplicatingId === template.id || deletingId === template.id}
                                                     >
                                                         {duplicatingId === template.id ? (
-                                                            <div className={`h-4 w-4 border-2 border-t-transparent rounded-full animate-spin`} style={{ borderColor: `var(--${template.color})`, borderTopColor: 'transparent' }} />
+                                                            <div className={`h-4 w-4 border-2 border-t-transparent rounded-full animate-spin`} style={{ borderColor: template.color === 'primary' ? 'hsl(var(--primary))' : (template.color || 'hsl(var(--primary))'), borderTopColor: 'transparent' }} />
                                                         ) : (
                                                             <Copy className="h-4 w-4" />
                                                         )}
@@ -295,7 +295,7 @@ export default function EinheitenPage() {
                                                 <Button
                                                     size="sm"
                                                     className="h-9 rounded-xl font-bold text-white hover:brightness-110 flex gap-1.5 px-4 shadow-sm"
-                                                    style={{ backgroundColor: template.color || 'hsl(var(--primary))' }}
+                                                    style={{ backgroundColor: template.color === 'primary' ? 'hsl(var(--primary))' : (template.color || 'hsl(var(--primary))') }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         router.push(`/workout/active?templateId=${template.id}`);
