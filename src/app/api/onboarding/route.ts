@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         const response = NextResponse.json({ success: true, userId: user.id })
 
         // Set a long-lived httpOnly cookie with the userId
-        response.cookies.set('ftrack-user-id', user.id, {
+        response.cookies.set('iTrack-user-id', user.id, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',

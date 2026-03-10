@@ -151,7 +151,7 @@ export default async function SettingsPage() {
                                 <Info className="w-5 h-5" />
                             </div>
                             <div className="flex-1">
-                                <p className="font-semibold text-[15px] text-foreground">ftrack</p>
+                                <p className="font-semibold text-[15px] text-foreground">iTrack</p>
                                 <p className="text-[12px] text-muted-foreground">v0.3.0 · Made in Germany</p>
                             </div>
                         </CardContent>

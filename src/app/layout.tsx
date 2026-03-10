@@ -18,14 +18,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Workout Tracker",
-  description: "Ultra-fast workout tracking PWA",
+  title: "iTrack — Workout Tracker",
+  description: "Die premium Fitness-App für dein Training",
   manifest: "/manifest.json",
   openGraph: {
-    title: "Workout Tracker",
-    description: "Ultra-fast workout tracking PWA",
-    url: "https://ftrack.vercel.app", // Replace with real URL
-    siteName: "ftrack",
+    title: "iTrack — Workout Tracker",
+    description: "Die premium Fitness-App für dein Training",
+    url: "https://iTrack.vercel.app", // Replace with real URL
+    siteName: "iTrack",
     images: [
       {
         url: "/icon-512.png",

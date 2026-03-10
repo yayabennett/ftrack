@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 async function main() {
     // ─── Default user ────────────────────────────────────────────────────────
-    const defaultEmail = 'athlete@ftrack.app'
+    const defaultEmail = 'athlete@iTrack.app'
     const existingUser = await prisma.user.findUnique({ where: { email: defaultEmail } })
     if (!existingUser) {
         const hashedPassword = await bcrypt.hash('champion123', 12)

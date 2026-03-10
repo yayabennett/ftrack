@@ -87,15 +87,13 @@ export default function AuthPage() {
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/30 rounded-full blur-3xl pointer-events-none translate-y-1/4 -translate-x-1/4" />
 
             <div className="w-full max-w-sm z-10 animate-in fade-in zoom-in-95 duration-500">
-                <div className="flex flex-col items-center gap-4 mb-8">
-                    <div className="relative">
-                        <div className="w-20 h-20 rounded-[28px] bg-white dark:bg-card flex items-center justify-center shadow-soft">
-                            <Barbell weight="fill" className="text-primary w-10 h-10" />
-                        </div>
-                    </div>
-                    <div className="text-center space-y-1">
-                        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">ftrack</h1>
-                        <p className="text-sm text-muted-foreground font-medium">Dein Leben. Dein Training.</p>
+                <div className="flex flex-col items-center gap-2 mb-8">
+                    <div className="text-center">
+                        <h1 className="text-5xl tracking-tighter text-foreground flex items-baseline justify-center">
+                            <span className="font-light opacity-60">i</span>
+                            <span className="font-black text-primary">Track</span>
+                        </h1>
+                        <p className="text-sm text-muted-foreground font-semibold mt-1 opacity-80 uppercase tracking-[0.2em]">Dein Leben. Dein Training.</p>
                     </div>
                 </div>
 

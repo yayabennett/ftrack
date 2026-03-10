@@ -73,9 +73,13 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
                 </div>
             </div>
 
-            <div className="space-y-3">
-                <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
-                    Willkommen bei <span className="text-gradient">ftrack</span>
+            <div className="text-center space-y-4 mb-4">
+                <div className="inline-flex items-baseline justify-center text-4xl tracking-tighter mb-2">
+                    <span className="font-light opacity-60">i</span>
+                    <span className="font-black text-primary">Track</span>
+                </div>
+                <h1 className="text-2xl font-bold tracking-tight">
+                    Willkommen bei <span className="text-primary">iTrack</span>
                 </h1>
                 <p className="text-muted-foreground text-[15px] leading-relaxed max-w-xs mx-auto">
                     Dein intelligenter Trainingsbegleiter. Lass uns dein Profil einrichten, damit wir dein Training optimal gestalten können.
@@ -279,7 +283,7 @@ function SuccessStep({ name }: { name: string }) {
                     Bereit, {name || 'Champ'}! 🎉
                 </h2>
                 <p className="text-muted-foreground text-[15px] leading-relaxed max-w-xs mx-auto">
-                    Dein Profil ist eingerichtet. ftrack ist jetzt auf dein Training zugeschnitten. Zeit, Fortschritte zu machen!
+                    Dein Profil ist eingerichtet. iTrack ist jetzt auf dein Training zugeschnitten. Zeit, Fortschritte zu machen!
                 </p>
             </div>
         </div>
@@ -439,7 +443,7 @@ export default function OnboardingPage() {
             {/* Version footer on welcome */}
             {step === 0 && (
                 <p className="text-xs text-muted-foreground/40 text-center pb-6 font-medium tracking-wider">
-                    ftrack v0.3.0 · Dein Trainingsbegleiter
+                    iTrack v0.3.0 · Dein Trainingsbegleiter
                 </p>
             )}
         </div>

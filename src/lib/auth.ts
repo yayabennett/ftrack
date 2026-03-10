@@ -4,7 +4,7 @@ import { authOptions } from './auth-options'
 
 /**
  * Returns the current user's ID.
- * Prioritizes NextAuth session. Falls back to ftrack-user-id cookie for migration.
+ * Prioritizes NextAuth session. Falls back to iTrack-user-id cookie for migration.
  */
 export async function getCurrentUserId(): Promise<string | null> {
     const session = await getServerSession(authOptions)
@@ -13,5 +13,5 @@ export async function getCurrentUserId(): Promise<string | null> {
     }
 
     const cookieStore = await cookies()
-    return cookieStore.get('ftrack-user-id')?.value ?? null
+    return cookieStore.get('iTrack-user-id')?.value ?? null
 }

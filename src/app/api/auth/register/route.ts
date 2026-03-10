@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const cookieStore = await cookies()
-        const cookieMigrateUserId = cookieStore.get('ftrack-user-id')?.value
+        const cookieMigrateUserId = cookieStore.get('iTrack-user-id')?.value
         const actualMigrateUserId = migrateUserId || cookieMigrateUserId
 
         if (actualMigrateUserId) {
