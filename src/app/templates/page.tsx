@@ -81,11 +81,6 @@ export default function EinheitenPage() {
                     <Copy className="h-5 w-5 text-primary" />
                     <h1 className="text-[22px] font-bold tracking-tight text-foreground">Einheiten</h1>
                 </div>
-                <Link href="/templates/create">
-                    <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-secondary text-foreground hover:bg-secondary/80">
-                        <Plus className="h-5 w-5" />
-                    </Button>
-                </Link>
             </header>
 
             <div className="container mx-auto p-4 space-y-4 animate-in fade-in duration-300 mt-2">
@@ -108,56 +103,57 @@ export default function EinheitenPage() {
                         </div>
                     </div>
                 ) : (
-                    templates.map(template => (
-                        <Card key={template.id} className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-opacity ${deletingId === template.id ? 'opacity-50' : ''}`}>
-                            <CardContent className="p-0">
-                                <div className="p-4 flex flex-col gap-3">
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
-                                            <p className="text-[13px] text-muted-foreground leading-snug truncate">
-                                                {template.exercises.map(e => e.exercise.name).join(', ')}
-                                            </p>
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-10 w-10 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl shrink-0 transition-colors"
-                                            onClick={() => handleDelete(template.id, template.name)}
-                                            disabled={deletingId === template.id}
-                                        >
-                                            {deletingId === template.id ? (
-                                                <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
-                                            ) : (
-                                                <Trash2 className="h-5 w-5" />
-                                            )}
-                                        </Button>
-                                    </div>
-
-                                    <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">
-                                        <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
-                                            {template.exercises.length} Übungen
-                                        </span>
-                                        <Link href={`/workout/active?templateId=${template.id}`}>
-                                            <Button size="sm" className="h-9 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex gap-1.5 px-4 shadow-sm shadow-primary/20">
-                                                <Play className="w-4 h-4 fill-current" /> Starten
+                    <>
+                        {templates.map(template => (
+                            <Card key={template.id} className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-opacity ${deletingId === template.id ? 'opacity-50' : ''}`}>
+                                <CardContent className="p-0">
+                                    <div className="p-4 flex flex-col gap-3">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
+                                                <p className="text-[13px] text-muted-foreground leading-snug truncate">
+                                                    {template.exercises.map(e => e.exercise.name).join(', ')}
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-10 w-10 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl shrink-0 transition-colors"
+                                                onClick={() => handleDelete(template.id, template.name)}
+                                                disabled={deletingId === template.id}
+                                            >
+                                                {deletingId === template.id ? (
+                                                    <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="h-5 w-5" />
+                                                )}
                                             </Button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))
-                )}
+                                        </div>
 
-                <Link href="/templates/create" className="block mt-6">
-                    <Card className="bg-card ring-1 ring-white/5 shadow-sm hover:bg-secondary transition-colors cursor-pointer border border-dashed border-white/10 rounded-2xl overflow-hidden text-card-foreground active:scale-[0.98]">
-                        <CardContent className="p-5 flex gap-3 items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                            <Plus className="h-5 w-5 opacity-60" />
-                            <p className="text-[14px] font-bold">Neue Einheit erstellen</p>
-                        </CardContent>
-                    </Card>
-                </Link>
+                                        <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">
+                                            <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
+                                                {template.exercises.length} Übungen
+                                            </span>
+                                            <Link href={`/workout/active?templateId=${template.id}`}>
+                                                <Button size="sm" className="h-9 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex gap-1.5 px-4 shadow-sm shadow-primary/20">
+                                                    <Play className="w-4 h-4 fill-current" /> Starten
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+
+                        <div className="fixed bottom-24 right-6 z-40">
+                            <Link href="/templates/create">
+                                <Button className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 flex items-center justify-center action-press">
+                                    <Plus className="h-7 w-7 stroke-[3px]" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     )

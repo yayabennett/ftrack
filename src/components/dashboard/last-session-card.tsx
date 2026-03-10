@@ -52,19 +52,6 @@ export async function LastSessionRecap({ userId }: { userId: string }) {
 
     return (
         <>
-            {/* Hub: Highlight – subtle inline */}
-            <section className="px-5">
-                <div className="flex items-center gap-2.5 px-1">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        {highlightIcon}
-                    </div>
-                    <div className="min-w-0">
-                        <p className="text-[13px] font-semibold text-foreground truncate">{highlightText}</p>
-                        <p className="text-xs text-muted-foreground/70 truncate">{highlightSub}</p>
-                    </div>
-                </div>
-            </section>
-
             {/* Hub: Last Session Recap */}
             <section className="px-5 space-y-4">
                 <h2 className="text-sm font-bold tracking-widest text-muted-foreground uppercase px-1">Letzte Einheit</h2>
