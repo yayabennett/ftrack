@@ -26,9 +26,8 @@ export function BottomNav() {
     ]
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
-            {/* Clean Solid Yazio Dock */}
-            <div className="flex h-20 items-center justify-between bg-card border-t border-border px-4 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.2)]">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-t border-border shadow-[0_-8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.2)] pb-safe">
+            <div className="flex h-20 items-center justify-around px-2 max-w-md mx-auto">
                 {mainNavItems.map((item) => {
                     const isActive = pathname === item.href
 
@@ -37,12 +36,12 @@ export function BottomNav() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="relative flex flex-col items-center justify-center -mt-8 group px-2 action-press"
+                                className="relative flex flex-col items-center justify-center -mt-10 group px-2 action-press"
                             >
-                                <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full btn-primary-gradient text-white ring-[6px] ring-card transition-all duration-300 group-hover:scale-105">
-                                    <item.icon className="h-8 w-8 stroke-[2.5px] transition-transform duration-300 group-hover:rotate-180" />
+                                <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full btn-primary-gradient text-white ring-[8px] ring-card shadow-lg transition-all duration-300 group-hover:scale-105">
+                                    <item.icon weight="bold" className="h-9 w-9 transition-transform duration-500 group-hover:rotate-180" />
                                 </div>
-                                <span className="mt-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">Start</span>
+                                <span className="mt-2 text-[10px] font-bold uppercase tracking-[0.1em] text-primary transition-colors">START</span>
                             </Link>
                         )
                     }
@@ -52,19 +51,26 @@ export function BottomNav() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "relative flex flex-col items-center justify-center gap-1 w-[60px] h-[60px] rounded-2xl transition-all duration-300 action-press",
-                                isActive
-                                    ? "text-primary"
-                                    : "text-muted-foreground hover:text-foreground"
+                                "relative flex flex-col items-center justify-center gap-1 w-16 h-16 rounded-2xl transition-all duration-300 action-press",
+                                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                             )}
                         >
-                            {isActive && (
-                                <motion.div layoutId="activeTab" className="absolute -top-1 w-8 h-1 bg-primary rounded-b-full" transition={{ type: "spring", stiffness: 500, damping: 30 }} />
-                            )}
-                            <item.icon className={cn("relative z-10 h-7 w-7 transition-all duration-300", isActive ? "scale-110 fill-primary/10" : "")} strokeWidth={isActive ? 2.5 : 2} />
-                            <span className={cn("relative z-10 text-xs", isActive ? "font-bold" : "font-medium")}>
-                                {item.name}
-                            </span>
+                            <div className="relative flex flex-col items-center">
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="pill-highlight"
+                                        className="absolute inset-0 -m-2 bg-primary/10 rounded-2xl"
+                                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                    />
+                                )}
+                                <item.icon
+                                    weight={isActive ? "fill" : "regular"}
+                                    className={cn("relative z-10 h-6 w-6 transition-all duration-300", isActive ? "scale-110" : "")}
+                                />
+                                <span className={cn("relative z-10 text-[10px] mt-1 tracking-tight transition-all duration-300", isActive ? "font-bold" : "font-medium")}>
+                                    {item.name}
+                                </span>
+                            </div>
                         </Link>
                     )
                 })}
