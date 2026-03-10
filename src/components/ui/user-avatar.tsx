@@ -2,7 +2,15 @@
 
 import { useMemo } from 'react'
 import { createAvatar } from '@dicebear/core'
-import * as collections from '@dicebear/collection'
+import { initials, micah, notionists, adventurer, bottts } from '@dicebear/collection'
+
+const COLLECTIONS = {
+    initials,
+    micah,
+    notionists,
+    adventurer,
+    bottts
+}
 
 interface UserAvatarProps {
     seed: string
@@ -19,8 +27,7 @@ export function UserAvatar({ seed, style = 'initials', className = "w-10 h-10" }
         const bgColor = parts[2] || 'transparent'
 
         // Map collection name to actual collection object
-        // @ts-ignore
-        const selectedCollection = collections[collectionName as keyof typeof collections] || collections.initials
+        const selectedCollection = COLLECTIONS[collectionName as keyof typeof COLLECTIONS] || COLLECTIONS.initials
 
         return createAvatar(selectedCollection as any, {
             seed: customSeed,
