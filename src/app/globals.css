@@ -226,6 +226,29 @@
   .h-safe {
     height: env(safe-area-inset-bottom, 0px);
   }
+
+  /* Premium Custom Slider */
+  .premium-slider {
+    @apply w-full h-16 bg-transparent appearance-none outline-none relative z-20 cursor-grab active:cursor-grabbing;
+  }
+
+  .premium-slider::-webkit-slider-thumb {
+    @apply w-8 h-[5.5rem] rounded-full bg-primary appearance-none border-4 border-card transition-transform;
+    box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+  }
+
+  .premium-slider::-webkit-slider-thumb:active {
+    @apply scale-110;
+  }
+
+  .premium-slider::-moz-range-thumb {
+    @apply w-8 h-[5.5rem] rounded-full bg-primary appearance-none border-4 border-card transition-transform;
+    box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+  }
+
+  .premium-slider::-moz-range-thumb:active {
+    @apply scale-110;
+  }
 }
 
 @layer base {

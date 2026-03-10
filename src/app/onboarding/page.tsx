@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, CheckCircle, Barbell as Dumbbell, Target, Ruler, User, Sparkle as Sparkles, Lightning as Zap, CaretLeft as ChevronLeft } from '@phosphor-icons/react'
+import {
+    ArrowRight, CheckCircle, Barbell as Dumbbell, Target, Ruler, User,
+    Sparkle as Sparkles, Lightning as Zap, CaretLeft as ChevronLeft,
+    Fire, Heartbeat, Plant, Diamond, Crown, GenderMale, GenderFemale, GenderIntersex
+} from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signIn } from 'next-auth/react'
@@ -12,22 +16,22 @@ import { Gender, Goal, ExperienceLevel } from '@prisma/client'
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const GOALS = [
-    { id: Goal.MUSCLE_GAIN, title: 'Muskeln aufbauen', desc: 'Sichtbar Masse & Kraft gewinnen', emoji: '💪', color: 'bg-blue-500/10 text-blue-500 ring-blue-500/30' },
-    { id: Goal.FAT_LOSS, title: 'Fett abbauen', desc: 'Körperfett reduzieren, straffer werden', emoji: '🔥', color: 'bg-orange-500/10 text-orange-500 ring-orange-500/30' },
-    { id: Goal.STRENGTH, title: 'Stärker werden', desc: 'Gewichte bei Grundübungen steigern', emoji: '🏋️', color: 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/30' },
-    { id: Goal.GENERAL_FITNESS, title: 'Einfach fit werden', desc: 'Gesund bleiben und besser fühlen', emoji: '⚡', color: 'bg-violet-500/10 text-violet-500 ring-violet-500/30' },
+    { id: Goal.MUSCLE_GAIN, title: 'Muskeln aufbauen', desc: 'Sichtbar Masse & Kraft gewinnen', icon: Dumbbell, color: 'text-blue-500 bg-blue-500/10' },
+    { id: Goal.FAT_LOSS, title: 'Fett abbauen', desc: 'Körperfett reduzieren, straffer werden', icon: Fire, color: 'text-orange-500 bg-orange-500/10' },
+    { id: Goal.STRENGTH, title: 'Stärker werden', desc: 'Gewichte bei Grundübungen steigern', icon: Zap, color: 'text-emerald-500 bg-emerald-500/10' },
+    { id: Goal.GENERAL_FITNESS, title: 'Einfach fit werden', desc: 'Gesund bleiben und besser fühlen', icon: Heartbeat, color: 'text-violet-500 bg-violet-500/10' },
 ] as const
 
 const EXPERIENCE_LEVELS = [
-    { id: ExperienceLevel.BEGINNER, title: 'Anfänger', desc: 'Ich fange gerade erst an', emoji: '🌱' },
-    { id: ExperienceLevel.INTERMEDIATE, title: 'Fortgeschritten', desc: 'Ich trainiere schon einige Monate', emoji: '💎' },
-    { id: ExperienceLevel.ADVANCED, title: 'Profi', desc: 'Ich trainiere seit Jahren', emoji: '👑' },
+    { id: ExperienceLevel.BEGINNER, title: 'Anfänger', desc: 'Ich fange gerade erst an', icon: Plant, color: 'text-emerald-500 bg-emerald-500/10' },
+    { id: ExperienceLevel.INTERMEDIATE, title: 'Fortgeschritten', desc: 'Ich trainiere schon einige Monate', icon: Diamond, color: 'text-blue-500 bg-blue-500/10' },
+    { id: ExperienceLevel.ADVANCED, title: 'Profi', desc: 'Ich trainiere seit Jahren', icon: Crown, color: 'text-amber-500 bg-amber-500/10' },
 ] as const
 
 const GENDERS = [
-    { id: Gender.MALE, title: 'Männlich', emoji: '👨' },
-    { id: Gender.FEMALE, title: 'Weiblich', emoji: '👩' },
-    { id: Gender.OTHER, title: 'Divers', emoji: '🌈' },
+    { id: Gender.MALE, title: 'Männlich', icon: GenderMale, color: 'text-blue-500 bg-blue-500/10' },
+    { id: Gender.FEMALE, title: 'Weiblich', icon: GenderFemale, color: 'text-pink-500 bg-pink-500/10' },
+    { id: Gender.OTHER, title: 'Divers', icon: GenderIntersex, color: 'text-violet-500 bg-violet-500/10' },
 ] as const
 
 const TOTAL_STEPS = 8 // Welcome, Name, Gender, Goal, Experience, Metrics, Analyzing, Account
@@ -65,13 +69,15 @@ const PageHeader = ({ title, subtitle }: { title: string, subtitle?: string }) =
 const CardButton = ({
     selected,
     onClick,
-    emoji,
+    icon: Icon,
+    iconColorClass,
     title,
     desc
 }: {
     selected: boolean,
     onClick: () => void,
-    emoji: string,
+    icon: React.ElementType,
+    iconColorClass: string,
     title: string,
     desc?: string
 }) => (
@@ -84,8 +90,8 @@ const CardButton = ({
             : 'bg-card border-transparent shadow-soft hover:shadow-md hover:bg-secondary/40'
             }`}
     >
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-300 ${selected ? 'scale-110 bg-primary/15' : 'bg-secondary/50'}`}>
-            {emoji}
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-300 ${selected ? 'scale-110 ' + iconColorClass : 'bg-secondary/50 text-muted-foreground'}`}>
+            <Icon weight={selected ? "duotone" : "regular"} className="w-8 h-8" />
         </div>
         <div>
             <h3 className={`font-bold text-[17px] sm:text-lg tracking-tight ${selected ? 'text-primary' : 'text-foreground'}`}>{title}</h3>
@@ -93,7 +99,7 @@ const CardButton = ({
         </div>
         <div className="ml-auto">
             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
-                {selected && <CheckCircle className="w-4 h-4 text-white" weight="bold" />}
+                {selected && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}><CheckCircle className="w-4 h-4 text-white" weight="bold" /></motion.div>}
             </div>
         </div>
     </motion.button>
@@ -189,7 +195,8 @@ function GenderStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof
                 {GENDERS.map((g) => (
                     <CardButton
                         key={g.id}
-                        emoji={g.emoji}
+                        icon={g.icon}
+                        iconColorClass={g.color}
                         title={g.title}
                         selected={data.gender === g.id}
                         onClick={() => onChange('gender', g.id)}
@@ -208,7 +215,8 @@ function GoalStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof P
                 {GOALS.map((g) => (
                     <CardButton
                         key={g.id}
-                        emoji={g.emoji}
+                        icon={g.icon}
+                        iconColorClass={g.color}
                         title={g.title}
                         desc={g.desc}
                         selected={data.goal === g.id}
@@ -228,7 +236,8 @@ function ExperienceStep({ data, onChange }: { data: ProfileData; onChange: (f: k
                 {EXPERIENCE_LEVELS.map((g) => (
                     <CardButton
                         key={g.id}
-                        emoji={g.emoji}
+                        icon={g.icon}
+                        iconColorClass={g.color}
                         title={g.title}
                         desc={g.desc}
                         selected={data.experienceLevel === g.id}
@@ -240,24 +249,58 @@ function ExperienceStep({ data, onChange }: { data: ProfileData; onChange: (f: k
     )
 }
 
-function MetricsStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: string) => void }) {
+function MetricSlider({ title, value, min, max, unit, onChange }: { title: string, value: number, min: number, max: number, unit: string, onChange: (v: number) => void }) {
     return (
-        <div className="flex flex-col h-full pt-8">
-            <PageHeader title="Deine Körperdaten" subtitle="Lass uns deinen Startpunkt festhalten, um deine Fortschritte zu messen." />
+        <div className="py-2">
+            <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-[12px] mb-8">{title}</p>
 
-            <div className="space-y-10 mt-8 w-full max-w-sm mx-auto">
-                <div>
-                    <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Alter</p>
-                    <HugeInput type="number" value={data.age?.toString() || ""} onChange={(v) => onChange('age', v)} placeholder="25" postfix="Jahre" />
+            <div className="relative w-full mb-10 px-2">
+                <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-16 bg-secondary/30 rounded-[28px] overflow-hidden border-2 border-transparent shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] pointer-events-none">
+                    <div className="absolute inset-0 opacity-20 text-foreground" style={{
+                        backgroundImage: `
+                            linear-gradient(90deg, currentColor 2px, transparent 2px),
+                            linear-gradient(90deg, currentColor 1px, transparent 1px)
+                        `,
+                        backgroundSize: '40px 100%, 10px 30%',
+                        backgroundPosition: 'left bottom, left bottom',
+                        backgroundRepeat: 'repeat-x'
+                    }} />
                 </div>
-                <div>
-                    <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Gewicht</p>
-                    <HugeInput type="number" value={data.weight?.toString() || ""} onChange={(v) => onChange('weight', v)} placeholder="80" postfix="kg" />
-                </div>
-                <div>
-                    <p className="text-center font-bold text-muted-foreground uppercase tracking-widest text-xs mb-2">Körpergröße</p>
-                    <HugeInput type="number" value={data.height?.toString() || ""} onChange={(v) => onChange('height', v)} placeholder="180" postfix="cm" />
-                </div>
+
+                <input
+                    type="range"
+                    min={min}
+                    max={max}
+                    value={value || min}
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    className="premium-slider"
+                />
+            </div>
+
+            <div className="text-center flex items-baseline justify-center gap-2">
+                <motion.div
+                    key={value}
+                    initial={{ y: 5, opacity: 0.5 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="text-6xl sm:text-7xl font-black text-foreground tracking-tighter"
+                >
+                    {value || min}
+                </motion.div>
+                <span className="text-2xl text-muted-foreground font-semibold">{unit}</span>
+            </div>
+        </div>
+    )
+}
+
+function MetricsStep({ data, onChange }: { data: ProfileData; onChange: (f: keyof ProfileData, v: any) => void }) {
+    return (
+        <div className="flex flex-col h-full pt-4">
+            <PageHeader title="Deine Körpermaße" subtitle="Präzise Daten. Maximale Ergebnisse." />
+            <div className="space-y-12 mt-4 w-full max-w-sm mx-auto">
+                <MetricSlider title="Alter" value={data.age as unknown as number} min={14} max={99} unit="Jahre" onChange={(v) => onChange('age', v)} />
+                <MetricSlider title="Gewicht" value={data.weight as unknown as number} min={40} max={200} unit="kg" onChange={(v) => onChange('weight', v)} />
+                <MetricSlider title="Körpergröße" value={data.height as unknown as number} min={140} max={220} unit="cm" onChange={(v) => onChange('height', v)} />
             </div>
         </div>
     )
@@ -460,21 +503,36 @@ export default function OnboardingPage() {
                 <div className="pt-safe-top bg-background/80 backdrop-blur-xl z-50 sticky top-0 px-4 py-4 flex items-center gap-4">
                     <button
                         onClick={() => setStep(s => s - 1)}
-                        className="w-10 h-10 rounded-full bg-secondary/60 flex items-center justify-center text-foreground hover:bg-secondary transition-colors"
+                        className="w-10 h-10 rounded-[14px] bg-secondary/60 flex items-center justify-center text-foreground hover:bg-secondary transition-colors shrink-0"
                     >
                         <ChevronLeft className="w-5 h-5" weight="bold" />
                     </button>
-                    <div className="flex-1 h-3 bg-secondary/50 rounded-full overflow-hidden">
-                        <motion.div
-                            className="h-full bg-primary rounded-full relative overflow-hidden"
-                            initial={{ width: `${((step) / (TOTAL_STEPS - 2)) * 100}%` }}
-                            animate={{ width: `${((step) / (TOTAL_STEPS - 2)) * 100}%` }}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        >
-                            <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)', backgroundSize: '1rem 1rem' }} />
-                        </motion.div>
+
+                    <div className="flex-1 flex flex-col">
+                        <div className="flex justify-between items-end mb-1.5 px-0.5">
+                            <motion.span
+                                key={step}
+                                initial={{ opacity: 0, y: 2 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-[10px] font-black text-primary uppercase tracking-widest"
+                            >
+                                {step < 3 ? 'Startpunkt' : step < 5 ? 'Halbzeit' : 'Fast Geschafft'}
+                            </motion.span>
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                Noch ~1 Min
+                            </span>
+                        </div>
+                        <div className="h-2.5 w-full bg-secondary/50 rounded-full overflow-hidden relative">
+                            <motion.div
+                                className="absolute top-0 bottom-0 left-0 bg-primary rounded-full overflow-hidden"
+                                initial={{ width: `${((step) / (TOTAL_STEPS - 2)) * 100}%` }}
+                                animate={{ width: `${((step) / (TOTAL_STEPS - 2)) * 100}%` }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            >
+                                <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)', backgroundSize: '1rem 1rem' }} />
+                            </motion.div>
+                        </div>
                     </div>
-                    <span className="text-[13px] font-bold text-muted-foreground w-8 text-right">{Math.min(step, 7)}/7</span>
                 </div>
             )}
 
