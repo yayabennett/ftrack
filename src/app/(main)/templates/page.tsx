@@ -37,7 +37,9 @@ export default function EinheitenPage() {
         }
     })
 
-    const handleDelete = async (id: string, name: string) => {
+    const handleDelete = async (id: string, name: string, e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
         if (!confirm(`"${name}" wirklich löschen?`)) return
         setDeletingId(id)
         try {
@@ -125,59 +127,76 @@ export default function EinheitenPage() {
                 ) : (
                     <>
                         {templates.map(template => (
-                            <Card key={template.id} className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-opacity ${deletingId === template.id ? 'opacity-50' : ''}`}>
-                                <CardContent className="p-0">
-                                    <div className="p-4 flex flex-col gap-3">
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
-                                                <p className="text-[13px] text-muted-foreground leading-snug truncate">
-                                                    {template.exercises.map(e => e.exercise.name).join(', ')}
-                                                </p>
+                            <div
+                                key={template.id}
+                                onClick={() => router.push(`/templates/${template.id}`)}
+                                className="block cursor-pointer active:scale-[0.99] transition-all"
+                            >
+                                <Card className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-opacity hover:bg-secondary/20 ${deletingId === template.id ? 'opacity-50' : ''}`}>
+                                    <CardContent className="p-0">
+                                        <div className="p-4 flex flex-col gap-3">
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
+                                                    <p className="text-[13px] text-muted-foreground leading-snug truncate">
+                                                        {template.exercises.map(e => e.exercise.name).join(', ')}
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-col gap-1 shrink-0">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-9 w-9 text-muted-foreground hover:bg-secondary/80 hover:text-foreground rounded-lg transition-colors"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDuplicate(template.id, e);
+                                                        }}
+                                                        disabled={duplicatingId === template.id || deletingId === template.id}
+                                                    >
+                                                        {duplicatingId === template.id ? (
+                                                            <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                                        ) : (
+                                                            <Copy className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(template.id, template.name, e);
+                                                        }}
+                                                        disabled={deletingId === template.id || duplicatingId === template.id}
+                                                    >
+                                                        {deletingId === template.id ? (
+                                                            <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                                                        ) : (
+                                                            <Trash2 className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-col gap-1 shrink-0">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-9 w-9 text-muted-foreground hover:bg-secondary/80 hover:text-foreground rounded-lg transition-colors"
-                                                    onClick={(e) => handleDuplicate(template.id, e)}
-                                                    disabled={duplicatingId === template.id || deletingId === template.id}
-                                                >
-                                                    {duplicatingId === template.id ? (
-                                                        <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                                                    ) : (
-                                                        <Copy className="h-4 w-4" />
-                                                    )}
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
-                                                    onClick={() => handleDelete(template.id, template.name)}
-                                                    disabled={deletingId === template.id || duplicatingId === template.id}
-                                                >
-                                                    {deletingId === template.id ? (
-                                                        <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
-                                                    ) : (
-                                                        <Trash2 className="h-4 w-4" />
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        </div>
 
-                                        <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">
-                                            <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
-                                                {template.exercises.length} Übungen
-                                            </span>
-                                            <Link href={`/workout/active?templateId=${template.id}`}>
-                                                <Button size="sm" className="h-9 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex gap-1.5 px-4 shadow-sm shadow-primary/20">
+                                            <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">
+                                                <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
+                                                    {template.exercises.length} Übungen
+                                                </span>
+                                                <Button
+                                                    size="sm"
+                                                    className="h-9 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex gap-1.5 px-4 shadow-sm shadow-primary/20"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/workout/active?templateId=${template.id}`);
+                                                    }}
+                                                >
                                                     <Play className="w-4 h-4 fill-current" /> Starten
                                                 </Button>
-                                            </Link>
+                                            </div>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         ))}
 
                         <div className="fixed bottom-24 right-6 z-40">

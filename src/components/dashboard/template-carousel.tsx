@@ -31,7 +31,7 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
                         </Card>
                     </Link>
                 ) : templates.map((template) => (
-                    <Link key={template.id} href={`/workout/active?templateId=${template.id}`} className="min-w-[170px] active:scale-95 transition-transform">
+                    <Link key={template.id} href={`/templates/${template.id}`} className="min-w-[170px] active:scale-95 transition-transform">
                         <Card className="bg-card border border-border/40 shadow-sm rounded-2xl overflow-hidden h-full">
                             <CardContent className="p-4 flex flex-col justify-between h-full">
                                 <div>
