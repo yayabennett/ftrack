@@ -91,6 +91,7 @@ model Exercise {
 model Template {
   id     String  @id @default(uuid())
   name   String
+  color  String  @default("primary")
   order  Int     @default(0)
   isProgressiveOverload Boolean @default(false)
   userId String?
