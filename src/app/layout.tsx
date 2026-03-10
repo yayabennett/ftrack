@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { BottomNav } from "@/components/bottom-nav";
 import { OfflineBanner } from "@/components/offline-banner";
 import Providers from "@/components/providers";
 import { AuthProvider } from "@/components/providers/auth-provider";
@@ -52,6 +51,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -70,10 +73,9 @@ export default function RootLayout({
             <div className="min-h-screen bg-background flex flex-col">
               <div className="pt-safe-top flex-1 flex flex-col relative">
                 <OfflineBanner />
-                <main className="flex-1 pb-20 md:pb-0">
+                <main className="flex-1 flex flex-col">
                   {children}
                 </main>
-                <BottomNav />
               </div>
             </div>
             <Toaster theme="dark" position="bottom-center" />

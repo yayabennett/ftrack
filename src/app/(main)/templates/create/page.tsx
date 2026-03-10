@@ -40,10 +40,14 @@ export default function CreateTemplatePage() {
     const router = useRouter()
     const queryClient = useQueryClient()
     const [isPending, startTransition] = useTransition()
+    // UI State
+    const [name, setName] = useState('')
+    const [searchQuery, setSearchQuery] = useState('')
+    const [activeTab, setActiveTab] = useState('Alle')
 
-    // Fetch exercises via React Query
-    const { data: exercises = [], isLoading } = useQuery({
-        queryKey: ['exercises'],
+    // 1. Fetch My Active Exercises
+    const { data: myExercises = [], isLoading: isLoadingMine } = useQuery({
+        queryKey: ['my-exercises-template'],
         queryFn: async () => {
             const res = await fetch('/api/exercises')
             if (!res.ok) throw new Error('Failed to fetch exercises')
@@ -51,10 +55,19 @@ export default function CreateTemplatePage() {
         }
     })
 
-    // UI State
-    const [name, setName] = useState('')
-    const [searchQuery, setSearchQuery] = useState('')
-    const [activeTab, setActiveTab] = useState('Alle')
+    // 2. Fetch Global Exercises
+    const { data: globalExercises = [], isLoading: isLoadingGlobal } = useQuery({
+        queryKey: ['global-exercises-template', searchQuery],
+        queryFn: async () => {
+            const res = await fetch(`/api/exercises/global?q=${encodeURIComponent(searchQuery)}`)
+            if (!res.ok) throw new Error('Failed to fetch global')
+            return res.json() as Promise<(ExerciseDTO & { isSaved: boolean })[]>
+        },
+        staleTime: 60000,
+    })
+
+    const exercises = [...myExercises, ...globalExercises.filter(g => !myExercises.some(m => m.id === g.id))]
+    const isLoading = isLoadingMine || isLoadingGlobal
 
     // Selected exercises map (id -> order) to preserve selection sequence
     const [selectedIds, setSelectedIds] = useState<string[]>([])

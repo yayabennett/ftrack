@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
 import { getCurrentUserId } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { WeeklyConsistency } from '@/components/dashboard/weekly-consistency'
@@ -46,6 +47,18 @@ export default async function Home() {
       </header>
 
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-2">
+        <div className="px-5">
+          <Link href="/workout/start" className="w-full flex items-center justify-between p-4 rounded-3xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-[0_4px_24px_rgba(0,226,170,0.25)] active:scale-[0.98] transition-all group overflow-hidden relative">
+            <div className="absolute inset-0 bg-white/10 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            <span className="text-[15px] relative z-10">Workout Starten</span>
+            <div className="w-8 h-8 rounded-full bg-black/20 flex items-center justify-center relative z-10 group-hover:rotate-90 transition-transform duration-300">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </div>
+          </Link>
+        </div>
         <Suspense fallback={<DashboardSkeleton />}>
           <WeeklyConsistency userId={userId} />
         </Suspense>
