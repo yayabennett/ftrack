@@ -20,12 +20,6 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
 
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -51,157 +45,137 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Gamification Colors */
+  /* Yazio Gamification / Status Colors */
   --color-success: var(--success);
   --color-energy: var(--energy);
   --color-xp: var(--xp);
 
-  --radius-sm: calc(var(--radius) - 6px);
+  /* Much rounder organic corners */
+  --radius-sm: calc(var(--radius) - 8px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 16px);
-  --radius-4xl: calc(var(--radius) + 24px);
+  --radius-xl: calc(var(--radius) + 8px);
+  --radius-2xl: calc(var(--radius) + 12px);
+  --radius-3xl: calc(var(--radius) + 20px);
+  --radius-4xl: calc(var(--radius) + 28px);
 }
 
-/* Light mode */
+/* Yazio-inspired Light Mode (Clean, Soft, Default) */
 :root {
-  --radius: 0.9rem;
+  /* Extreme rounding for friendly organic feel */
+  --radius: 1.5rem;
 
-  --background: oklch(0.985 0.004 320);
-  --foreground: oklch(0.19 0.01 320);
+  /* Surfaces: Off-white background, pure white cards */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
 
-  --card: oklch(0.995 0.002 320);
-  --card-foreground: oklch(0.19 0.01 320);
+  --card: #FFFFFF;
+  --card-foreground: #1E293B;
 
-  --popover: oklch(0.995 0.002 320);
-  --popover-foreground: oklch(0.19 0.01 320);
+  --popover: #FFFFFF;
+  --popover-foreground: #1E293B;
 
-  /* Brand */
-  --primary: oklch(0.64 0.26 352);
-  --primary-foreground: oklch(0.99 0.003 255);
+  /* Brand Hero Color - Soft Ocean Teal / Cyan */
+  --primary: #06B6D4;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: oklch(0.962 0.006 320);
-  --secondary-foreground: oklch(0.24 0.012 320);
+  /* Supporting surfaces - friendly neutral */
+  --secondary: #F1F5F9;
+  --secondary-foreground: #334155;
 
-  --muted: oklch(0.965 0.004 320);
-  --muted-foreground: oklch(0.54 0.018 320);
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
 
-  --accent: oklch(0.958 0.012 340);
-  --accent-foreground: oklch(0.24 0.012 320);
+  --accent: #E0E7FF;
+  --accent-foreground: #1E3A8A;
 
-  --destructive: oklch(0.58 0.23 27.3);
-  --destructive-foreground: oklch(0.99 0.003 255);
+  /* Important actions (e.g. log food/workout) - Vibrant Coral */
+  --destructive: #F43F5E;
+  --destructive-foreground: #FFFFFF;
 
-  --border: oklch(0.91 0.008 320);
-  --input: oklch(0.97 0.004 320);
-  --ring: oklch(0.64 0.22 352 / 0.28);
+  --border: #E2E8F0;
+  --input: #F1F5F9;
+  --ring: rgba(6, 182, 212, 0.4);
 
-  --chart-1: oklch(0.64 0.26 352);
-  --chart-2: oklch(0.67 0.19 20);
-  --chart-3: oklch(0.7 0.16 305);
-  --chart-4: oklch(0.73 0.17 145);
-  --chart-5: oklch(0.69 0.14 250);
-
-  --sidebar: oklch(0.982 0.003 320);
-  --sidebar-foreground: oklch(0.19 0.01 320);
-  --sidebar-primary: oklch(0.64 0.26 352);
-  --sidebar-primary-foreground: oklch(0.99 0.003 255);
-  --sidebar-accent: oklch(0.958 0.012 340);
-  --sidebar-accent-foreground: oklch(0.24 0.012 320);
-  --sidebar-border: oklch(0.91 0.008 320);
-  --sidebar-ring: oklch(0.64 0.22 352 / 0.28);
-
-  --success: oklch(0.72 0.2 152);
-  --energy: oklch(0.74 0.18 40);
-  --xp: oklch(0.68 0.16 315);
+  /* Gamification */
+  --success: #10B981;
+  --energy: #F59E0B;
+  --xp: #06B6D4;
 
   color-scheme: light;
 }
 
-/* Vanguard Cyan Fitness Theme */
+/* Yazio-inspired Soft Dark Mode */
 .dark {
-  /* Base layers - Richer, deeper midnight */
-  --background: #05070A;
-  --foreground: #FCFCFD;
+  /* Surfaces: Soft slate, not stark black */
+  --background: #0B1120;
+  --foreground: #F8FAFC;
 
-  /* Surfaces */
-  --card: #0C0E12;
-  --card-foreground: #FAFAFB;
+  --card: #1E293B;
+  --card-foreground: #F1F5F9;
 
-  --popover: #0C0E12;
-  --popover-foreground: #FAFAFB;
+  --popover: #1E293B;
+  --popover-foreground: #F1F5F9;
 
-  /* Brand Hero Color - Vanguard Cyan */
-  --primary: #00D1FF;
-  --primary-foreground: #05070A;
+  /* Brand Hero Color - Slightly brighter teal for dark mode */
+  --primary: #22D3EE;
+  --primary-foreground: #083344;
 
   /* Supporting surfaces */
-  --secondary: #11141A;
-  --secondary-foreground: #F5F5F7;
+  --secondary: #334155;
+  --secondary-foreground: #F8FAFC;
 
-  --muted: #0F1115;
+  --muted: #1E293B;
   --muted-foreground: #94A3B8;
 
-  --accent: #161A22;
-  --accent-foreground: #F8F8FA;
+  --accent: #1E3A8A;
+  --accent-foreground: #DBEAFE;
 
   /* System */
-  --destructive: #FF453A;
-  --destructive-foreground: #FFFFFF;
+  --destructive: #FB7185;
+  --destructive-foreground: #4C0519;
 
   /* Gamification */
-  --success: #22E58B;
-  --energy: #FFD600;
-  --xp: #00D1FF;
+  --success: #34D399;
+  --energy: #FBBF24;
+  --xp: #22D3EE;
 
   /* Structure */
-  --border: #1D2128;
-  --input: #0F1115;
-  --ring: rgba(0, 209, 255, 0.3);
-
-  /* Charts – Cyan dominant */
-  --chart-1: #00D1FF;
-  --chart-2: #00A3FF;
-  --chart-3: #0075FF;
-  --chart-4: #FFD600;
-  --chart-5: #22E58B;
-
-  /* Sidebar */
-  --sidebar: #080A0E;
-  --sidebar-foreground: #FAFAFB;
-  --sidebar-primary: #00D1FF;
-  --sidebar-primary-foreground: #05070A;
-  --sidebar-accent: #11141A;
-  --sidebar-accent-foreground: #FAFAFB;
-  --sidebar-border: #1D2128;
-  --sidebar-ring: rgba(0, 209, 255, 0.3);
-
-  --radius: 1rem;
+  --border: #334155;
+  --input: #1E293B;
+  --ring: rgba(34, 211, 238, 0.4);
 
   color-scheme: dark;
 }
 
 @layer utilities {
   .action-press {
-    @apply transition-transform duration-150 active:scale-[0.985];
+    @apply transition-transform duration-[250ms] active:scale-[0.96] ease-[cubic-bezier(0.34, 1.56, 0.64, 1)];
   }
 
   .hairline {
-    border-color: color-mix(in srgb, var(--border) 88%, transparent);
+    border-color: color-mix(in srgb, var(--border) 100%, transparent);
   }
 
+  /* Soft, diffuse iOS-style card shadow */
   .shadow-soft {
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.035) inset,
-      0 12px 34px rgba(0, 0, 0, 0.34);
+      0 4px 20px -2px rgba(0, 0, 0, 0.04),
+      0 12px 30px -4px rgba(0, 0, 0, 0.02);
   }
 
-  .backdrop-dim {
-    background: rgba(0, 0, 0, 0.58);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+  /* Organic Card Hover */
+  .card-hover {
+    transition:
+      transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 250ms ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 12px 40px -8px rgba(0, 0, 0, 0.08),
+      0 4px 12px -2px rgba(0, 0, 0, 0.04);
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -213,51 +187,12 @@
     scrollbar-width: none;
   }
 
-  /* Brand gradient text */
+  /* Friendly gradient text */
   .text-gradient {
-    background: linear-gradient(135deg, #00D1FF 0%, #0075FF 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  /* Stronger motivational gradient */
-  .text-gradient-neon {
-    background: linear-gradient(135deg, #00D1FF 0%, #00FFF0 50%, #22E58B 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .card-hover {
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease,
-      border-color 180ms ease,
-      background-color 180ms ease;
-  }
-
-  .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      0 10px 28px rgba(0, 0, 0, 0.45),
-      0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-    border-color: color-mix(in srgb, var(--border) 80%, var(--primary) 20%);
-  }
-
-  /* Controlled primary glow */
-  .glow-primary {
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-      0 0 18px rgba(0, 209, 255, 0.15),
-      0 0 42px rgba(0, 209, 255, 0.05);
-  }
-
-  .glow-primary-strong {
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-      0 0 24px rgba(0, 209, 255, 0.18),
-      0 0 60px rgba(0, 209, 255, 0.08);
   }
 
   input[type="number"]::-webkit-outer-spin-button,
@@ -271,46 +206,16 @@
     appearance: textfield;
   }
 
-  /* More disciplined glass */
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.015);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.02),
-      0 12px 34px rgba(0, 0, 0, 0.35);
-  }
-
-  .inner-highlight {
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  }
-
-  /* Primary CTA */
+  /* Friendly Primary CTA */
   .btn-primary-gradient {
-    background:
-      linear-gradient(180deg,
-        color-mix(in srgb, var(--primary) 85%, white 15%) 0%,
-        var(--primary) 42%,
-        color-mix(in srgb, var(--primary) 88%, black 12%) 100%);
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.25),
-      0 8px 24px rgba(0, 209, 255, 0.25),
-      0 0 28px rgba(0, 209, 255, 0.08);
+    background: var(--primary);
+    box-shadow: 0 4px 14px -2px color-mix(in srgb, var(--primary) 50%, transparent);
+    transition: all 0.25s ease;
   }
 
   .btn-primary-gradient:hover {
-    filter: brightness(1.04);
-  }
-
-  .surface-elevated {
-    background: color-mix(in srgb, var(--card) 92%, white 8%);
-    border: 1px solid color-mix(in srgb, var(--border) 84%, white 16%);
-  }
-
-  .surface-interactive {
-    background: color-mix(in srgb, var(--card) 88%, var(--primary) 12%);
-    border: 1px solid color-mix(in srgb, var(--border) 75%, var(--primary) 25%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px -2px color-mix(in srgb, var(--primary) 60%, transparent);
   }
 
   .pb-safe {
@@ -333,38 +238,12 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
-  }
-
-  ::selection {
-    background: rgba(0, 209, 255, 0.25);
-    color: #ffffff;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
   }
 
   :where(button, a, input, textarea, select, [role="button"], [tabindex]):focus-visible {
     outline: none;
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 0 0 4px var(--ring),
-      0 0 18px rgba(0, 209, 255, 0.15);
-    border-radius: var(--radius);
-  }
-
-  input,
-  textarea,
-  select {
-    transition:
-      border-color 150ms ease,
-      background-color 150ms ease,
-      box-shadow 150ms ease,
-      color 150ms ease;
-  }
-
-  :where(input, textarea, select):hover {
-    border-color: color-mix(in srgb, var(--border) 72%, var(--primary) 28%);
-  }
-
-  :where(input, textarea, select):focus {
-    background: color-mix(in srgb, var(--input) 90%, white 10%);
+    box-shadow: 0 0 0 3px var(--background), 0 0 0 6px var(--ring);
+    border-radius: var(--radius-md);
   }
 }

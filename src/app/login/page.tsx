@@ -82,24 +82,24 @@ export default function AuthPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
-            {/* Background Glows */}
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+            {/* Soft decorative background circles instead of neon glows */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/4" />
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/30 rounded-full blur-3xl pointer-events-none translate-y-1/4 -translate-x-1/4" />
 
             <div className="w-full max-w-sm z-10 animate-in fade-in zoom-in-95 duration-500">
                 <div className="flex flex-col items-center gap-4 mb-8">
                     <div className="relative">
-                        <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-[0_8px_32px_-8px_rgba(59,130,246,0.6)]">
-                            <Barbell weight="fill" className="text-white w-8 h-8" />
+                        <div className="w-20 h-20 rounded-[28px] bg-white dark:bg-card flex items-center justify-center shadow-soft">
+                            <Barbell weight="fill" className="text-primary w-10 h-10" />
                         </div>
                     </div>
                     <div className="text-center space-y-1">
-                        <h1 className="text-3xl font-extrabold tracking-tight">ftrack</h1>
-                        <p className="text-sm text-muted-foreground font-medium">Dein intelligentes Training</p>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">ftrack</h1>
+                        <p className="text-sm text-muted-foreground font-medium">Dein Leben. Dein Training.</p>
                     </div>
                 </div>
 
-                <Card className="p-6 bg-card/60 backdrop-blur-3xl ring-1 ring-white/10 border-0 shadow-2xl rounded-3xl overflow-hidden relative">
+                <Card className="p-6 bg-card border-border shadow-soft rounded-[32px] overflow-hidden relative">
                     {/* Segmented Control */}
                     <div className="flex p-1 bg-secondary/60 rounded-xl mb-6 ring-1 ring-white/5 relative z-10">
                         <button
@@ -185,7 +185,7 @@ export default function AuthPage() {
 
                         <Button
                             type="submit"
-                            className="w-full h-12 rounded-xl text-[15px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-6px_rgba(59,130,246,0.6)] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                            className="w-full h-[52px] rounded-2xl text-[16px] font-bold btn-primary-gradient text-white flex items-center justify-center gap-2 mt-2"
                             disabled={loading}
                         >
                             {loading ? (

@@ -26,9 +26,9 @@ export function BottomNav() {
     ]
 
     return (
-        <div className="fixed bottom-6 left-4 right-4 z-50">
-            {/* Main Floating Dock */}
-            <div className="flex h-[72px] items-center justify-between rounded-[2rem] border border-white/10 bg-background/70 backdrop-blur-[32px] px-2 shadow-sm">
+        <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
+            {/* Clean Solid Yazio Dock */}
+            <div className="flex h-20 items-center justify-between bg-card border-t border-border px-4 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.2)]">
                 {mainNavItems.map((item) => {
                     const isActive = pathname === item.href
 
@@ -37,12 +37,12 @@ export function BottomNav() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="relative flex flex-col items-center justify-center -mt-4 group px-2"
+                                className="relative flex flex-col items-center justify-center -mt-8 group px-2 action-press"
                             >
-                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-blue-600 text-primary-foreground shadow-[0_4px_16px_rgba(59,130,246,0.2)] ring-[4px] ring-background transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_8px_24px_rgba(59,130,246,0.3)] group-active:scale-95 group-active:shadow-none">
-                                    <item.icon className="h-7 w-7 stroke-[2px] transition-transform duration-300 group-hover:rotate-90" />
+                                <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full btn-primary-gradient text-white ring-[6px] ring-card transition-all duration-300 group-hover:scale-105">
+                                    <item.icon className="h-8 w-8 stroke-[2.5px] transition-transform duration-300 group-hover:rotate-180" />
                                 </div>
-                                <span className="mt-1 text-xs font-bold uppercase tracking-wider text-muted-foreground/80 group-hover:text-primary transition-colors">Start</span>
+                                <span className="mt-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">Start</span>
                             </Link>
                         )
                     }
@@ -52,16 +52,16 @@ export function BottomNav() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "relative flex flex-col items-center justify-center gap-1.5 w-[52px] h-[52px] rounded-2xl transition-all duration-300",
+                                "relative flex flex-col items-center justify-center gap-1 w-[60px] h-[60px] rounded-2xl transition-all duration-300 action-press",
                                 isActive
                                     ? "text-primary"
-                                    : "text-muted-foreground hover:text-foreground active:scale-90"
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             {isActive && (
-                                <motion.div layoutId="activeTab" className="absolute inset-0 bg-primary/10 rounded-2xl" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                                <motion.div layoutId="activeTab" className="absolute -top-1 w-8 h-1 bg-primary rounded-b-full" transition={{ type: "spring", stiffness: 500, damping: 30 }} />
                             )}
-                            <item.icon className={cn("relative z-10 h-[22px] w-[22px] transition-all duration-300", isActive ? "scale-110 fill-primary/20" : "")} strokeWidth={isActive ? 2.5 : 2} />
+                            <item.icon className={cn("relative z-10 h-7 w-7 transition-all duration-300", isActive ? "scale-110 fill-primary/10" : "")} strokeWidth={isActive ? 2.5 : 2} />
                             <span className={cn("relative z-10 text-xs", isActive ? "font-bold" : "font-medium")}>
                                 {item.name}
                             </span>
