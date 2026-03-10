@@ -118,10 +118,6 @@ export default function ExercisesPage() {
     return (
         <div className="min-h-screen bg-background pb-32">
             <header className="px-5 pt-8 pb-2">
-                <div className="flex items-center gap-2 mb-1">
-                    <Barbell className="w-5 h-5 text-primary" />
-                    <p className="text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase opacity-60">Bibliothek</p>
-                </div>
                 <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1">
                     Übungen
                 </h1>
