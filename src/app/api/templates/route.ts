@@ -6,6 +6,7 @@ import { getCurrentUserId } from '@/lib/auth'
 const CreateTemplateSchema = z.object({
     name: z.string().min(1, "Name is required"),
     isProgressiveOverload: z.boolean().optional().default(false),
+    color: z.string().optional().default('primary'),
     exercises: z.array(z.object({
         exerciseId: z.string().uuid(),
         targetSets: z.number().optional().nullable(),
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: result.error.format() }, { status: 400 })
         }
 
-        const { name, isProgressiveOverload, exercises } = result.data
+        const { name, isProgressiveOverload, color, exercises } = result.data
         const userId = await getCurrentUserId()
         if (!userId) return new NextResponse('Unauthorized', { status: 401 })
 
@@ -82,6 +83,7 @@ export async function POST(request: Request) {
             data: {
                 name,
                 isProgressiveOverload,
+                color,
                 userId,
                 exercises: {
                     create: exercises?.map((ex, index) => ({

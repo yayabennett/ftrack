@@ -121,8 +121,8 @@ export default async function SettingsPage() {
                 {/* Settings List */}
                 <div className="space-y-2">
                     <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1 mb-3">Einstellungen</h3>
-                    <SettingsToggle icon={Moon} label="Dark Mode erzwingen" defaultOn={true} />
-                    <SettingsToggle icon={DeviceMobile} label="Haptisches Feedback" defaultOn={true} />
+                    <SettingsToggle icon={<Moon className="w-5 h-5" />} label="Dark Mode erzwingen" defaultOn={true} />
+                    <SettingsToggle icon={<DeviceMobile className="w-5 h-5" />} label="Haptisches Feedback" defaultOn={true} />
                 </div>
 
                 {/* Actions */}

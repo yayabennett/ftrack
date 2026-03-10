@@ -38,13 +38,13 @@ export function SortableExerciseItem({ id, name, muscleGroup, onRemove, targets,
         <div
             ref={setNodeRef}
             style={style}
-            className={`flex items-center gap-3 p-3 bg-card border border-white/5 rounded-2xl shadow-sm touch-none transition-colors ${isDragging ? 'ring-2 ring-primary bg-primary/5 opacity-90' : ''
+            className={`flex items-center gap-3 p-3 bg-card border border-white/5 rounded-2xl shadow-sm transition-colors ${isDragging ? 'ring-2 ring-primary bg-primary/5 opacity-90' : ''
                 }`}
         >
             <div
                 {...attributes}
                 {...listeners}
-                className="p-1 cursor-grab text-muted-foreground hover:text-foreground touch-none bg-secondary/50 rounded-lg shrink-0"
+                className="p-1 cursor-grab text-muted-foreground hover:text-foreground bg-secondary/50 rounded-lg shrink-0"
             >
                 <GripVertical className="h-5 w-5" />
             </div>

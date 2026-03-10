@@ -42,6 +42,7 @@ export default function CreateTemplatePage() {
     const [isPending, startTransition] = useTransition()
     // UI State
     const [name, setName] = useState('')
+    const [color, setColor] = useState('hsl(var(--primary))')
     const [searchQuery, setSearchQuery] = useState('')
     const [activeTab, setActiveTab] = useState('Alle')
 
@@ -116,6 +117,7 @@ export default function CreateTemplatePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name,
+                    color,
                     exercises: selectedIds.map(id => ({ exerciseId: id }))
                 })
             })
@@ -169,19 +171,48 @@ export default function CreateTemplatePage() {
 
             <form onSubmit={handleFormSubmit} className="container mx-auto p-4 pt-6 space-y-6 animate-in fade-in duration-300">
                 {/* Name Input */}
-                <div className="space-y-2">
-                    <label htmlFor="name" className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">
-                        Name der Einheit
-                    </label>
-                    <Input
-                        autoFocus
-                        id="name"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        placeholder="Wie heißt deine Foltermethode heute?"
-                        className="h-14 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-2xl text-[16px] px-4 font-semibold"
-                        required
-                    />
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <label htmlFor="name" className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">
+                            Name der Einheit
+                        </label>
+                        <Input
+                            autoFocus
+                            id="name"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            placeholder="Wie heißt deine Foltermethode heute?"
+                            className="h-14 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-2xl text-[16px] px-4 font-semibold"
+                            required
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">
+                            Farbe
+                        </label>
+                        <div className="flex gap-3 overflow-x-auto no-scrollbar px-1 pb-2">
+                            {[
+                                { id: 'hsl(var(--primary))', label: 'Blau' },
+                                { id: '#ef4444', label: 'Rot' },
+                                { id: '#f97316', label: 'Orange' },
+                                { id: '#10b981', label: 'Grün' },
+                                { id: '#8b5cf6', label: 'Lila' },
+                                { id: '#ec4899', label: 'Pink' },
+                                { id: '#eab308', label: 'Gelb' }
+                            ].map(c => (
+                                <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => setColor(c.id)}
+                                    className={`w-10 h-10 rounded-full shrink-0 transition-transform active:scale-90 flex items-center justify-center ${color === c.id ? 'ring-2 ring-white ring-offset-2 ring-offset-background scale-110' : ''}`}
+                                    style={{ backgroundColor: c.id }}
+                                >
+                                    {color === c.id && <Check className="w-5 h-5 text-white stroke-[3px]" />}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Exercises Section */}

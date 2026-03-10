@@ -26,6 +26,7 @@ export interface TemplateExerciseDTO {
 export type TemplateDTO = {
   id: string
   name: string
+  color: string
   order: number
   isProgressiveOverload: boolean
   exercises: TemplateExerciseDTO[]

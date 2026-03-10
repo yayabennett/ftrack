@@ -21,6 +21,7 @@ export async function POST(
         const newTemplate = await prisma.template.create({
             data: {
                 name: `${sourceTemplate.name} (Kopie)`,
+                color: sourceTemplate.color,
                 userId,
                 exercises: {
                     create: sourceTemplate.exercises.map(ex => ({

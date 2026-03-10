@@ -43,6 +43,7 @@ export default function EditTemplatePage() {
 
     // UI State
     const [name, setName] = useState('')
+    const [color, setColor] = useState('hsl(var(--primary))')
     const [isProgressiveOverload, setIsProgressiveOverload] = useState(false)
     const [selectedExercises, setSelectedExercises] = useState<{ id: string, targets: { targetSets: number, repRange: string, targetWeight?: number } }[]>([])
     const [searchQuery, setSearchQuery] = useState('')
@@ -84,6 +85,7 @@ export default function EditTemplatePage() {
     useEffect(() => {
         if (template) {
             setName(template.name)
+            setColor(template.color || 'hsl(var(--primary))')
             setIsProgressiveOverload(template.isProgressiveOverload)
             setSelectedExercises(template.exercises.map(e => ({
                 id: e.exerciseId,
@@ -125,6 +127,7 @@ export default function EditTemplatePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name,
+                    color,
                     isProgressiveOverload,
                     exercises: selectedExercises.map(ex => ({
                         exerciseId: ex.id,
@@ -210,6 +213,33 @@ export default function EditTemplatePage() {
                             onChange={e => setName(e.target.value)}
                             className="h-14 bg-card ring-1 ring-white/5 border-0 focus-visible:ring-primary rounded-2xl text-[16px] px-4 font-semibold"
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">
+                            Farbe
+                        </label>
+                        <div className="flex gap-3 overflow-x-auto no-scrollbar px-1 pb-2">
+                            {[
+                                { id: 'hsl(var(--primary))', label: 'Blau' },
+                                { id: '#ef4444', label: 'Rot' },
+                                { id: '#f97316', label: 'Orange' },
+                                { id: '#10b981', label: 'Grün' },
+                                { id: '#8b5cf6', label: 'Lila' },
+                                { id: '#ec4899', label: 'Pink' },
+                                { id: '#eab308', label: 'Gelb' }
+                            ].map(c => (
+                                <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => setColor(c.id)}
+                                    className={`w-10 h-10 rounded-full shrink-0 transition-transform active:scale-90 flex items-center justify-center ${color === c.id ? 'ring-2 ring-white ring-offset-2 ring-offset-background scale-110' : ''}`}
+                                    style={{ backgroundColor: c.id }}
+                                >
+                                    {color === c.id && <Check className="w-5 h-5 text-white stroke-[3px]" />}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <Card className={`relative bg-card ring-2 transition-all shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer active:scale-[0.98] ${isProgressiveOverload ? 'ring-primary bg-primary/5' : 'ring-white/5'}`} onClick={() => setIsProgressiveOverload(!isProgressiveOverload)}>

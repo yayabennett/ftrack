@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { useHaptics } from '@/hooks/use-haptics'
 
-export function SettingsToggle({ icon: Icon, label, defaultOn = false }: { icon: React.ComponentType<{ className?: string }>; label: string, defaultOn?: boolean }) {
+export function SettingsToggle({ icon, label, defaultOn = false }: { icon: React.ReactNode; label: string, defaultOn?: boolean }) {
     const [isOn, setIsOn] = useState(defaultOn)
     const { vibrate } = useHaptics()
 
@@ -19,7 +19,7 @@ export function SettingsToggle({ icon: Icon, label, defaultOn = false }: { icon:
         >
             <CardContent className="p-4 flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isOn ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
-                    <Icon className="w-5 h-5" />
+                    {icon}
                 </div>
                 <div className="flex-1">
                     <p className="font-semibold text-[15px] text-foreground">{label}</p>

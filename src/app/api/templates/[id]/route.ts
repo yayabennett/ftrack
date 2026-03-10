@@ -39,7 +39,7 @@ export async function PATCH(
         if (!userId) return new NextResponse('Unauthorized', { status: 401 })
 
         const { id } = await params
-        const { name, exercises, isProgressiveOverload } = await request.json()
+        const { name, exercises, isProgressiveOverload, color } = await request.json()
 
         // Batch update: delete old relations and create new ones
         await prisma.$transaction([
@@ -48,6 +48,7 @@ export async function PATCH(
                 where: { id, userId },
                 data: {
                     name,
+                    color,
                     isProgressiveOverload: isProgressiveOverload ?? false,
                     exercises: {
                         create: exercises.map((ex: any, idx: number) => ({

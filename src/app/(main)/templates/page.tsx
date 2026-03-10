@@ -21,6 +21,7 @@ interface TemplateExercise {
 interface Template {
     id: string
     name: string
+    color: string
     exercises: TemplateExercise[]
     usageCount?: number
     lastUsed?: string | null
@@ -162,7 +163,8 @@ export default function EinheitenPage() {
                                             </div>
                                             <Button
                                                 size="sm"
-                                                className="h-9 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex gap-1.5 px-4 shadow-sm shadow-primary/20 shrink-0 ml-3"
+                                                className="h-9 rounded-xl font-bold text-white hover:brightness-110 flex gap-1.5 px-4 shadow-sm shrink-0 ml-3"
+                                                style={{ backgroundColor: template.color || 'hsl(var(--primary))' }}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     router.push(`/workout/active?templateId=${template.id}`);
@@ -265,7 +267,7 @@ export default function EinheitenPage() {
                                                         disabled={duplicatingId === template.id || deletingId === template.id}
                                                     >
                                                         {duplicatingId === template.id ? (
-                                                            <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                                            <div className={`h-4 w-4 border-2 border-t-transparent rounded-full animate-spin`} style={{ borderColor: `var(--${template.color})`, borderTopColor: 'transparent' }} />
                                                         ) : (
                                                             <Copy className="h-4 w-4" />
                                                         )}
@@ -292,7 +294,8 @@ export default function EinheitenPage() {
                                                 </span>
                                                 <Button
                                                     size="sm"
-                                                    className="h-9 rounded-xl font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex gap-1.5 px-4 shadow-sm shadow-primary/20"
+                                                    className="h-9 rounded-xl font-bold text-white hover:brightness-110 flex gap-1.5 px-4 shadow-sm"
+                                                    style={{ backgroundColor: template.color || 'hsl(var(--primary))' }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         router.push(`/workout/active?templateId=${template.id}`);
