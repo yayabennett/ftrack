@@ -6,92 +6,205 @@ import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Barbell } from "@phosphor-icons/react"
+import { Barbell, UserPlus, SignIn } from "@phosphor-icons/react"
+import { toast } from "sonner"
+import { motion, AnimatePresence } from "framer-motion"
 
-export default function LoginPage() {
+type Tab = "login" | "register"
+
+export default function AuthPage() {
     const router = useRouter()
+    const [tab, setTab] = useState<Tab>("login")
+
+    // Form state
+    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
-    async function handleLogin(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         setLoading(true)
         setError("")
 
-        const res = await signIn("credentials", {
-            email,
-            password,
-            redirect: false
-        })
+        if (tab === "register") {
+            try {
+                const res = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password }),
+                })
 
-        if (res?.error) {
-            setError("Invalid email or password.")
-            setLoading(false)
+                if (!res.ok) {
+                    const errorText = await res.text()
+                    setError(errorText || "Registrierung fehlgeschlagen")
+                    setLoading(false)
+                    return
+                }
+
+                // Auto sign-in
+                const signInRes = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                })
+
+                if (signInRes?.error) {
+                    setError("Account erstellt, Login fehlgeschlagen.")
+                    setLoading(false)
+                } else {
+                    toast.success("Account erfolgreich erstellt!")
+                    router.push("/")
+                    router.refresh()
+                }
+            } catch (err) {
+                setError("Ein unerwarteter Fehler ist aufgetreten.")
+                setLoading(false)
+            }
         } else {
-            router.push("/")
-            router.refresh()
+            // Login
+            const res = await signIn("credentials", {
+                email,
+                password,
+                redirect: false
+            })
+
+            if (res?.error) {
+                setError("Ungültige E-Mail oder Passwort.")
+                setLoading(false)
+            } else {
+                router.push("/")
+                router.refresh()
+            }
         }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-            <Card className="w-full max-w-sm p-6 space-y-6 bg-card border border-border/50">
-                <div className="flex flex-col items-center gap-2">
-                    <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Barbell weight="fill" className="text-primary w-6 h-6" />
+        <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
+            {/* Background Glows */}
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+
+            <div className="w-full max-w-sm z-10 animate-in fade-in zoom-in-95 duration-500">
+                <div className="flex flex-col items-center gap-4 mb-8">
+                    <div className="relative">
+                        <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-[0_8px_32px_-8px_rgba(59,130,246,0.6)]">
+                            <Barbell weight="fill" className="text-white w-8 h-8" />
+                        </div>
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-                    <p className="text-sm text-muted-foreground text-center">
-                        Sign in to access your workouts across devices.
-                    </p>
+                    <div className="text-center space-y-1">
+                        <h1 className="text-3xl font-extrabold tracking-tight">ftrack</h1>
+                        <p className="text-sm text-muted-foreground font-medium">Dein intelligentes Training</p>
+                    </div>
                 </div>
 
-                {error && (
-                    <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md text-center">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleLogin} className="space-y-4">
-                    <div className="space-y-2">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Email
-                        </label>
-                        <Input
-                            type="email"
-                            placeholder="you@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
+                <Card className="p-6 bg-card/60 backdrop-blur-3xl ring-1 ring-white/10 border-0 shadow-2xl rounded-3xl overflow-hidden relative">
+                    {/* Segmented Control */}
+                    <div className="flex p-1 bg-secondary/60 rounded-xl mb-6 ring-1 ring-white/5 relative z-10">
+                        <button
+                            type="button"
+                            onClick={() => { setTab("login"); setError(""); }}
+                            className={`flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all z-10 ${tab === "login" ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
+                        >
+                            Anmelden
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setTab("register"); setError(""); }}
+                            className={`flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all z-10 ${tab === "register" ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
+                        >
+                            Registrieren
+                        </button>
+                        <motion.div
+                            className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-card rounded-lg shadow-sm ring-1 ring-white/10"
+                            animate={{ left: tab === "login" ? "4px" : "calc(50%)" }}
+                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Password
-                        </label>
-                        <Input
-                            type="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Signing in..." : "Sign in"}
-                    </Button>
-                </form>
 
-                <p className="text-center text-sm text-muted-foreground">
-                    Don't have an account?{" "}
-                    <Link href="/register" className="text-primary hover:underline">
-                        Register here
-                    </Link>
-                </p>
-            </Card>
+                    {error && (
+                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-destructive/10 text-destructive text-sm font-semibold p-3 rounded-xl text-center mb-6 ring-1 ring-destructive/20 relative z-10">
+                            {error}
+                        </motion.div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+                        <AnimatePresence mode="popLayout" initial={false}>
+                            {tab === "register" && (
+                                <motion.div
+                                    key="name-field"
+                                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                                    animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+                                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    className="space-y-1.5 overflow-hidden"
+                                >
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">
+                                        Name
+                                    </label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Dein Name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required={tab === "register"}
+                                        className="h-12 bg-secondary/30 border-0 rounded-xl text-[15px] font-medium px-4 focus-visible:ring-primary focus-visible:bg-secondary/50 transition-all placeholder:text-muted-foreground/50"
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">
+                                Email
+                            </label>
+                            <Input
+                                type="email"
+                                placeholder="name@beispiel.de"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="h-12 bg-secondary/30 border-0 rounded-xl text-[15px] font-medium px-4 focus-visible:ring-primary focus-visible:bg-secondary/50 transition-all placeholder:text-muted-foreground/50"
+                            />
+                        </div>
+                        <div className="space-y-1.5 pb-2">
+                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground px-1">
+                                Passwort
+                            </label>
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                minLength={6}
+                                className="h-12 bg-secondary/30 border-0 rounded-xl text-[15px] font-medium px-4 focus-visible:ring-primary focus-visible:bg-secondary/50 transition-all placeholder:text-muted-foreground/50"
+                            />
+                        </div>
+
+                        <Button
+                            type="submit"
+                            className="w-full h-12 rounded-xl text-[15px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-6px_rgba(59,130,246,0.6)] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            ) : tab === "login" ? (
+                                <>
+                                    <SignIn className="w-5 h-5" />
+                                    Einloggen
+                                </>
+                            ) : (
+                                <>
+                                    <UserPlus className="w-5 h-5" />
+                                    Account erstellen
+                                </>
+                            )}
+                        </Button>
+                    </form>
+                </Card>
+            </div>
         </div>
     )
 }

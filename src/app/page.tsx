@@ -5,11 +5,16 @@ import { WeeklyConsistency } from '@/components/dashboard/weekly-consistency'
 import { TemplateCarousel } from '@/components/dashboard/template-carousel'
 import { LastSessionRecap } from '@/components/dashboard/last-session-card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { redirect } from 'next/navigation'
 
 export default async function Home() {
   const userId = await getCurrentUserId()
-  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { name: true } }) : null
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { name: true, isOnboarded: true } }) : null
   const userName = user?.name || 'Viper' // Cool default placeholder for athletes
+
+  if (userId && user && !user.isOnboarded) {
+    redirect('/onboarding')
+  }
 
   const now = new Date()
   const hour = now.getHours()
