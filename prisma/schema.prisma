@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 enum Gender {
@@ -61,6 +61,7 @@ model User {
   goal            Goal?
   experienceLevel ExperienceLevel?
   isOnboarded     Boolean  @default(false)
+  image           String?
   createdAt       DateTime @default(now())
 
   exercises Exercise[]

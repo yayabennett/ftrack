@@ -4,6 +4,8 @@ import prisma from '@/lib/prisma'
 import Link from 'next/link'
 import { getCurrentUserId } from '@/lib/auth'
 import { StatTile } from '@/components/ui/stat-tile'
+import { UserAvatar } from '@/components/ui/user-avatar'
+import { AvatarSelector } from '@/components/ui/avatar-selector'
 
 export const revalidate = 0
 
@@ -41,9 +43,11 @@ export default async function SettingsPage() {
                 {/* Profile Card */}
                 <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden">
                     <CardContent className="p-5 flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center text-primary shadow-[0_4px_20px_-4px_rgba(59,130,246,0.3)]">
-                            <User className="w-7 h-7" />
-                        </div>
+                        <UserAvatar
+                            seed={user?.id || 'default'}
+                            style={(user?.image as any) || 'initials'}
+                            className="w-16 h-16"
+                        />
                         <div className="flex-1">
                             <h2 className="font-extrabold text-xl text-foreground tracking-tight">{userName}</h2>
                             <p className="text-sm text-muted-foreground">
@@ -52,6 +56,11 @@ export default async function SettingsPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Avatar Settings */}
+                {user && (
+                    <AvatarSelector userId={user.id} currentStyle={user.image || 'initials'} />
+                )}
 
                 {/* Profile Details */}
                 {user && (
