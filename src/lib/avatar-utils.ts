@@ -39,11 +39,11 @@ export function parseAvatarConfig(dbString?: string | null, defaultUserId?: stri
         const parts = dbString.split('|');
         if (parts.length >= 3) {
             const traitsArray = parts[3] ? parts[3].split(',') : [];
-            const traitsObj: Record<string, string> = {};
+            const traitsObj: Record<string, string[]> = {};
 
             traitsArray.forEach(pair => {
                 const [key, value] = pair.split('=');
-                if (key && value) traitsObj[key] = value;
+                if (key && value) traitsObj[key] = [value];
             });
 
             return {
@@ -80,8 +80,14 @@ export function stringifyAvatarConfig(config: AvatarConfig): string {
     if (config.style === 'builder') {
         const traitStrings = Object.entries(config.traits)
             // Filter out empty/undefined undefined traits
-            .filter(([_, val]) => val !== undefined && val !== '')
-            .map(([key, val]) => `${key}=${val}`);
+            .filter(([_, val]) => {
+                if (Array.isArray(val)) return val.length > 0 && val[0] !== undefined && val[0] !== '';
+                return val !== undefined && val !== '';
+            })
+            .map(([key, val]) => {
+                const strVal = Array.isArray(val) ? val[0] : val;
+                return `${key}=${strVal}`;
+            });
 
         const traitPart = traitStrings.length > 0 ? `|${traitStrings.join(',')}` : '';
         return `builder|${config.seed}|${config.bgColor}${traitPart}`;
