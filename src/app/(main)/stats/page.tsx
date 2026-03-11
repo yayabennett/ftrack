@@ -14,13 +14,10 @@ import type { WeeklyStatsDTO } from '@/lib/types'
 const WeeklyChart = dynamic(() => import('@/components/stats/weekly-chart'), {
     ssr: false,
     loading: () => (
-        <div className="h-[176px] flex items-end justify-between px-2 gap-2 pb-6 pt-8">
-            <Skeleton className="w-8 h-12 rounded-t-sm bg-secondary" />
-            <Skeleton className="w-8 h-24 rounded-t-sm bg-secondary" />
-            <Skeleton className="w-8 h-16 rounded-t-sm bg-secondary" />
-            <Skeleton className="w-8 h-32 rounded-t-sm bg-primary/40" />
-            <Skeleton className="w-8 h-20 rounded-t-sm bg-secondary" />
-            <Skeleton className="w-8 h-8 rounded-t-sm bg-secondary" />
+        <div className="h-[176px] flex items-end justify-between px-2 gap-2 pb-6 pt-8 w-full">
+            {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton key={i} className="w-8 flex-1 rounded-t-sm bg-secondary animate-pulse" style={{ height: `${Math.random() * 60 + 20}%` }} />
+            ))}
         </div>
     )
 })
@@ -95,7 +92,9 @@ export default function StatsPage() {
                 {/* Hero Volume Card */}
                 <Card className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden glow-primary">
                     <CardContent className="p-6 text-center">
-                        <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-2">Wochen-Volumen</p>
+                        <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-2">
+                            {range === 7 ? "Wochen-Volumen" : `Volumen (${range} Tage)`}
+                        </p>
                         {isLoading ? (
                             <div className="flex flex-col items-center justify-center gap-2 h-[88px]">
                                 <Skeleton className="h-12 w-32 rounded-lg bg-primary/20" />
@@ -116,7 +115,7 @@ export default function StatsPage() {
                 {/* Stat Tiles */}
                 <div className="grid grid-cols-3 gap-3">
                     <StatTile icon={<Flame className="h-5 w-5" />} value={weeklyStreak} label="Streak" color="text-orange-400" bg="bg-orange-400/10" />
-                    <StatTile icon={<Pulse className="h-5 w-5" />} value={sessionsCount} label="Diese Woche" color="text-primary" bg="bg-primary/10" />
+                    <StatTile icon={<Pulse className="h-5 w-5" />} value={sessionsCount} label={range === 7 ? "Diese Woche" : `${range} Tage`} color="text-primary" bg="bg-primary/10" />
                     <StatTile icon={<Barbell className="h-5 w-5" />} value={totalSessionsEver} label="Gesamt" color="text-emerald-400" bg="bg-emerald-400/10" />
                 </div>
 
@@ -130,16 +129,13 @@ export default function StatsPage() {
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
                         {isLoading ? (
-                            <div className="h-[176px] flex items-end justify-between px-2 gap-2 pb-6 pt-8">
-                                <Skeleton className="w-8 h-12 rounded-t-sm bg-secondary" />
-                                <Skeleton className="w-8 h-24 rounded-t-sm bg-secondary" />
-                                <Skeleton className="w-8 h-16 rounded-t-sm bg-secondary" />
-                                <Skeleton className="w-8 h-32 rounded-t-sm bg-primary/40" />
-                                <Skeleton className="w-8 h-20 rounded-t-sm bg-secondary" />
-                                <Skeleton className="w-8 h-8 rounded-t-sm bg-secondary" />
+                            <div className="h-[176px] flex items-end justify-between px-2 gap-2 pb-6 pt-8 w-full">
+                                {Array.from({ length: range }).map((_, i) => (
+                                    <Skeleton key={i} className={cn("rounded-t-sm bg-secondary animate-pulse", range > 7 ? "w-full" : "w-8")} style={{ height: `${Math.random() * 60 + 20}%` }} />
+                                ))}
                             </div>
                         ) : (
-                            <WeeklyChart data={data?.days ?? []} todayISO={todayISO} />
+                            <WeeklyChart data={data?.days ?? []} todayISO={todayISO} range={range} />
                         )}
                     </CardContent>
                 </Card>
