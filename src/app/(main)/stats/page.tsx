@@ -90,7 +90,7 @@ export default function StatsPage() {
                     ))}
                 </div>
                 {/* Hero Volume Card */}
-                <Card className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden glow-primary">
+                <Card className="bg-card/50 backdrop-blur-2xl ring-1 ring-white/10 border-0 rounded-[28px] overflow-hidden glow-primary shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
                     <CardContent className="p-6 text-center">
                         <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-2">
                             {range === 7 ? "Wochen-Volumen" : `Volumen (${range} Tage)`}
@@ -120,7 +120,7 @@ export default function StatsPage() {
                 </div>
 
                 {/* Real Recharts Bar Chart */}
-                <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
+                <Card className="bg-card/60 backdrop-blur-md ring-1 ring-white/5 shadow-sm rounded-[24px] border-0 overflow-hidden text-card-foreground">
                     <CardHeader className="p-4 pb-2">
                         <CardTitle className="text-[15px] font-semibold flex items-center gap-2 text-foreground">
                             <TrendUp className="h-4 w-4 text-primary" />
@@ -141,8 +141,8 @@ export default function StatsPage() {
                 </Card>
 
                 {/* Motivation Card */}
-                <div className="bg-secondary/20 rounded-2xl p-4 flex gap-3 items-center border border-white/5">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <div className="bg-card/40 backdrop-blur-md rounded-[20px] p-4 flex gap-3 items-center ring-1 ring-white/5 shadow-sm">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0 shadow-inner glow-primary">
                         <Lightning className="w-5 h-5" />
                     </div>
                     <div>

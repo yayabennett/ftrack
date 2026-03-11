@@ -42,10 +42,10 @@ export default function HistoryPage() {
                 {isLoading ? (
                     <div className="space-y-4">
                         <Skeleton className="h-4 w-32 bg-secondary/50 mb-2 mt-4" />
-                        <Skeleton className="h-[96px] w-full rounded-2xl bg-card border border-white/5" />
-                        <Skeleton className="h-[96px] w-full rounded-2xl bg-card border border-white/5" />
+                        <Skeleton className="h-[96px] w-full rounded-[20px] bg-card/40 backdrop-blur-md ring-1 ring-white/5" />
+                        <Skeleton className="h-[96px] w-full rounded-[20px] bg-card/40 backdrop-blur-md ring-1 ring-white/5" />
                         <Skeleton className="h-4 w-32 bg-secondary/50 mb-2 mt-8" />
-                        <Skeleton className="h-[96px] w-full rounded-2xl bg-card border border-white/5" />
+                        <Skeleton className="h-[96px] w-full rounded-[20px] bg-card/40 backdrop-blur-md ring-1 ring-white/5" />
                     </div>
                 ) : sessions.length === 0 ? (
                     <div className="text-center mt-12 mb-12 space-y-3 p-8 glass-panel rounded-3xl mx-2 shadow-soft">
@@ -87,9 +87,9 @@ export default function HistoryPage() {
 
                                     return (
                                         <Link key={session.id} href={`/history/${session.id}`} className="block active:scale-[0.98] transition-transform">
-                                            <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
+                                            <Card className="bg-card/60 backdrop-blur-md ring-1 ring-white/5 shadow-sm rounded-[20px] border-0 overflow-hidden text-card-foreground">
                                                 <CardContent className="p-4 flex items-center gap-4">
-                                                    <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 ${isHighlight ? 'bg-primary/20 text-primary ring-1 ring-primary/30' : 'bg-secondary/50 text-muted-foreground'}`}>
+                                                    <div className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center shrink-0 transition-all ${isHighlight ? 'bg-primary/20 text-primary ring-1 ring-primary/40 shadow-[0_0_15px_rgba(0,226,170,0.3)] glow-primary' : 'bg-secondary/50 text-muted-foreground'}`}>
                                                         <span className="text-[10px] font-bold uppercase tracking-wider">{relativeLabel}</span>
                                                         <span className={`text-[18px] font-black leading-none mt-0.5 ${isHighlight ? 'text-primary' : 'text-foreground'}`}>{d.getDate()}</span>
                                                     </div>
@@ -118,7 +118,7 @@ export default function HistoryPage() {
 
                 {!isLoading && sessions.length > visibleCount && (
                     <div className="pt-4 pb-8 flex justify-center w-full">
-                        <Button variant="outline" onClick={() => setVisibleCount(c => c + 20)} className="rounded-full shadow-sm text-xs font-bold ring-1 ring-white/5 bg-transparent border-0 text-muted-foreground hover:bg-secondary/40 active:scale-95 transition-all w-full">
+                        <Button variant="outline" onClick={() => setVisibleCount(c => c + 20)} className="h-14 rounded-[20px] shadow-sm text-[15px] font-bold ring-1 ring-white/10 bg-card/60 backdrop-blur-md border-0 text-foreground hover:bg-card/80 active:scale-95 transition-all w-full">
                             Ältere Einheiten laden
                         </Button>
                     </div>

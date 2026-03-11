@@ -31,8 +31,8 @@ export default function SessionDetailPage() {
                     <Skeleton className="w-32 h-6 bg-secondary" />
                 </header>
                 <div className="container mx-auto p-4 space-y-4">
-                    <Skeleton className="h-[100px] w-full rounded-2xl bg-card border border-white/5" />
-                    <Skeleton className="h-[200px] w-full rounded-2xl bg-card border border-white/5" />
+                    <Skeleton className="h-[100px] w-full rounded-[28px] bg-card/40 backdrop-blur-md ring-1 ring-white/5" />
+                    <Skeleton className="h-[200px] w-full rounded-[28px] bg-card/40 backdrop-blur-md ring-1 ring-white/5" />
                 </div>
             </div>
         )
@@ -83,7 +83,7 @@ export default function SessionDetailPage() {
 
             <div className="container mx-auto p-4 space-y-6 mt-2 animate-in slide-in-from-bottom-4 duration-300">
                 {/* Overview Hero Card */}
-                <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden">
+                <Card className="bg-card/50 backdrop-blur-2xl ring-1 ring-white/10 border-0 rounded-[28px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
                     <CardContent className="p-5">
                         <div className="flex items-center gap-2 text-[12px] font-bold tracking-wider text-muted-foreground uppercase mb-4">
                             <Calendar className="w-4 h-4" />
@@ -120,7 +120,7 @@ export default function SessionDetailPage() {
                     </h3>
 
                     {session.exercises.map((ex, index) => (
-                        <Card key={ex.id} className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground">
+                        <Card key={ex.id} className="bg-card/60 backdrop-blur-md ring-1 ring-white/5 shadow-sm rounded-[24px] border-0 overflow-hidden text-card-foreground">
                             <CardContent className="p-0">
                                 <div className="p-3 bg-secondary/30 border-b border-white/5 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -137,14 +137,14 @@ export default function SessionDetailPage() {
                                     <div>kg</div>
                                     <div>Wdh</div>
                                 </div>
-                                <div className="space-y-1 p-2 pt-0">
+                                <div className="space-y-1.5 p-2 pt-0">
                                     {ex.sets.map((set, sIdx) => (
-                                        <div key={set.id} className="grid grid-cols-[3rem_1fr_1fr] gap-2 items-center rounded-xl p-2 bg-secondary/20">
-                                            <div className="text-center text-[13px] font-bold text-muted-foreground">
+                                        <div key={set.id} className="grid grid-cols-[3rem_1fr_1fr] gap-2 items-center rounded-xl h-12 bg-black/20 ring-1 ring-white/5 shadow-inner shadow-black/20 transition-all">
+                                            <div className="text-center text-[13px] font-bold text-muted-foreground/60">
                                                 {sIdx + 1}
                                             </div>
-                                            <div className="text-center font-semibold text-[15px]">{set.weight}</div>
-                                            <div className="text-center font-semibold text-[15px]">{set.reps}</div>
+                                            <div className="text-center font-bold text-[17px] tabular-nums tracking-tight">{set.weight}</div>
+                                            <div className="text-center font-bold text-[17px] tabular-nums tracking-tight">{set.reps}</div>
                                         </div>
                                     ))}
                                 </div>
