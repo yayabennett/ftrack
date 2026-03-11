@@ -42,7 +42,7 @@ export default async function SettingsPage() {
 
             <div className="container mx-auto p-4 space-y-6 animate-in fade-in duration-300 mt-2">
                 {/* Profile Card */}
-                <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent ring-1 ring-white/10 border-0 rounded-3xl overflow-hidden">
+                <Card className="bg-card/50 backdrop-blur-2xl ring-1 ring-white/10 border-0 rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
                     <CardContent className="p-5 flex items-center gap-4">
                         <UserAvatar
                             seed={user?.id || 'default'}
@@ -92,25 +92,25 @@ export default async function SettingsPage() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 mt-2">
-                            <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0">
-                                <CardContent className="p-3 flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-emerald-400/10 flex items-center justify-center text-emerald-400">
-                                        <Target className="w-4 h-4" />
+                            <Card className="bg-card/60 backdrop-blur-md ring-1 ring-white/5 shadow-sm rounded-[24px] border-0">
+                                <CardContent className="p-4 flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-400/10 flex items-center justify-center text-emerald-400">
+                                        <Target className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ziel</p>
-                                        <p className="text-[13px] font-semibold text-foreground">{GOAL_LABELS[user.goal ?? ''] || '–'}</p>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ziel</p>
+                                        <p className="text-[15px] font-bold text-foreground tracking-tight">{GOAL_LABELS[user.goal ?? ''] || '–'}</p>
                                     </div>
                                 </CardContent>
                             </Card>
-                            <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0">
-                                <CardContent className="p-3 flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-amber-400/10 flex items-center justify-center text-amber-400">
-                                        <Barbell className="w-4 h-4" />
+                            <Card className="bg-card/60 backdrop-blur-md ring-1 ring-white/5 shadow-sm rounded-[24px] border-0">
+                                <CardContent className="p-4 flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-400/10 flex items-center justify-center text-amber-400">
+                                        <Barbell className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Level</p>
-                                        <p className="text-[13px] font-semibold text-foreground">{EXPERIENCE_LABELS[user.experienceLevel ?? ''] || '–'}</p>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Level</p>
+                                        <p className="text-[15px] font-bold text-foreground tracking-tight">{EXPERIENCE_LABELS[user.experienceLevel ?? ''] || '–'}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -129,16 +129,16 @@ export default async function SettingsPage() {
                 <div className="space-y-2">
                     <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1 mb-3">Daten</h3>
                     <Link href="/api/export" target="_blank">
-                        <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden hover:bg-secondary/60 transition-colors cursor-pointer active:scale-[0.98]">
-                            <CardContent className="p-4 flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                                    <DownloadSimple className="w-5 h-5" />
+                        <Card className="bg-card/60 backdrop-blur-md ring-1 ring-white/10 shadow-sm rounded-[24px] border-0 overflow-hidden hover:bg-card/80 transition-all cursor-pointer active:scale-95 text-card-foreground">
+                            <CardContent className="p-5 flex items-center gap-4">
+                                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner glow-primary">
+                                    <DownloadSimple className="w-7 h-7" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-semibold text-[15px] text-foreground">Daten exportieren</p>
-                                    <p className="text-[12px] text-muted-foreground">Alle Workouts als JSON herunterladen</p>
+                                    <p className="font-extrabold text-[17px] tracking-tight text-foreground">Daten exportieren</p>
+                                    <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Alle Workouts als JSON herunterladen</p>
                                 </div>
-                                <CaretRight className="w-4 h-4 text-muted-foreground/40" />
+                                <CaretRight className="w-5 h-5 text-muted-foreground/40" />
                             </CardContent>
                         </Card>
                     </Link>
@@ -147,14 +147,14 @@ export default async function SettingsPage() {
                 {/* About */}
                 <div className="space-y-2">
                     <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1 mb-3">Über</h3>
-                    <Card className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden">
-                        <CardContent className="p-4 flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground">
-                                <Info className="w-5 h-5" />
+                    <Card className="bg-card/40 backdrop-blur-md ring-1 ring-white/5 shadow-sm rounded-[24px] border-0 overflow-hidden">
+                        <CardContent className="p-5 flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-muted-foreground shadow-inner">
+                                <Info className="w-7 h-7" />
                             </div>
                             <div className="flex-1">
-                                <p className="font-semibold text-[15px] text-foreground">iTrack</p>
-                                <p className="text-[12px] text-muted-foreground">v0.3.0 · Made in Germany</p>
+                                <p className="font-extrabold text-[17px] tracking-tight text-foreground">iTrack</p>
+                                <p className="text-[13px] font-medium text-muted-foreground mt-0.5">v0.4.0 · Premium Build</p>
                             </div>
                         </CardContent>
                     </Card>
