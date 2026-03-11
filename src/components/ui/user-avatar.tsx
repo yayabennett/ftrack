@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { createAvatar } from '@dicebear/core'
 import { initials, micah, notionists, adventurer, bottts } from '@dicebear/collection'
+import { parseAvatarConfig } from '@/lib/avatar-utils'
 
 const COLLECTIONS = {
     initials,
@@ -13,38 +14,75 @@ const COLLECTIONS = {
 }
 
 interface UserAvatarProps {
-    seed: string
-    style?: string // Format can be just "initials" or detailed "collection:seed:backgroundColor"
+    seed: string          // Either the raw DB string or just the old seed
+    style?: string        // Used as raw DB string if provided. (Backwards compat)
+    defaultName?: string  // Needed to extract real initials if the style is "initials"
     className?: string
 }
 
-export function UserAvatar({ seed, style = 'initials', className = "w-10 h-10" }: UserAvatarProps) {
-    const avatar = useMemo(() => {
-        // Parse the payload if it's the new complex format
-        const parts = style.split(':')
-        const collectionName = parts[0] || 'initials'
-        const customSeed = parts[1] || seed
-        const bgColor = parts[2] || 'transparent'
+export function UserAvatar({ seed, style, defaultName, className = "w-10 h-10" }: UserAvatarProps) {
 
-        // Map collection name to actual collection object
-        const selectedCollection = COLLECTIONS[collectionName as keyof typeof COLLECTIONS] || COLLECTIONS.initials
+    // The raw string could be passed as `style` OR `seed` depending on how it was invoked previously
+    // E.g. <UserAvatar seed={user.image} /> vs <UserAvatar seed={user.id} style={user.image} />
+    const rawConfigString = style && style.includes(':') || style?.includes('|') ? style : (seed.includes(':') || seed.includes('|') || seed.startsWith('http') ? seed : `${style}:${seed}:transparent`)
+
+    // Parse using our new robust utility
+    const config = parseAvatarConfig(rawConfigString, seed)
+
+    const avatarSvg = useMemo(() => {
+        if (config.isUrl) return null; // Skip SVG generation for raw HTTP URLs
+
+        // 1. Initial Style Override (Don't use random hash, use real initials)
+        if (config.style === 'initials') {
+            const initialChars = defaultName ? defaultName.trim().substring(0, 2).toUpperCase() : config.seed.substring(0, 2).toUpperCase()
+            return createAvatar(initials, {
+                seed: initialChars,
+                backgroundColor: config.bgColor !== 'transparent' ? [config.bgColor.replace('#', '')] : undefined,
+                radius: 50
+            }).toDataUri()
+        }
+
+        // 2. The New Builder Format
+        // We will map 'builder' to the 'micah' collection locally because it has the most human traits
+        if (config.style === 'builder') {
+            return createAvatar(micah, {
+                seed: config.seed,
+                backgroundColor: config.bgColor !== 'transparent' ? [config.bgColor.replace('#', '')] : undefined,
+                radius: 50,
+                // Pass all dynamic traits parsed from string 
+                // e.g. { hair: ['short'], facialHair: ['beard'], ... }
+                ...config.traits
+            }).toDataUri()
+        }
+
+        // 3. Fallback to older presets 
+        const selectedCollection = COLLECTIONS[config.style as keyof typeof COLLECTIONS] || COLLECTIONS.initials
 
         return createAvatar(selectedCollection as any, {
-            seed: customSeed,
-            backgroundColor: bgColor !== 'transparent' ? [bgColor.replace('#', '')] : undefined,
-            radius: 50, // ensures transparent avatars fit nicely natively
+            seed: config.seed,
+            backgroundColor: config.bgColor !== 'transparent' ? [config.bgColor.replace('#', '')] : undefined,
+            radius: 50,
         }).toDataUri()
-    }, [seed, style])
 
-    // Extract background color to apply to container if needed
-    const containerBg = style.includes(':') && style.split(':')[2] !== 'transparent' ? style.split(':')[2] : undefined
+    }, [config, defaultName])
 
+    // Render Raw Image
+    if (config.isUrl) {
+        return (
+            <div className={`rounded-full overflow-hidden flex items-center justify-center border border-white/10 ${className}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={config.seed} alt="User Avatar" className="w-full h-full object-cover" />
+            </div>
+        )
+    }
+
+    // Render DiceBear SVG
     return (
         <div
-            className={`rounded-full overflow-hidden flex items-center justify-center border border-white/10 ${!containerBg ? 'bg-secondary' : ''} ${className}`}
-            style={containerBg ? { backgroundColor: containerBg } : {}}
+            className={`rounded-full overflow-hidden flex items-center justify-center border border-white/10 ${config.bgColor === 'transparent' ? 'bg-secondary' : ''} ${className}`}
+            style={config.bgColor !== 'transparent' ? { backgroundColor: config.bgColor } : {}}
         >
-            <img src={avatar} alt="User Avatar" className="w-full h-full object-cover" />
+            <img src={avatarSvg!} alt="User Avatar" className="w-full h-full object-cover" />
         </div>
     )
 }

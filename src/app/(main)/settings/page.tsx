@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { getCurrentUserId } from '@/lib/auth'
 import { StatTile } from '@/components/ui/stat-tile'
 import { UserAvatar } from '@/components/ui/user-avatar'
-import { AvatarSelector } from '@/components/ui/avatar-selector'
+import { AvatarBuilder } from '@/components/avatar/avatar-builder'
 import { SettingsToggle } from './settings-toggle'
 
 export const revalidate = 0
@@ -60,7 +60,7 @@ export default async function SettingsPage() {
 
                 {/* Avatar Settings */}
                 {user && (
-                    <AvatarSelector userId={user.id} currentStyle={user.image || 'initials'} />
+                    <AvatarBuilder userId={user.id} userName={user.name} currentStyle={user.image || 'initials'} />
                 )}
 
                 {/* Profile Details */}
