@@ -11,7 +11,7 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
     })
 
     return (
-        <section className="space-y-4">
+        <section className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both delay-[300ms]">
             <div className="px-5 pb-2 flex items-center justify-between">
                 <h2 className="text-xl font-bold tracking-tight text-foreground">Einheiten</h2>
                 <Link href="/templates" className="text-sm font-bold text-primary hover:underline underline-offset-4">Mehr</Link>
@@ -19,8 +19,8 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
 
             <div className="flex gap-4 overflow-x-auto px-5 pb-2 no-scrollbar scroll-smooth">
                 {templates.length === 0 ? (
-                    <Link href="/templates" className="min-w-[240px] flex active:scale-[0.98] transition-transform group">
-                        <Card className="w-full bg-secondary/10 hover:bg-primary/5 transition-colors border-2 border-dashed border-border/50 hover:border-primary/50 rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-3">
+                    <Link href="/templates" className="min-w-[240px] flex active:scale-[0.96] transition-all duration-300 group card-hover">
+                        <Card className="w-full bg-card/20 backdrop-blur-sm border-2 border-dashed border-white/10 hover:border-primary/50 rounded-[28px] p-4 flex flex-col items-center justify-center text-center gap-3 transition-colors">
                             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <Plus className="w-5 h-5 text-primary" weight="bold" />
                             </div>
@@ -31,8 +31,8 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
                         </Card>
                     </Link>
                 ) : templates.map((template) => (
-                    <Link key={template.id} href={`/templates/${template.id}`} className="min-w-[170px] active:scale-95 transition-transform">
-                        <Card className="bg-card border border-border/40 shadow-sm rounded-2xl overflow-hidden h-full">
+                    <Link key={template.id} href={`/templates/${template.id}`} className="min-w-[170px] active:scale-[0.96] transition-all duration-300 group card-hover">
+                        <Card className="bg-card/40 backdrop-blur-md ring-1 ring-white/5 border-0 shadow-soft rounded-[28px] overflow-hidden h-full group-hover:bg-card/60 transition-all duration-300 relative">
                             <CardContent className="p-4 flex flex-col justify-between h-full">
                                 <div>
                                     <h3 className="font-bold text-[15px] mb-1 truncate">{template.name}</h3>

@@ -41,7 +41,7 @@ export function WorkoutTimer({ startedAt, totalSets, completedSets }: WorkoutTim
 
     return (
         <div className="flex items-center gap-2">
-            <span className="tabular-nums font-mono font-bold text-[17px] tracking-widest text-primary">
+            <span className="tabular-nums font-mono font-black text-xl tracking-widest text-primary drop-shadow-[0_0_8px_rgba(0,226,170,0.5)]">
                 {hours > 0 ? `${hours.toString().padStart(2, '0')}:` : ''}
                 {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
             </span>

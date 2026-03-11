@@ -124,11 +124,11 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                 animate={controls}
                 style={{ x }}
                 className={cn(
-                    "relative grid grid-cols-[3rem_1fr_1fr_4rem] gap-2 items-center rounded-xl p-1 transition-colors touch-pan-y shadow-sm",
+                    "relative grid grid-cols-[2.5rem_1fr_1fr_4.5rem] gap-2.5 items-center rounded-xl p-1.5 transition-colors touch-pan-y shadow-sm",
                     isCompleted ? "bg-[#182433]" : "bg-card border border-white/5"
                 )}
             >
-                <div className={cn("text-center text-[15px] font-bold tracking-tight", isCompleted ? "text-primary" : "text-muted-foreground")}>
+                <div className={cn("text-center text-[16px] font-black tracking-tight", isCompleted ? "text-primary drop-shadow-[0_0_8px_rgba(0,226,170,0.4)]" : "text-muted-foreground/60")}>
                     {setEntry.setIndex}
                 </div>
                 <Input
@@ -140,8 +140,8 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                     placeholder={setEntry.previousWeight ? setEntry.previousWeight.toString() : "0"}
                     disabled={isCompleted}
                     className={cn(
-                        "h-11 tabular-nums text-[16px] text-center font-semibold border-0 transition-all focus:scale-105 focus:ring-2 focus:ring-primary focus:bg-primary/10 shadow-none placeholder:text-muted-foreground/30",
-                        isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
+                        "h-14 tabular-nums text-lg text-center font-black border-0 transition-all focus:scale-[1.02] focus:ring-2 focus:ring-primary focus:bg-primary/20 shadow-none placeholder:text-muted-foreground/20 rounded-xl",
+                        isCompleted ? "bg-transparent text-foreground" : "bg-black/40 text-foreground shadow-inner"
                     )}
                 />
                 <Input
@@ -153,11 +153,11 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                     placeholder={setEntry.previousReps ? setEntry.previousReps.toString() : "0"}
                     disabled={isCompleted}
                     className={cn(
-                        "h-11 tabular-nums text-[16px] text-center font-semibold border-0 transition-all focus:scale-105 focus:ring-2 focus:ring-primary focus:bg-primary/10 shadow-none placeholder:text-muted-foreground/30",
-                        isCompleted ? "bg-transparent text-foreground" : "bg-secondary/80 text-foreground"
+                        "h-14 tabular-nums text-lg text-center font-black border-0 transition-all focus:scale-[1.02] focus:ring-2 focus:ring-primary focus:bg-primary/20 shadow-none placeholder:text-muted-foreground/20 rounded-xl",
+                        isCompleted ? "bg-transparent text-foreground" : "bg-black/40 text-foreground shadow-inner"
                     )}
                 />
-                <div className="flex justify-end pr-1">
+                <div className="flex justify-end pr-1 h-full items-center">
                     <Button
                         onClick={handleSave}
                         disabled={isLoading || (!weight && !setEntry.previousWeight) || (!reps && !setEntry.previousReps)}
@@ -165,11 +165,11 @@ export function SetRow({ exerciseId, exerciseDbId, setEntry, onComplete, onPR }:
                         variant={isCompleted ? "default" : "outline"}
                         aria-label={isCompleted ? "Satz bearbeiten" : "Satz abspeichern"}
                         className={cn(
-                            "h-11 w-11 text-[16px] rounded-[10px] active:scale-95 transition-transform",
-                            isCompleted ? "bg-primary text-primary-foreground border-0" : "bg-secondary/80 text-muted-foreground border-white/10"
+                            "h-14 w-full text-xl rounded-xl active:scale-95 transition-all duration-200",
+                            isCompleted ? "bg-primary text-primary-foreground border-0 shadow-[0_4px_12px_rgba(0,226,170,0.4)]" : "bg-black/60 text-muted-foreground border-white/5 hover:bg-black/80"
                         )}
                     >
-                        <Check className={cn("h-5 w-5", isLoading && "animate-pulse")} />
+                        <Check className={cn("h-6 w-6", isLoading && "animate-pulse")} weight="bold" />
                     </Button>
                 </div>
             </motion.div>

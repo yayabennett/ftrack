@@ -42,11 +42,11 @@ export function SwipeToFinish({ onFinish }: { onFinish: () => void }) {
     return (
         <motion.div
             style={{ backgroundColor: bgColor }}
-            className="relative h-16 w-full max-w-[320px] mx-auto rounded-full border border-white/10 flex items-center p-1 overflow-hidden"
+            className="relative h-16 w-full max-w-[320px] mx-auto rounded-full ring-1 ring-white/10 border-0 flex items-center p-1 overflow-hidden backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
         >
             {/* Background Text */}
             <motion.div style={{ opacity }} className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="text-[15px] font-bold tracking-widest uppercase text-muted-foreground/80 pl-8">
+                <span className="text-[15px] font-black tracking-widest uppercase text-muted-foreground/60 drop-shadow-md pl-8">
                     Workout beenden
                 </span>
             </motion.div>
@@ -60,8 +60,8 @@ export function SwipeToFinish({ onFinish }: { onFinish: () => void }) {
                 animate={controls}
                 style={{ x }}
                 className={cn(
-                    "h-14 w-14 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg relative z-10",
-                    isFinished ? "bg-[#00E2AA] text-black" : "bg-primary text-primary-foreground"
+                    "h-14 w-14 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-[0_4px_16px_rgba(0,0,0,0.3)] relative z-10 transition-colors duration-300",
+                    isFinished ? "bg-[#00E2AA] text-black shadow-[0_0_24px_rgba(0,226,170,0.6)]" : "bg-primary text-primary-foreground shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)]"
                 )}
             >
                 {isFinished ? (

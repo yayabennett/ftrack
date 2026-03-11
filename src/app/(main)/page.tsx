@@ -35,10 +35,10 @@ export default async function Home() {
       {/* Header / Brand */}
       <header className="px-5 pt-8 pb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1">
+          <h1 className="text-[42px] leading-tight font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50 mb-1">
             Heute
           </h1>
-          <p className="text-sm font-semibold text-muted-foreground">
+          <p className="text-sm font-bold text-muted-foreground/80 tracking-wide">
             Hi {userName}, {greeting}
           </p>
         </div>
@@ -49,13 +49,13 @@ export default async function Home() {
         </Link>
       </header>
 
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-2">
-        <div className="px-5">
-          <Link href="/workout/start" className="w-full flex items-center justify-between p-4 rounded-3xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-[0_4px_24px_rgba(0,226,170,0.25)] active:scale-[0.98] transition-all group overflow-hidden relative">
-            <div className="absolute inset-0 bg-white/10 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-            <span className="text-[15px] relative z-10">Workout Starten</span>
-            <div className="w-8 h-8 rounded-full bg-black/20 flex items-center justify-center relative z-10 group-hover:rotate-90 transition-transform duration-300">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+      <div className="space-y-8 mt-2 pb-8">
+        <div className="px-5 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
+          <Link href="/workout/start" className="w-full flex items-center justify-between p-4 rounded-[28px] bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_8px_32px_rgba(0,226,170,0.35)] ring-1 ring-primary/50 active:scale-[0.96] transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+            <span className="text-[16px] relative z-10 drop-shadow-sm ml-2">Workout Starten</span>
+            <div className="w-10 h-10 rounded-full bg-black/20 flex items-center justify-center relative z-10 group-hover:rotate-45 transition-transform duration-300 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="translate-x-[1px]">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>

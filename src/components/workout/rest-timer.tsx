@@ -76,7 +76,7 @@ export function RestTimerPill({ endsAt, onDismiss }: { endsAt: number; onDismiss
             className="flex items-center justify-center gap-3 py-2 animate-in fade-in cursor-pointer active:scale-95 transition-transform"
             onClick={handleSkip}
         >
-            <span className="font-mono font-bold text-primary text-lg tracking-wider tabular-nums animate-pulse-slow">
+            <span className="font-mono font-black text-primary text-xl tracking-wider tabular-nums animate-pulse-slow drop-shadow-[0_0_8px_rgba(0,226,170,0.5)]">
                 {mins}:{secs.toString().padStart(2, '0')}
             </span>
             <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Pause</span>

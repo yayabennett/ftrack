@@ -30,9 +30,9 @@ export async function WeeklyConsistency({ userId }: { userId: string }) {
     })
 
     return (
-        <section className="px-5">
-            <Link href="/history" className="block active:scale-[0.98] transition-transform group">
-                <div className="bg-card border border-border/40 rounded-[1.25rem] p-5 shadow-sm group-hover:bg-primary/5 transition-colors duration-300">
+        <section className="px-5 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both delay-[150ms]">
+            <Link href="/history" className="block active:scale-[0.96] transition-all duration-300 group card-hover">
+                <div className="bg-card/40 backdrop-blur-md ring-1 ring-white/5 border-0 rounded-[28px] p-5 shadow-soft group-hover:bg-card/60 transition-all duration-300 relative overflow-hidden">
                     <div className="flex items-center justify-between mb-5">
                         <h2 className="text-xl font-bold tracking-tight text-foreground">Aktivität</h2>
                         {weekSessions.length > 0 && (
