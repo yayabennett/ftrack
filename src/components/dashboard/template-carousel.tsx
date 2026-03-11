@@ -31,7 +31,8 @@ export async function TemplateCarousel({ userId }: { userId: string }) {
                         </Card>
                     </Link>
                 ) : templates.map((template) => {
-                    const tColor = template.color === 'primary' ? 'hsl(var(--primary))' : (template.color || 'hsl(var(--primary))')
+                    const rawColor = (template as any).color;
+                    const tColor = rawColor === 'primary' ? 'hsl(var(--primary))' : (rawColor || 'hsl(var(--primary))')
 
                     return (
                         <Link key={template.id} href={`/templates/${template.id}`} className="min-w-[170px] active:scale-[0.96] transition-all duration-300 group card-hover relative">
