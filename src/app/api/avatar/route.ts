@@ -44,6 +44,8 @@ export async function GET(request: Request) {
                 seed: config.seed,
                 backgroundColor: config.bgColor !== 'transparent' ? [config.bgColor.replace('#', '')] : undefined,
                 radius: 50,
+                facialHairProbability: 100,
+                glassesProbability: 100,
                 ...config.traits
             }).toString()
         }

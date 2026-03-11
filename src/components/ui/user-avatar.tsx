@@ -49,6 +49,8 @@ export function UserAvatar({ seed, style, defaultName, className = "w-10 h-10" }
                 seed: config.seed,
                 backgroundColor: config.bgColor !== 'transparent' ? [config.bgColor.replace('#', '')] : undefined,
                 radius: 50,
+                facialHairProbability: 100,
+                glassesProbability: 100,
                 // Pass all dynamic traits parsed from string 
                 // e.g. { hair: ['short'], facialHair: ['beard'], ... }
                 ...config.traits

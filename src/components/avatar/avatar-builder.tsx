@@ -3,13 +3,12 @@
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { UserAvatar } from '@/components/ui/user-avatar'
-import { Check, DiceThree, CheckCircle, ArrowCounterClockwise } from '@phosphor-icons/react'
+import { Check, DiceThree, CheckCircle, ArrowCounterClockwise, Sparkle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { parseAvatarConfig, stringifyAvatarConfig, AvatarConfig } from '@/lib/avatar-utils'
 
-// Since we map "builder" to Micah, we provide trait options compatible with Micah
 const TRAITS = {
     hair: [
         { id: 'fonze', label: 'Kurz' },
@@ -45,20 +44,19 @@ const TRAITS = {
     ]
 }
 
-const BG_COLORS = [
-    { id: 'transparent', label: 'Leer' },
-    { id: '#3b82f6', label: 'Blau' },
-    { id: '#10b981', label: 'Smaragd' },
-    { id: '#8b5cf6', label: 'Violett' },
-    { id: '#ec4899', label: 'Pink' },
-    { id: '#f59e0b', label: 'Bernstein' },
-    { id: '#ef4444', label: 'Rot' }
+const HAIR_COLORS = [
+    { id: '000000', label: 'Schwarz' },
+    { id: '77311d', label: 'Braun' },
+    { id: 'ffba5a', label: 'Blond' },
+    { id: 'd93967', label: 'Rot' },
+    { id: 'e0ddff', label: 'Grau' },
+    { id: '9287ff', label: 'Lila' },
+    { id: 'fc909f', label: 'Pink' },
 ]
 
 const TABS = [
-    { id: 'hair', label: 'Frisur' },
-    { id: 'face', label: 'Gesicht' },
-    { id: 'colors', label: 'Farben' }
+    { id: 'hair', label: 'Frisur & Haar' },
+    { id: 'face', label: 'Gesicht & Details' }
 ]
 
 interface AvatarBuilderProps {
@@ -70,22 +68,23 @@ interface AvatarBuilderProps {
 export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderProps) {
     const router = useRouter()
 
-    // Original DB Config
     const originalConfig = parseAvatarConfig(currentStyle, userId)
 
-    // Working State
-    const [config, setConfig] = useState<AvatarConfig>(originalConfig)
+    // Ensure we force background to transparent for the new builder format, if they had a color before or not.
+    const [config, setConfig] = useState<AvatarConfig>({
+        ...originalConfig,
+        bgColor: 'transparent'
+    })
     const [activeTab, setActiveTab] = useState('hair')
     const [isSaving, setIsSaving] = useState(false)
 
-    // Ensure style is builder if they start changing traits that only micah supports
     const handleTraitChange = (category: string, value: string) => {
         setConfig(prev => {
             const newTraits = { ...prev.traits }
             if (value === '') {
                 delete newTraits[category]
             } else {
-                newTraits[category] = [value] // Arrays required for traits by dicebear
+                newTraits[category] = [value]
             }
             return {
                 ...prev,
@@ -95,18 +94,10 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
         })
     }
 
-    const handleBgChange = (bgColor: string) => {
-        setConfig(prev => ({ ...prev, bgColor }))
-    }
-
     const handleShuffle = () => {
-        // Randomize all the builder traits + seed to get completely new combo
         const newSeed = Math.random().toString(16).substring(2, 10)
 
-        const randomTrait = (options: { id: string }[]) => {
-            const randomOption = options[Math.floor(Math.random() * options.length)]
-            return randomOption.id
-        }
+        const randomTrait = (options: { id: string }[]) => options[Math.floor(Math.random() * options.length)].id
 
         const newTraits: Record<string, string[]> = {}
         const hair = randomTrait(TRAITS.hair)
@@ -124,22 +115,24 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
         const glasses = randomTrait(TRAITS.glasses)
         if (glasses) newTraits.glasses = [glasses]
 
+        const hairColor = randomTrait(HAIR_COLORS)
+        newTraits.hairColor = [hairColor]
+
         setConfig({
             style: 'builder',
             seed: newSeed,
-            // keep old bg color or randomize? Let's keep the bg color.
-            bgColor: config.bgColor,
+            bgColor: 'transparent',
             isUrl: false,
             traits: newTraits
         })
     }
 
     const handleReset = () => {
-        setConfig(originalConfig)
+        setConfig({ ...originalConfig, bgColor: 'transparent' })
     }
 
     const draftString = stringifyAvatarConfig(config)
-    const currentString = currentStyle || ''
+    const currentString = stringifyAvatarConfig({ ...originalConfig, bgColor: 'transparent' })
     const hasChanged = draftString !== currentString
 
     const saveAvatar = async () => {
@@ -165,83 +158,88 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
     }
 
     return (
-        <div className="space-y-4">
-            <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">Avatar Studio</h3>
+        <div className="space-y-6">
+            <div className="flex items-center gap-2 px-1">
+                <Sparkle className="w-5 h-5 text-primary" weight="fill" />
+                <h3 className="text-sm font-bold tracking-widest text-foreground uppercase">Avatar Studio</h3>
+            </div>
 
-            <Card className="bg-card ring-1 ring-white/5 border-0 rounded-3xl overflow-hidden shadow-sm">
-                <CardContent className="p-0">
-                    {/* Top: Large Preview Area */}
-                    <div className="bg-gradient-to-br from-secondary/50 via-background to-secondary/30 pt-8 pb-6 px-4 flex flex-col justify-center items-center relative gap-6 border-b border-white/5">
+            <div className="bg-card ring-1 ring-white/10 rounded-[32px] overflow-hidden shadow-2xl shadow-black/20">
+                {/* Premium Header / Preview Area */}
+                <div className="relative pt-12 pb-10 px-4 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-background via-background to-secondary/20">
 
-                        {/* Control Buttons (Reset / Shuffle) */}
-                        <div className="absolute top-4 left-4 right-4 flex justify-between">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleReset}
-                                disabled={!hasChanged}
-                                className="h-8 w-8 p-0 rounded-full bg-background/50 backdrop-blur"
-                            >
-                                <ArrowCounterClockwise className="w-4 h-4 text-muted-foreground" />
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={handleShuffle}
-                                className="h-8 rounded-full shadow-sm font-bold gap-1.5 active:scale-95 transition-transform"
-                            >
-                                <DiceThree className="w-4 h-4" weight="fill" />
-                                Würfeln
-                            </Button>
-                        </div>
+                    {/* Glowing Backdrops */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/20 blur-[64px] rounded-full pointer-events-none" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-violet-500/20 blur-[48px] rounded-full pointer-events-none" />
 
-                        <div className="relative group mt-4">
-                            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-110 opacity-50" />
-                            <UserAvatar
-                                style={draftString}
-                                seed={config.seed}
-                                defaultName={userName || undefined}
-                                className="w-32 h-32 ring-4 ring-background shadow-xl text-4xl relative z-10 transition-transform duration-300"
-                            />
-                        </div>
-
-                        {/* Tabs */}
-                        <div className="flex gap-1.5 bg-secondary/40 rounded-full p-1 w-full max-w-[280px]">
-                            {TABS.map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`flex-1 py-1.5 rounded-full text-[12px] font-bold transition-all ${activeTab === tab.id
-                                        ? "bg-background text-foreground shadow-sm"
-                                        : "text-muted-foreground hover:text-foreground"
-                                        }`}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
+                    {/* Top Controls */}
+                    <div className="absolute top-5 left-5 right-5 flex justify-between z-20">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleReset}
+                            disabled={!hasChanged}
+                            className={`w-10 h-10 rounded-full bg-background/50 backdrop-blur-md border-white/10 transition-all ${hasChanged ? 'opacity-100 hover:bg-background/80 hover:scale-105' : 'opacity-40 pointer-events-none'}`}
+                        >
+                            <ArrowCounterClockwise className="w-5 h-5" />
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            onClick={handleShuffle}
+                            className="h-10 rounded-full px-4 gap-2 bg-foreground text-background hover:bg-foreground/90 font-bold shadow-lg shadow-black/20 hover:scale-105 transition-all"
+                        >
+                            <DiceThree className="w-5 h-5" weight="fill" />
+                            Würfeln
+                        </Button>
                     </div>
 
-                    {/* Bottom: Customization Controls */}
-                    <div className="p-5 space-y-6">
+                    {/* Avatar Display */}
+                    <div className="relative group z-10">
+                        <UserAvatar
+                            style={draftString}
+                            seed={config.seed}
+                            defaultName={userName || undefined}
+                            className="w-40 h-40 ring-[6px] ring-background/80 shadow-2xl text-5xl relative z-10 transition-transform duration-500 ease-out group-hover:scale-105 bg-secondary/30 backdrop-blur-sm"
+                        />
+                    </div>
+                </div>
+
+                {/* Trait Controls */}
+                <div className="bg-secondary/10 p-2 border-t border-white/5">
+                    {/* Premium Tabs */}
+                    <div className="flex gap-2 p-1.5 bg-background/50 backdrop-blur-xl rounded-[24px] mx-2 mt-2">
+                        {TABS.map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex-1 py-2.5 rounded-[20px] text-[13px] font-bold transition-all duration-300 ${activeTab === tab.id
+                                        ? "bg-foreground text-background shadow-md shadow-black/20"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                    }`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="p-4 space-y-8 min-h-[300px] mt-2">
                         {activeTab === 'hair' && (
-                            <div className="space-y-5 animate-in fade-in slide-in-from-right-2 duration-200">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300 ease-out fill-mode-both">
+
                                 {/* Hair Style Selector */}
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Frisur</label>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="space-y-3.5">
+                                    <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Schnitt</label>
+                                    <div className="flex flex-wrap gap-2.5">
                                         {TRAITS.hair.map((t) => {
                                             const isActive = ((config.traits.hair as string[])?.[0] || 'fonze') === t.id
-                                            const isOldInitials = config.style === 'initials' && !config.traits.hair
-                                            const actuallyActive = isActive && !isOldInitials
-
+                                            const actuallyActive = isActive && config.style !== 'initials'
                                             return (
                                                 <button
                                                     key={t.id}
                                                     onClick={() => handleTraitChange('hair', t.id)}
-                                                    className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold transition-all active:scale-95 border ${actuallyActive
-                                                        ? 'bg-foreground text-background border-transparent shadow-sm'
-                                                        : 'bg-secondary/50 text-muted-foreground border-transparent hover:text-foreground'
+                                                    className={`px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-all duration-200 active:scale-95 ${actuallyActive
+                                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 ring-2 ring-primary ring-offset-2 ring-offset-card'
+                                                            : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-secondary border border-white/5 shadow-sm'
                                                         }`}
                                                 >
                                                     {t.label}
@@ -250,10 +248,39 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                                         })}
                                     </div>
                                 </div>
+
+                                {/* Hair Color Selector */}
+                                <div className="space-y-3.5">
+                                    <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Haarfarbe</label>
+                                    <div className="flex gap-4 overflow-x-auto pb-4 pt-1 px-1 no-scrollbar snap-x">
+                                        {HAIR_COLORS.map((c) => {
+                                            // Handle default fallback logically: if no color is set, "000000" might be a safe assumption or the actual default is unknown. We check active state strictly.
+                                            const isActive = ((config.traits.hairColor as string[])?.[0] || '') === c.id
+                                            return (
+                                                <button
+                                                    key={c.id}
+                                                    onClick={() => handleTraitChange('hairColor', c.id)}
+                                                    className={`w-14 h-14 rounded-full shrink-0 snap-center transition-all duration-300 active:scale-90 flex items-center justify-center relative ${isActive
+                                                            ? 'ring-4 ring-primary ring-offset-4 ring-offset-card scale-110 shadow-xl shadow-primary/20'
+                                                            : 'ring-1 ring-white/10 shadow-sm hover:scale-110'
+                                                        }`}
+                                                    style={{ backgroundColor: `#${c.id}` }}
+                                                >
+                                                    {/* Inner inset shadow for realistic bubble feel */}
+                                                    <div className="absolute inset-0 rounded-full shadow-[inset_0_-4px_8px_rgba(0,0,0,0.3)] mix-blend-overlay pointer-events-none" />
+                                                    <div className="absolute inset-0 rounded-full shadow-[inset_0_4px_8px_rgba(255,255,255,0.4)] mix-blend-overlay pointer-events-none" />
+
+                                                    {isActive && <Check className="w-6 h-6 text-white drop-shadow-md relative z-10" weight="bold" />}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+
                                 {/* Facial Hair Selector */}
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Bart</label>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="space-y-3.5">
+                                    <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Bart</label>
+                                    <div className="flex flex-wrap gap-2.5">
                                         {TRAITS.facialHair.map((t) => {
                                             const isActive = ((config.traits.facialHair as string[])?.[0] || '') === t.id
                                             const actuallyActive = isActive && config.style !== 'initials'
@@ -261,9 +288,9 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                                                 <button
                                                     key={t.id || 'none'}
                                                     onClick={() => handleTraitChange('facialHair', t.id)}
-                                                    className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold transition-all active:scale-95 border ${actuallyActive
-                                                        ? 'bg-foreground text-background border-transparent shadow-sm'
-                                                        : 'bg-secondary/50 text-muted-foreground border-transparent hover:text-foreground'
+                                                    className={`px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-all duration-200 active:scale-95 border ${actuallyActive
+                                                            ? 'bg-foreground text-background border-transparent shadow-lg shadow-black/20'
+                                                            : 'bg-background/80 text-muted-foreground hover:text-foreground border-white/5 hover:bg-secondary'
                                                         }`}
                                                 >
                                                     {t.label}
@@ -276,11 +303,11 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                         )}
 
                         {activeTab === 'face' && (
-                            <div className="space-y-5 animate-in fade-in slide-in-from-right-2 duration-200">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300 ease-out fill-mode-both">
                                 {/* Eyes Selector */}
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Augen</label>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="space-y-3.5">
+                                    <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Augen</label>
+                                    <div className="flex flex-wrap gap-2.5">
                                         {TRAITS.eyes.map((t) => {
                                             const isActive = ((config.traits.eyes as string[])?.[0] || 'eyes') === t.id
                                             const actuallyActive = isActive && config.style !== 'initials'
@@ -288,9 +315,9 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                                                 <button
                                                     key={t.id}
                                                     onClick={() => handleTraitChange('eyes', t.id)}
-                                                    className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold transition-all active:scale-95 border ${actuallyActive
-                                                        ? 'bg-foreground text-background border-transparent shadow-sm'
-                                                        : 'bg-secondary/50 text-muted-foreground border-transparent hover:text-foreground'
+                                                    className={`px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-all duration-200 active:scale-95 border ${actuallyActive
+                                                            ? 'bg-foreground text-background border-transparent shadow-lg shadow-black/20'
+                                                            : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-secondary border-white/5'
                                                         }`}
                                                 >
                                                     {t.label}
@@ -299,10 +326,11 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                                         })}
                                     </div>
                                 </div>
+
                                 {/* Mouth Selector */}
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Mund</label>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="space-y-3.5">
+                                    <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Mund</label>
+                                    <div className="flex flex-wrap gap-2.5">
                                         {TRAITS.mouth.map((t) => {
                                             const isActive = ((config.traits.mouth as string[])?.[0] || 'smile') === t.id
                                             const actuallyActive = isActive && config.style !== 'initials'
@@ -310,9 +338,9 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                                                 <button
                                                     key={t.id}
                                                     onClick={() => handleTraitChange('mouth', t.id)}
-                                                    className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold transition-all active:scale-95 border ${actuallyActive
-                                                        ? 'bg-foreground text-background border-transparent shadow-sm'
-                                                        : 'bg-secondary/50 text-muted-foreground border-transparent hover:text-foreground'
+                                                    className={`px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-all duration-200 active:scale-95 border ${actuallyActive
+                                                            ? 'bg-foreground text-background border-transparent shadow-lg shadow-black/20'
+                                                            : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-secondary border-white/5'
                                                         }`}
                                                 >
                                                     {t.label}
@@ -321,10 +349,11 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                                         })}
                                     </div>
                                 </div>
+
                                 {/* Glasses Selector */}
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Brille</label>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="space-y-3.5">
+                                    <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Brille</label>
+                                    <div className="flex flex-wrap gap-2.5">
                                         {TRAITS.glasses.map((t) => {
                                             const isActive = ((config.traits.glasses as string[])?.[0] || '') === t.id
                                             const actuallyActive = isActive && config.style !== 'initials'
@@ -332,9 +361,9 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                                                 <button
                                                     key={t.id || 'none'}
                                                     onClick={() => handleTraitChange('glasses', t.id)}
-                                                    className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold transition-all active:scale-95 border ${actuallyActive
-                                                        ? 'bg-foreground text-background border-transparent shadow-sm'
-                                                        : 'bg-secondary/50 text-muted-foreground border-transparent hover:text-foreground'
+                                                    className={`px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-all duration-200 active:scale-95 border ${actuallyActive
+                                                            ? 'bg-primary text-primary-foreground border-transparent shadow-lg shadow-primary/25 ring-2 ring-primary ring-offset-2 ring-offset-card'
+                                                            : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-secondary border-white/5'
                                                         }`}
                                                 >
                                                     {t.label}
@@ -346,51 +375,27 @@ export function AvatarBuilder({ currentStyle, userId, userName }: AvatarBuilderP
                             </div>
                         )}
 
-                        {activeTab === 'colors' && (
-                            <div className="space-y-5 animate-in fade-in slide-in-from-right-2 duration-200">
-                                {/* Background Color */}
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Hintergrund</label>
-                                    <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
-                                        {BG_COLORS.map((c) => (
-                                            <button
-                                                key={c.id}
-                                                onClick={() => handleBgChange(c.id)}
-                                                className={`w-10 h-10 rounded-full shrink-0 transition-transform active:scale-90 flex items-center justify-center border-2 ${config.bgColor === c.id
-                                                    ? 'border-foreground scale-110'
-                                                    : 'border-transparent'
-                                                    }`}
-                                                style={{ backgroundColor: c.id === 'transparent' ? 'rgba(255,255,255,0.05)' : c.id }}
-                                            >
-                                                {config.bgColor === c.id && <Check className={`w-5 h-5 ${c.id === 'transparent' ? 'text-foreground' : 'text-white'}`} weight="bold" />}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                {/* In a full version, we could add Skin color, Hair Color here through the traits system. */}
-                            </div>
-                        )}
-
-                        {/* Save Action */}
-                        <div className="pt-2">
+                        {/* Save Action Area */}
+                        <div className="pt-6 pb-2">
                             <Button
                                 onClick={saveAvatar}
                                 disabled={!hasChanged || isSaving}
-                                className="w-full h-12 text-[15px] font-bold rounded-2xl shadow-sm transition-all"
-                                variant={hasChanged ? 'default' : 'secondary'}
+                                className={`w-full h-14 text-[16px] font-bold rounded-full shadow-xl transition-all duration-300 ${hasChanged ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/25 scale-100' : 'bg-background/50 border border-white/5 text-muted-foreground shadow-none scale-[0.98]'
+                                    }`}
+                                variant="outline"
                             >
                                 {isSaving ? (
-                                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                    <div className="w-6 h-6 border-3 border-white/20 border-t-white rounded-full animate-spin" />
                                 ) : hasChanged ? (
-                                    <>Änderungen speichern <CheckCircle className="ml-1.5 w-5 h-5" weight="fill" /></>
+                                    <>Änderungen speichern <CheckCircle className="ml-2 w-6 h-6" weight="fill" /></>
                                 ) : (
-                                    'Bereits berechnet & schick'
+                                    'Profilbild ist aktuell'
                                 )}
                             </Button>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     )
 }
