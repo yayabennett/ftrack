@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { MiniSparkline } from '@/components/ui/mini-sparkline'
 import type { ExerciseDTO } from '@/lib/types'
 import { getMuscleGroupStyle } from '@/lib/exercise-styles'
+import { useHaptics } from '@/hooks/use-haptics'
 
 interface ExerciseListItemProps {
     exercise: ExerciseDTO & {
@@ -15,6 +16,7 @@ interface ExerciseListItemProps {
 }
 
 export function ExerciseListItem({ exercise }: ExerciseListItemProps) {
+    const { vibrate } = useHaptics()
     const level = exercise.history?.length || 0
     const hasTrend = exercise.history && exercise.history.length > 1
 
@@ -23,11 +25,12 @@ export function ExerciseListItem({ exercise }: ExerciseListItemProps) {
     return (
         <Link
             href={`/exercises/${exercise.id}`}
+            onClick={() => vibrate('light')}
             className={cn(
-                "flex items-center justify-between px-4 py-3.5 rounded-2xl",
-                "bg-card/40 ring-1 ring-white/[0.04] border-0",
-                "active:scale-[0.98] transition-all duration-150",
-                "hover:bg-card/70 hover:ring-white/[0.08]",
+                "flex items-center justify-between px-4 min-h-[72px] rounded-[20px]",
+                "bg-card/60 backdrop-blur-md ring-1 ring-white/5 border-0 shadow-sm",
+                "active:scale-95 transition-all duration-300",
+                "hover:bg-card hover:ring-white/10 hover:shadow-md",
                 "group relative overflow-hidden"
             )}
         >

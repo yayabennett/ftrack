@@ -145,7 +145,7 @@ export default function ExercisesPage() {
                         placeholder="Übung suchen (Lokal & Global)…"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full h-12 pl-12 pr-4 rounded-2xl bg-card border border-border/40 text-[15px] font-medium text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all shadow-sm"
+                        className="w-full h-14 pl-12 pr-4 rounded-[20px] bg-card/60 backdrop-blur-md ring-1 ring-white/10 text-[16px] font-bold text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all shadow-sm"
                     />
                 </div>
 
@@ -160,10 +160,10 @@ export default function ExercisesPage() {
                                 key={f.id}
                                 onClick={() => setFilter(f.id as 'all' | 'frequent' | 'focus')}
                                 className={cn(
-                                    "whitespace-nowrap px-4 py-1.5 rounded-full text-[13px] font-bold transition-all shrink-0 border",
+                                    "whitespace-nowrap px-5 py-2 rounded-full text-[13px] font-bold transition-all shrink-0 active:scale-95",
                                     filter === f.id
-                                        ? "bg-primary text-primary-foreground border-transparent shadow-sm glow-primary"
-                                        : "bg-card border-border/40 text-muted-foreground hover:text-foreground hover:border-border"
+                                        ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                                        : "bg-card/60 backdrop-blur-md ring-1 ring-white/5 text-muted-foreground hover:text-foreground hover:bg-card/80"
                                 )}
                             >
                                 {f.label}
@@ -191,7 +191,7 @@ export default function ExercisesPage() {
                                     hidden: { opacity: 0, scale: 0.95 },
                                     show: { opacity: 1, scale: 1 }
                                 }}
-                                className="h-16 rounded-2xl bg-secondary/40 animate-pulse"
+                                className="min-h-[72px] rounded-[20px] bg-card/40 backdrop-blur-md ring-1 ring-white/5 animate-pulse"
                             />
                         ))}
                     </motion.div>
@@ -232,7 +232,7 @@ export default function ExercisesPage() {
                                 ) : (
                                     <div className="space-y-2">
                                         {globalResults.map(ex => (
-                                            <div key={`global-${ex.id}`} className="flex items-center justify-between px-4 py-3 bg-card border border-border/40 rounded-2xl">
+                                            <div key={`global-${ex.id}`} className="flex items-center justify-between px-4 min-h-[72px] bg-card/60 backdrop-blur-md ring-1 ring-white/5 rounded-[20px] shadow-sm">
                                                 <div className="min-w-0 pr-4">
                                                     <p className="font-bold text-[15px] text-foreground truncate">{ex.name}</p>
                                                     <div className="flex gap-2 mt-0.5">
