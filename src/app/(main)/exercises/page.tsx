@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import type { ExerciseDTO } from '@/lib/types'
 import { ExerciseListItem } from '@/components/exercises/exercise-list-item'
 import { MuscleGroupSection } from '@/components/exercises/muscle-group-section'
+import { CreateExerciseDialog } from '@/components/exercises/create-exercise-dialog'
 import { motion } from 'framer-motion'
 
 type ExerciseWithTrend = ExerciseDTO & {
@@ -137,7 +138,9 @@ export default function ExercisesPage() {
                 </div>
             )}
 
-            <div className="px-5 py-3 space-y-3 sticky top-safe z-40 bg-background/80 backdrop-blur-md outline outline-8 outline-background/80">
+            <div className="px-5 py-3 space-y-4 sticky top-safe z-40 bg-background/80 backdrop-blur-md outline outline-8 outline-background/80">
+                <CreateExerciseDialog />
+
                 <div className="relative">
                     <MagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <input

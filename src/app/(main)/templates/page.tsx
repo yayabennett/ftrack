@@ -139,47 +139,7 @@ export default function EinheitenPage() {
                 </h1>
             </header>
 
-            {!search && filter === 'all' && recentlyTrained.length > 0 && (
-                <div className="px-5 py-4 space-y-3">
-                    <h3 className="text-[10px] font-black tracking-widest text-primary uppercase flex items-center gap-2">
-                        <Sparkle weight="fill" className="w-3 h-3" />
-                        Zuletzt trainiert
-                    </h3>
-                    <div className="grid grid-cols-1 gap-3">
-                        {recentlyTrained.map(template => (
-                            <Card
-                                key={`recent-${template.id}`}
-                                onClick={() => router.push(`/templates/${template.id}`)}
-                                className="cursor-pointer transition-all active:scale-[0.98] block group card-hover relative overflow-hidden"
-                            >
-                                <CardContent className="p-0">
-                                    <div className="p-4 flex flex-col gap-3">
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
-                                                <p className="text-[13px] text-muted-foreground leading-snug truncate">
-                                                    {template.exercises.map(e => e.exercise.name).join(', ')}
-                                                </p>
-                                            </div>
-                                            <Button
-                                                size="sm"
-                                                className="h-9 rounded-xl font-bold text-white hover:brightness-110 flex gap-1.5 px-4 shadow-sm shrink-0 ml-3"
-                                                style={{ backgroundColor: template.color === 'primary' ? 'hsl(var(--primary))' : (template.color || 'hsl(var(--primary))') }}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/workout/active?templateId=${template.id}`);
-                                                }}
-                                            >
-                                                <Play className="w-4 h-4 fill-current" /> Starten
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            )}
+
 
             <div className="px-5 py-3 space-y-3 sticky top-safe z-40 bg-background/80 backdrop-blur-md outline outline-8 outline-background/80 mt-2">
                 <div className="relative">
@@ -242,73 +202,85 @@ export default function EinheitenPage() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {filteredTemplates.map(template => (
-                            <div
-                                key={template.id}
-                                onClick={() => router.push(`/templates/${template.id}`)}
-                                className="block cursor-pointer active:scale-[0.99] transition-all group card-hover"
-                            >
-                                <Card className={`transition-all relative overflow-hidden ${deletingId === template.id ? 'opacity-50' : ''}`}>
-                                    <CardContent className="p-0">
-                                        <div className="p-4 flex flex-col gap-3">
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex-1 min-w-0 pr-2">
-                                                    <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
-                                                    <p className="text-[13px] text-muted-foreground leading-snug truncate">
-                                                        {template.exercises.map(e => e.exercise.name).join(', ')}
-                                                    </p>
-                                                </div>
-                                                <div className="flex flex-col gap-1 shrink-0">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-9 w-9 text-muted-foreground hover:bg-secondary/80 hover:text-foreground rounded-lg transition-colors"
-                                                        onClick={(e) => handleDuplicate(template.id, e)}
-                                                        disabled={duplicatingId === template.id || deletingId === template.id}
-                                                    >
-                                                        {duplicatingId === template.id ? (
-                                                            <div className={`h-4 w-4 border-2 border-t-transparent rounded-full animate-spin`} style={{ borderColor: template.color === 'primary' ? 'hsl(var(--primary))' : (template.color || 'hsl(var(--primary))'), borderTopColor: 'transparent' }} />
-                                                        ) : (
-                                                            <Copy className="h-4 w-4" />
-                                                        )}
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
-                                                        onClick={(e) => handleDelete(template.id, template.name, e)}
-                                                        disabled={deletingId === template.id || duplicatingId === template.id}
-                                                    >
-                                                        {deletingId === template.id ? (
-                                                            <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
-                                                        ) : (
-                                                            <Trash2 className="h-4 w-4" />
-                                                        )}
-                                                    </Button>
-                                                </div>
-                                            </div>
+                        {filteredTemplates.map(template => {
+                            const rawColor = (template as any).color;
+                            const tColor = rawColor === 'primary' ? 'hsl(var(--primary))' : (rawColor || 'hsl(var(--primary))')
 
-                                            <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">
-                                                <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
-                                                    {template.exercises.length} Übungen
-                                                </span>
-                                                <Button
-                                                    size="sm"
-                                                    className="h-9 rounded-xl font-bold text-white hover:brightness-110 flex gap-1.5 px-4 shadow-sm"
-                                                    style={{ backgroundColor: template.color === 'primary' ? 'hsl(var(--primary))' : (template.color || 'hsl(var(--primary))') }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        router.push(`/workout/active?templateId=${template.id}`);
-                                                    }}
-                                                >
-                                                    <Play className="w-4 h-4 fill-current" /> Starten
-                                                </Button>
+                            return (
+                                <div
+                                    key={template.id}
+                                    onClick={() => router.push(`/templates/${template.id}`)}
+                                    className="block cursor-pointer active:scale-[0.99] transition-all group relative card-hover"
+                                >
+                                    <Card
+                                        className={`transition-all relative overflow-hidden ring-0 rounded-[28px] bg-card/40 backdrop-blur-md ${deletingId === template.id ? 'opacity-50' : ''}`}
+                                        style={{
+                                            boxShadow: `0 8px 30px -10px color-mix(in srgb, ${tColor} 30%, transparent)`,
+                                            border: `1px solid color-mix(in srgb, ${tColor} 20%, transparent)`
+                                        }}
+                                    >
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none" style={{ background: `linear-gradient(135deg, ${tColor} 0%, transparent 100%)` }} />
+
+                                        <CardContent className="p-0 relative z-10">
+                                            <div className="p-4 flex flex-col gap-3">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-1 min-w-0 pr-2">
+                                                        <h3 className="font-bold text-[18px] mb-1">{template.name}</h3>
+                                                        <p className="text-[13px] text-muted-foreground leading-snug truncate">
+                                                            {template.exercises.map(e => e.exercise.name).join(', ')}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 shrink-0">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-9 w-9 text-muted-foreground hover:bg-secondary/80 hover:text-foreground rounded-lg transition-colors"
+                                                            onClick={(e) => handleDuplicate(template.id, e)}
+                                                            disabled={duplicatingId === template.id || deletingId === template.id}
+                                                        >
+                                                            {duplicatingId === template.id ? (
+                                                                <div className={`h-4 w-4 border-2 border-t-transparent rounded-full animate-spin`} style={{ borderColor: tColor, borderTopColor: 'transparent' }} />
+                                                            ) : (
+                                                                <Copy className="h-4 w-4" />
+                                                            )}
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
+                                                            onClick={(e) => handleDelete(template.id, template.name, e)}
+                                                            disabled={deletingId === template.id || duplicatingId === template.id}
+                                                        >
+                                                            {deletingId === template.id ? (
+                                                                <div className="h-4 w-4 border-2 border-destructive border-t-transparent rounded-full animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="h-4 w-4" />
+                                                            )}
+                                                        </Button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/5">
+                                                    <span className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
+                                                        {template.exercises.length} Übungen
+                                                    </span>
+                                                    <Button
+                                                        size="sm"
+                                                        className="h-9 rounded-xl font-bold bg-primary text-primary-foreground flex gap-1.5 px-4 shadow-sm shadow-primary/20 active:scale-95 transition-transform"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            router.push(`/workout/active?templateId=${template.id}`);
+                                                        }}
+                                                    >
+                                                        <Play className="w-4 h-4 fill-current" /> Starten
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        ))}
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            )
+                        })}
                     </div>
                 )}
 
