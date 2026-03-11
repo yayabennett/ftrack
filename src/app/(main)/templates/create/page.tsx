@@ -197,7 +197,7 @@ export default function CreateTemplatePage() {
                         <label className="text-xs font-bold tracking-widest text-muted-foreground uppercase px-1">
                             Farbe
                         </label>
-                        <div className="flex gap-3 overflow-x-auto no-scrollbar px-1 pb-2">
+                        <div className="flex flex-wrap gap-4 pt-1 pb-3 px-1">
                             {[
                                 { id: 'hsl(var(--primary))', label: 'Blau' },
                                 { id: '#ef4444', label: 'Rot' },
@@ -210,11 +210,14 @@ export default function CreateTemplatePage() {
                                 <button
                                     key={c.id}
                                     type="button"
-                                    onClick={() => { vibrate('light'); setColor(c.id) }}
-                                    className={`w-10 h-10 rounded-full shrink-0 transition-transform active:scale-90 flex items-center justify-center ${color === c.id ? 'ring-2 ring-white ring-offset-2 ring-offset-background scale-110' : ''}`}
-                                    style={{ backgroundColor: c.id }}
+                                    onClick={() => { vibrate('medium'); setColor(c.id) }}
+                                    className={`w-[48px] h-[48px] rounded-full shrink-0 transition-all duration-300 active:scale-90 flex items-center justify-center relative ${color === c.id ? 'ring-2 ring-white ring-offset-4 ring-offset-background scale-110 z-10' : 'ring-1 ring-white/10 hover:scale-105 opacity-80 hover:opacity-100'}`}
+                                    style={{
+                                        backgroundColor: c.id,
+                                        boxShadow: color === c.id ? `0 0 24px -2px ${c.id}` : 'none'
+                                    }}
                                 >
-                                    {color === c.id && <Check className="w-5 h-5 text-white stroke-[3px]" />}
+                                    {color === c.id && <Check className="w-6 h-6 text-white stroke-[4px] drop-shadow-md" />}
                                 </button>
                             ))}
                         </div>
