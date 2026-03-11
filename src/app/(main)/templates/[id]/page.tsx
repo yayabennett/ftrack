@@ -10,6 +10,7 @@ import { useRouter, useParams } from 'next/navigation'
 import type { ExerciseDTO, TemplateDTO } from '@/lib/types'
 import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useHaptics } from '@/hooks/use-haptics'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
     DndContext,
@@ -40,6 +41,7 @@ export default function EditTemplatePage() {
     const { id } = useParams()
     const queryClient = useQueryClient()
     const [isPending, startTransition] = useTransition()
+    const { vibrate } = useHaptics()
 
     // UI State
     const [name, setName] = useState('')
@@ -110,6 +112,7 @@ export default function EditTemplatePage() {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event
         if (over && active.id !== over.id) {
+            vibrate('light')
             setSelectedExercises((items) => {
                 const oldIndex = items.findIndex(x => x.id === active.id)
                 const newIndex = items.findIndex(x => x.id === over.id)
@@ -150,6 +153,7 @@ export default function EditTemplatePage() {
     }
 
     const toggleSelection = (id: string) => {
+        vibrate('medium')
         setSelectedExercises(prev =>
             prev.some(x => x.id === id)
                 ? prev.filter(x => x.id !== id)
@@ -232,7 +236,7 @@ export default function EditTemplatePage() {
                                 <button
                                     key={c.id}
                                     type="button"
-                                    onClick={() => setColor(c.id)}
+                                    onClick={() => { vibrate('light'); setColor(c.id) }}
                                     className={`w-10 h-10 rounded-full shrink-0 transition-transform active:scale-90 flex items-center justify-center ${color === c.id ? 'ring-2 ring-white ring-offset-2 ring-offset-background scale-110' : ''}`}
                                     style={{ backgroundColor: c.id }}
                                 >
@@ -242,7 +246,7 @@ export default function EditTemplatePage() {
                         </div>
                     </div>
 
-                    <Card className={`relative bg-card ring-2 transition-all shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer active:scale-[0.98] ${isProgressiveOverload ? 'ring-primary bg-primary/5' : 'ring-white/5'}`} onClick={() => setIsProgressiveOverload(!isProgressiveOverload)}>
+                    <Card className={`relative transition-all shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer active:scale-[0.98] ${isProgressiveOverload ? 'ring-primary bg-primary/5' : 'ring-white/5'}`} onClick={() => { vibrate('light'); setIsProgressiveOverload(!isProgressiveOverload) }}>
                         <CardContent className="p-4 flex items-center justify-between">
                             <div className="flex-1 pr-4">
                                 <h4 className="font-bold text-[15px] text-foreground">Progressive Overload</h4>
@@ -319,7 +323,7 @@ export default function EditTemplatePage() {
                                 {['Alle', 'Push', 'Pull', 'Beine', 'Core'].map(tab => (
                                     <button
                                         key={tab}
-                                        onClick={() => setActiveTab(tab)}
+                                        onClick={() => { vibrate('light'); setActiveTab(tab) }}
                                         className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all active:scale-95 ${activeTab === tab ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card text-muted-foreground ring-1 ring-white/5'}`}
                                     >
                                         {tab}
@@ -342,7 +346,7 @@ export default function EditTemplatePage() {
                                         <Card
                                             key={ex.id}
                                             onClick={() => toggleSelection(ex.id)}
-                                            className={`bg-card ring-1 shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer transition-all active:scale-[0.98] ${isSelected ? 'ring-primary bg-primary/5' : 'ring-white/5'}`}
+                                            className={`transition-all overflow-hidden cursor-pointer active:scale-[0.98] ${isSelected ? 'ring-primary bg-primary/5' : ''}`}
                                         >
                                             <CardContent className="p-4 flex items-center justify-between">
                                                 <div>

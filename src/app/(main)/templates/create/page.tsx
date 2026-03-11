@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import type { ExerciseDTO } from '@/lib/types'
 import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useHaptics } from '@/hooks/use-haptics'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
     DndContext,
@@ -43,6 +44,8 @@ export default function CreateTemplatePage() {
     // UI State
     const [name, setName] = useState('')
     const [color, setColor] = useState('hsl(var(--primary))')
+    const { vibrate } = useHaptics()
+    const [isProgressiveOverload, setIsProgressiveOverload] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [activeTab, setActiveTab] = useState('Alle')
 
@@ -82,6 +85,7 @@ export default function CreateTemplatePage() {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event
         if (over && active.id !== over.id) {
+            vibrate('light')
             setSelectedIds((items) => {
                 const oldIndex = items.indexOf(active.id as string)
                 const newIndex = items.indexOf(over.id as string)
@@ -118,6 +122,7 @@ export default function CreateTemplatePage() {
                 body: JSON.stringify({
                     name,
                     color,
+                    isProgressiveOverload,
                     exercises: selectedIds.map(id => ({ exerciseId: id }))
                 })
             })
@@ -133,6 +138,7 @@ export default function CreateTemplatePage() {
     }
 
     const toggleSelection = (id: string) => {
+        vibrate('medium')
         setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
         )
@@ -204,7 +210,7 @@ export default function CreateTemplatePage() {
                                 <button
                                     key={c.id}
                                     type="button"
-                                    onClick={() => setColor(c.id)}
+                                    onClick={() => { vibrate('light'); setColor(c.id) }}
                                     className={`w-10 h-10 rounded-full shrink-0 transition-transform active:scale-90 flex items-center justify-center ${color === c.id ? 'ring-2 ring-white ring-offset-2 ring-offset-background scale-110' : ''}`}
                                     style={{ backgroundColor: c.id }}
                                 >
@@ -213,6 +219,18 @@ export default function CreateTemplatePage() {
                             ))}
                         </div>
                     </div>
+
+                    <Card className={`relative transition-all shadow-sm rounded-2xl border-0 overflow-hidden cursor-pointer active:scale-[0.98] ${isProgressiveOverload ? 'ring-primary bg-primary/5' : 'ring-white/5'}`} onClick={() => { vibrate('light'); setIsProgressiveOverload(!isProgressiveOverload) }}>
+                        <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex-1 pr-4">
+                                <h4 className="font-bold text-[15px] text-foreground">Progressive Overload</h4>
+                                <p className="text-[13px] text-muted-foreground font-medium mt-0.5 leading-snug">Gewichte werden basierend auf dem letzten Training automatisch leicht erhöht vorgeschlagen.</p>
+                            </div>
+                            <div className={`shrink-0 w-12 h-7 rounded-full transition-colors relative flex items-center px-1 ${isProgressiveOverload ? 'bg-primary' : 'bg-muted/50'}`}>
+                                <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${isProgressiveOverload ? 'translate-x-[20px]' : 'translate-x-0'}`} />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Exercises Section */}
@@ -265,7 +283,7 @@ export default function CreateTemplatePage() {
                             <button
                                 key={tab}
                                 type="button"
-                                onClick={() => setActiveTab(tab)}
+                                onClick={() => { vibrate('light'); setActiveTab(tab) }}
                                 className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all active:scale-95 ${activeTab === tab
                                     ? 'bg-primary text-primary-foreground shadow-sm'
                                     : 'bg-card text-muted-foreground ring-1 ring-white/5'
@@ -316,7 +334,7 @@ export default function CreateTemplatePage() {
                                             onChange={() => toggleSelection(ex.id)}
                                             className="peer sr-only"
                                         />
-                                        <Card className={`bg-card ring-1 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-all active:scale-[0.98] ${isSelected ? 'ring-primary bg-primary/5' : 'ring-white/5'}`}>
+                                        <Card className={`transition-all overflow-hidden active:scale-[0.98] ${isSelected ? 'ring-primary bg-primary/5' : ''}`}>
                                             <CardContent className="p-4 flex items-center justify-between">
                                                 <div>
                                                     <h4 className="font-semibold text-[15px]">{ex.name}</h4>

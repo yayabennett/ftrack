@@ -123,9 +123,9 @@ export default function EinheitenPage() {
                     </h1>
                 </header>
                 <div className="container mx-auto p-4 space-y-4 mt-2">
-                    <Skeleton className="h-12 w-full rounded-2xl bg-card border border-white/5" />
-                    <Skeleton className="h-[140px] w-full rounded-2xl bg-card border border-white/5 mt-8" />
-                    <Skeleton className="h-[140px] w-full rounded-2xl bg-card border border-white/5" />
+                    <Skeleton className="h-12 w-full rounded-[28px] bg-card/40 backdrop-blur-md ring-1 ring-white/5" />
+                    <Skeleton className="h-[140px] w-full rounded-[28px] bg-card/40 backdrop-blur-md ring-1 ring-white/5 mt-8" />
+                    <Skeleton className="h-[140px] w-full rounded-[28px] bg-card/40 backdrop-blur-md ring-1 ring-white/5" />
                 </div>
             </div>
         )
@@ -150,7 +150,7 @@ export default function EinheitenPage() {
                             <Card
                                 key={`recent-${template.id}`}
                                 onClick={() => router.push(`/templates/${template.id}`)}
-                                className="bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground cursor-pointer transition-all active:scale-[0.98] hover:bg-secondary/20 block"
+                                className="cursor-pointer transition-all active:scale-[0.98] block group card-hover relative overflow-hidden"
                             >
                                 <CardContent className="p-0">
                                     <div className="p-4 flex flex-col gap-3">
@@ -246,9 +246,9 @@ export default function EinheitenPage() {
                             <div
                                 key={template.id}
                                 onClick={() => router.push(`/templates/${template.id}`)}
-                                className="block cursor-pointer active:scale-[0.99] transition-all"
+                                className="block cursor-pointer active:scale-[0.99] transition-all group card-hover"
                             >
-                                <Card className={`bg-card ring-1 ring-white/5 shadow-sm rounded-2xl border-0 overflow-hidden text-card-foreground transition-opacity hover:bg-secondary/20 ${deletingId === template.id ? 'opacity-50' : ''}`}>
+                                <Card className={`transition-all relative overflow-hidden ${deletingId === template.id ? 'opacity-50' : ''}`}>
                                     <CardContent className="p-0">
                                         <div className="p-4 flex flex-col gap-3">
                                             <div className="flex justify-between items-start">
